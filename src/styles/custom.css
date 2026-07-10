@@ -821,15 +821,10 @@ html:has(#app.theme--dark) {
     padding: 0 4px;
   }
 
-  .img-detail-toolbar .v-btn:not(.mobile-primary-share),
+  .img-detail-toolbar .v-btn,
   .img-detail-toolbar .v-progress-circular,
   .img-detail-tags {
     display: none !important;
-  }
-
-  .mobile-primary-share {
-    min-width: 44px !important;
-    min-height: 44px !important;
   }
 
   .img_detail_cont,
@@ -870,4 +865,50 @@ html:has(#app.theme--dark) {
   height: 28px;
   border-radius: 6px;
   object-fit: cover;
+}
+
+/* Prevent Safari from sharing raw image URLs on long press. */
+.posts-image-card img,
+.posts-image-card .v-image,
+.img_detail_sample,
+.img_detail_scale {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+.mobile-tag-search {
+  width: min(54vw, 280px);
+  margin-left: 6px;
+}
+
+.mobile-tag-search .v-input__slot {
+  min-height: 38px !important;
+  padding: 0 10px !important;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .06) !important;
+}
+
+.mobile-detail-nav .v-btn {
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  color: #f5f5f7 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html.ym-immersive .v-app-bar,
+html.ym-immersive .mobile-bottom-nav {
+  display: none !important;
+}
+
+html.ym-immersive .v-main {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+html.ym-immersive .posts-image-card {
+  border-radius: 0 !important;
 }
