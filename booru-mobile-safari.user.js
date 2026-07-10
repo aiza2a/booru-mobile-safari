@@ -46,7 +46,6 @@
 // @grant                GM_addStyle
 // @grant                unsafeWindow
 // @grant                GM_addElement
-// @grant                GM_info
 // @grant                GM_download
 // @grant                GM_xmlhttpRequest
 // ==/UserScript==
@@ -107,6 +106,7 @@ var __publicField = (obj, key, value) => {
     justifiedBaseWidth: isMobile ? 240 : 340,
     detailButtonsBottom: isMobile,
     closePopupOnImgClick: isMobile,
+    longPressDirectShare: false,
     downloadBy: "tm"
   };
   const initialSettings = {
@@ -2449,7 +2449,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     null
   );
   var WfLayout = __component__$c.exports;
-  var mdiAccount = "M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z";
   var mdiBrightness6 = "M12,18V6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,15.31L23.31,12L20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31Z";
   var mdiCalendar = "M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z";
   var mdiCalendarBlank = "M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1";
@@ -2473,7 +2472,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   var mdiContentCopy = "M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z";
   var mdiContentPaste = "M19,20H5V4H7V7H17V4H19M12,2A1,1 0 0,1 13,3A1,1 0 0,1 12,4A1,1 0 0,1 11,3A1,1 0 0,1 12,2M19,2H14.82C14.4,0.84 13.3,0 12,0C10.7,0 9.6,0.84 9.18,2H5A2,2 0 0,0 3,4V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V4A2,2 0 0,0 19,2Z";
   var mdiDelete = "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z";
-  var mdiDotsHorizontal = "M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z";
   var mdiDownload = "M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z";
   var mdiFileClockOutline = "M4 2A2 2 0 0 0 2 4V20A2 2 0 0 0 4 22H12.41A7 7 0 0 0 16 23A7 7 0 0 0 23 16A7 7 0 0 0 18 9.3V8L12 2H4M4 4H11V9H16A7 7 0 0 0 9 16A7 7 0 0 0 10.26 20H4V4M16 11A5 5 0 0 1 21 16A5 5 0 0 1 16 21A5 5 0 0 1 11 16A5 5 0 0 1 16 11M15 12V17L18.61 19.16L19.36 17.94L16.5 16.25V12H15Z";
   var mdiFileGifBox = "M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M10 10.5H7.5V13.5H8.5V12H10V13.7C10 14.4 9.5 15 8.7 15H7.3C6.5 15 6 14.3 6 13.7V10.4C6 9.7 6.5 9 7.3 9H8.6C9.5 9 10 9.7 10 10.3V10.5M13 15H11.5V9H13V15M17.5 10.5H16V11.5H17.5V13H16V15H14.5V9H17.5V10.5Z";
@@ -2483,12 +2481,10 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   var mdiFolderNetwork = "M3,15V5A2,2 0 0,1 5,3H11L13,5H19A2,2 0 0,1 21,7V15A2,2 0 0,1 19,17H13V19H14A1,1 0 0,1 15,20H22V22H15A1,1 0 0,1 14,23H10A1,1 0 0,1 9,22H2V20H9A1,1 0 0,1 10,19H11V17H5A2,2 0 0,1 3,15Z";
   var mdiFullscreen = "M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z";
   var mdiFullscreenExit = "M14,14H19V16H16V19H14V14M5,14H10V19H8V16H5V14M8,5H10V10H5V8H8V5M19,8V10H14V5H16V8H19Z";
-  var mdiGithub = "M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z";
   var mdiHeart = "M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z";
   var mdiHeartPlusOutline = "M12.67 20.74L12 21.35L10.55 20.03C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5C22 9.93 21.5 11.26 20.62 12.61C20 12.31 19.31 12.11 18.59 12.04C19.5 10.8 20 9.65 20 8.5C20 6.5 18.5 5 16.5 5C14.96 5 13.46 6 12.93 7.36H11.07C10.54 6 9.04 5 7.5 5C5.5 5 4 6.5 4 8.5C4 11.39 7.14 14.24 11.89 18.55L12 18.65L12.04 18.61C12.12 19.37 12.34 20.09 12.67 20.74M17 14V17H14V19H17V22H19V19H22V17H19V14H17Z";
   var mdiHome = "M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z";
   var mdiImageMultiple = "M22,16V4A2,2 0 0,0 20,2H8A2,2 0 0,0 6,4V16A2,2 0 0,0 8,18H20A2,2 0 0,0 22,16M11,12L13.03,14.71L16,11L20,16H8M2,6V20A2,2 0 0,0 4,22H18V20H4V6";
-  var mdiInformationOutline = "M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z";
   var mdiLaunch = "M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z";
   var mdiLinkVariant = "M10.59,13.41C11,13.8 11,14.44 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83C7.22,12.88 7.22,9.71 9.17,7.76V7.76L12.71,4.22C14.66,2.27 17.83,2.27 19.78,4.22C21.73,6.17 21.73,9.34 19.78,11.29L18.29,12.78C18.3,11.96 18.17,11.14 17.89,10.36L18.36,9.88C19.54,8.71 19.54,6.81 18.36,5.64C17.19,4.46 15.29,4.46 14.12,5.64L10.59,9.17C9.41,10.34 9.41,12.24 10.59,13.41M13.41,9.17C13.8,8.78 14.44,8.78 14.83,9.17C16.78,11.12 16.78,14.29 14.83,16.24V16.24L11.29,19.78C9.34,21.73 6.17,21.73 4.22,19.78C2.27,17.83 2.27,14.66 4.22,12.71L5.71,11.22C5.7,12.04 5.83,12.86 6.11,13.65L5.64,14.12C4.46,15.29 4.46,17.19 5.64,18.36C6.81,19.54 8.71,19.54 9.88,18.36L13.41,14.83C14.59,13.66 14.59,11.76 13.41,10.59C13,10.2 13,9.56 13.41,9.17Z";
   var mdiLocationExit = "M22 12L18 8V11H10V13H18V16M20 18A10 10 0 1 1 20 6H17.27A8 8 0 1 0 17.27 18Z";
@@ -2496,7 +2492,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   var mdiMagnify = "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z";
   var mdiMagnifyMinusOutline = "M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.5L20.5,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14M7,9H12V10H7V9Z";
   var mdiMagnifyPlusOutline = "M15.5,14L20.5,19L19,20.5L14,15.5V14.71L13.73,14.43C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.43,13.73L14.71,14H15.5M9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14M12,10H10V12H9V10H7V9H9V7H10V9H12V10Z";
-  var mdiMessageAlertOutline = "M13,10H11V6H13V10M13,12H11V14H13V12M22,4V16A2,2 0 0,1 20,18H6L2,22V4A2,2 0 0,1 4,2H20A2,2 0 0,1 22,4M20,4H4V17.2L5.2,16H20V4Z";
   var mdiPlaylistPlus = "M3 16H10V14H3M18 14V10H16V14H12V16H16V20H18V16H22V14M14 6H3V8H14M14 10H3V12H14V10Z";
   var mdiRefresh = "M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z";
   var mdiRotateRight = "M16.89,15.5L18.31,16.89C19.21,15.73 19.76,14.39 19.93,13H17.91C17.77,13.87 17.43,14.72 16.89,15.5M13,17.9V19.92C14.39,19.75 15.74,19.21 16.9,18.31L15.46,16.87C14.71,17.41 13.87,17.76 13,17.9M19.93,11C19.76,9.61 19.21,8.27 18.31,7.11L16.89,8.53C17.43,9.28 17.77,10.13 17.91,11M15.55,5.55L11,1V4.07C7.06,4.56 4,7.92 4,12C4,16.08 7.05,19.44 11,19.93V17.91C8.16,17.43 6,14.97 6,12C6,9.03 8.16,6.57 11,6.09V10L15.55,5.55Z";
@@ -2507,7 +2502,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   var mdiTagMultiple = "M5.5,9A1.5,1.5 0 0,0 7,7.5A1.5,1.5 0 0,0 5.5,6A1.5,1.5 0 0,0 4,7.5A1.5,1.5 0 0,0 5.5,9M17.41,11.58C17.77,11.94 18,12.44 18,13C18,13.55 17.78,14.05 17.41,14.41L12.41,19.41C12.05,19.77 11.55,20 11,20C10.45,20 9.95,19.78 9.58,19.41L2.59,12.42C2.22,12.05 2,11.55 2,11V6C2,4.89 2.89,4 4,4H9C9.55,4 10.05,4.22 10.41,4.58L17.41,11.58M13.54,5.71L14.54,4.71L21.41,11.58C21.78,11.94 22,12.45 22,13C22,13.55 21.78,14.05 21.42,14.41L16.04,19.79L15.04,18.79L20.75,13L13.54,5.71Z";
   var mdiTranslate = "M12.87,15.07L10.33,12.56L10.36,12.53C12.1,10.59 13.34,8.36 14.07,6H17V4H10V2H8V4H1V6H12.17C11.5,7.92 10.44,9.75 9,11.35C8.07,10.32 7.3,9.19 6.69,8H4.69C5.42,9.63 6.42,11.17 7.67,12.56L2.58,17.58L4,19L9,14L12.11,17.11L12.87,15.07M18.5,10H16.5L12,22H14L15.12,19H19.87L21,22H23L18.5,10M15.88,17L17.5,12.67L19.12,17H15.88Z";
   var mdiVideo = "M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z";
-  var mdiWeb = "M16.36,14C16.44,13.34 16.5,12.68 16.5,12C16.5,11.32 16.44,10.66 16.36,10H19.74C19.9,10.64 20,11.31 20,12C20,12.69 19.9,13.36 19.74,14M14.59,19.56C15.19,18.45 15.65,17.25 15.97,16H18.92C17.96,17.65 16.43,18.93 14.59,19.56M14.34,14H9.66C9.56,13.34 9.5,12.68 9.5,12C9.5,11.32 9.56,10.65 9.66,10H14.34C14.43,10.65 14.5,11.32 14.5,12C14.5,12.68 14.43,13.34 14.34,14M12,19.96C11.17,18.76 10.5,17.43 10.09,16H13.91C13.5,17.43 12.83,18.76 12,19.96M8,8H5.08C6.03,6.34 7.57,5.06 9.4,4.44C8.8,5.55 8.35,6.75 8,8M5.08,16H8C8.35,17.25 8.8,18.45 9.4,19.56C7.57,18.93 6.03,17.65 5.08,16M4.26,14C4.1,13.36 4,12.69 4,12C4,11.31 4.1,10.64 4.26,10H7.64C7.56,10.66 7.5,11.32 7.5,12C7.5,12.68 7.56,13.34 7.64,14M12,4.03C12.83,5.23 13.5,6.57 13.91,8H10.09C10.5,6.57 11.17,5.23 12,4.03M18.92,8H15.97C15.65,6.75 15.19,5.55 14.59,4.44C16.43,5.07 17.96,6.34 18.92,8M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
   function toDate(argument) {
     const argStr = Object.prototype.toString.call(argument);
     if (argument instanceof Date || typeof argument === "object" && argStr === "[object Date]") {
@@ -6899,7 +6893,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   const blackList = /* @__PURE__ */ new Set(["e621.net", "e926.net", "hypnohub.net", "derpibooru.org", "realbooru.com"]);
   const siteKeys = Object.keys(sites).filter((e) => !blackList.has(e));
   const isBooruSite = () => siteKeys.includes(location.host);
-  const siteDomains = [
+  [
     ...siteKeys,
     "e-shuushuu.net",
     "zerochan.net",
@@ -8618,89 +8612,40 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   var _sfc_main$a = /* @__PURE__ */ Vue2.defineComponent({
     __name: "NavDrawer",
     setup(__props) {
-      const userName = Vue2.ref("");
-      const version = Vue2.ref(GM_info.script.version);
-      function openLink(link) {
-        window.open(link, "_blank", "noreferrer");
-      }
-      function handleLink(link) {
-        if (link.includes("yande"))
-          return "https://yande.re/post?_wf=1";
-        if (link.includes("behoimi"))
-          return "http://behoimi.org";
-        return `https://${link}`;
-      }
-      function handleFavicon(link) {
-        if (link.includes("konachan"))
-          return "https://upload-bbs.miyoushe.com/upload/2023/01/14/190122060/cbd0b71ead30e0777e5b023170ba415c_4819570566325089051.png";
-        if (link.includes("behoimi"))
-          return "https://upload-bbs.miyoushe.com/upload/2023/01/14/190122060/d3b97f45046795c87c12ad5704074f32_1333245617164582614.png";
-        if (link.includes("sankaku") || link.includes("idolcomplex"))
-          return "https://upload-bbs.miyoushe.com/upload/2025/03/29/190122060/4fa56922d173d28ac8e687caaa487f27_1885629069482225420.png";
-        if (link.includes("rule34.xxx"))
-          return "https://upload-bbs.miyoushe.com/upload/2025/03/29/190122060/76ba90d4350a1455f899d2a1500fca69_8344852329496206545.png";
-        if (link.includes("rule34hentai.net"))
-          return "https://prod-alicdn-community.kurobbs.com/forum/ee44a4b6a2cc4f08b693cfc4e364b1fa20260129.png";
-        if (link.includes("aibooru.online"))
-          return "https://prod-alicdn-community.kurobbs.com/forum/177e56ba1e704d6b85e492a365642dd920260129.png";
-        if (link.includes("allthefallen") || link.includes("allgirl"))
-          return "https://kwc.cocomi.eu.org/https://danbooru.donmai.us/favicon.ico";
-        return `https://kwc.cocomi.eu.org/https://${link.split("/")[0]}/favicon.ico`;
-      }
-      const actSiteIndex = Vue2.computed(() => {
-        return siteDomains.findIndex((e) => location.href.includes(e));
-      });
-      function showSettingDrawer() {
+      const locationHost = location.hostname;
+      const iconProxy = (host) => `https://kwc.cocomi.eu.org/https://${host}/favicon.ico`;
+      const konachanIcon = "https://upload-bbs.miyoushe.com/upload/2023/01/14/190122060/cbd0b71ead30e0777e5b023170ba415c_4819570566325089051.png";
+      const rule34Icon = "https://upload-bbs.miyoushe.com/upload/2025/03/29/190122060/76ba90d4350a1455f899d2a1500fca69_8344852329496206545.png";
+      const sites2 = [
+        { label: "Yande.re", host: "yande.re", url: "https://yande.re/post?_wf=1", icon: iconProxy("yande.re") },
+        { label: "Konachan", host: "konachan.com", url: "https://konachan.com/post?_wf=1", icon: konachanIcon },
+        { label: "Konachan Safe", host: "konachan.net", url: "https://konachan.net/post?_wf=1", icon: konachanIcon },
+        { label: "Danbooru", host: "danbooru.donmai.us", url: "https://danbooru.donmai.us/posts?_wf=1", icon: iconProxy("danbooru.donmai.us") },
+        { label: "Gelbooru", host: "gelbooru.com", url: "https://gelbooru.com/index.php?page=post&s=list&_wf=1", icon: iconProxy("gelbooru.com") },
+        { label: "Rule34", host: "rule34.xxx", url: "https://rule34.xxx/index.php?page=post&s=list&_wf=1", icon: rule34Icon },
+        { label: "Safebooru", host: "safebooru.org", url: "https://safebooru.org/index.php?page=post&s=list&_wf=1", icon: iconProxy("safebooru.org") },
+        { label: "Zerochan", host: "www.zerochan.net", url: "https://www.zerochan.net/", icon: iconProxy("www.zerochan.net") },
+        { label: "Pixiv Viewer", host: "pixiv.pictures", url: "https://pixiv.pictures/", icon: "https://pixiv.pictures/favicon.ico", note: "Pixiv \u6D4F\u89C8\u5668" },
+        { label: "Moeview", host: "moeview.app", url: "https://moeview.app/", icon: "https://moeview.app/favicon.ico", note: "\u56FE\u7247\u805A\u5408\u6D4F\u89C8" }
+      ];
+      function openSite(url) {
         store.showDrawer = false;
-        store.showSettings = true;
+        location.href = url;
       }
-      Vue2.onMounted(async () => {
-        if (store.isYKSite) {
-          const name = await getUsername();
-          if (name)
-            userName.value = name;
-        }
-      });
-      return { __sfc: true, userName, version, openLink, handleLink, handleFavicon, actSiteIndex, showSettingDrawer, mdiAccount, mdiFire, mdiGithub, mdiImageMultiple, mdiInformationOutline, mdiMessageAlertOutline, mdiShuffle, mdiStar, mdiWeb, getSiteTitle, siteDomains, store };
+      return { __sfc: true, locationHost, iconProxy, konachanIcon, rule34Icon, sites: sites2, openSite, mdiClose, store };
     }
   });
   var _sfc_render$a = function render() {
     var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
-    return _c("v-navigation-drawer", { staticClass: "nav_drawer", attrs: { "app": "", "temporary": "" }, model: { value: _setup.store.showDrawer, callback: function($$v) {
+    return _c("v-navigation-drawer", { staticClass: "nav_drawer mobile-site-drawer", attrs: { "app": "", "temporary": "" }, model: { value: _setup.store.showDrawer, callback: function($$v) {
       _vm.$set(_setup.store, "showDrawer", $$v);
-    }, expression: "store.showDrawer" } }, [_c("v-list-item", [_c("v-list-item-avatar", [_c("img", { attrs: { "width": "40", "src": "https://upload-bbs.mihoyo.com/upload/2022/09/07/190122060/8505ff4b535cb1487b521d73c7f71d63_865024295271530650.png", "alt": "", "loading": "lazy" } })]), _c("v-list-item-content", [_c("v-list-item-title", { staticClass: "title" }, [_vm._v("Booru Masonry")]), _c("v-list-item-subtitle", { attrs: { "title": _vm.$t("l8CbIALt_VWUnzBl_Rmgf") } }, [_vm._v(_vm._s(_vm.$t("l8CbIALt_VWUnzBl_Rmgf")))])], 1)], 1), _c("v-divider"), _setup.store.isYKSite ? _c("v-list", { attrs: { "dense": "", "nav": "" } }, [_c("v-list-group", { attrs: { "value": true, "no-action": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function() {
-      return [_c("v-list-item-content", [_c("v-list-item-title", { staticClass: "title" }, [_vm._v(_vm._s(_vm.$t("CacM8tispuPNrSxxpt9GX")))])], 1)];
-    }, proxy: true }], null, false, 765759728) }, [_setup.userName ? _c("v-list-item", { attrs: { "link": "", "href": "/user/home" } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiAccount))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_setup.userName))])], 1)], 1) : _vm._e(), _setup.userName ? _c("v-list-item", { attrs: { "link": "", "href": `/post?tags=vote%3A3%3A${_setup.userName}+order%3Avote&_wf=1` } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiStar))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("zs8YTCc8d8XFUgRnp7m_w")))])], 1)], 1) : _vm._e(), _c("v-list-item", { attrs: { "link": "", "href": "/pool?page=1" } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiImageMultiple))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("DXEhXAQbkiCMU_l252jo_")))])], 1)], 1), _c("v-list-item", { attrs: { "link": "", "href": "/post/popular_recent?period=1d" } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiFire))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("7Cgsr4PUMbezDXNfWdvWH")))])], 1)], 1), _c("v-list-item", { attrs: { "link": "", "href": "/post?tags=order%3Arandom&page=1" } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiShuffle))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("StU1-52QJmNFKQ5soJCyG")))])], 1)], 1)], 1)], 1) : _vm._e(), _c("v-list", { attrs: { "dense": "", "nav": "" } }, [_c("v-list-group", { attrs: { "value": true, "no-action": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function() {
-      return [_c("v-list-item-content", [_c("v-list-item-title", { staticClass: "title" }, [_vm._v(_vm._s(_vm.$t("e2_EYvweJsVoIZlIWkPRV")))])], 1)];
-    }, proxy: true }]) }, [_c("v-list-item-group", { attrs: { "value": _setup.actSiteIndex, "color": "primary" } }, [_vm._l(_setup.siteDomains, function(link) {
-      return _c("v-list-item", { key: link, attrs: { "href": _setup.handleLink(link), "referrerpolicy": "no-referrer" } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("img", { staticClass: "site_icon", attrs: { "src": _setup.handleFavicon(link), "loading": "lazy", "referrerpolicy": "no-referrer" } })]), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_setup.getSiteTitle(link)))])], 1)], 1);
-    }), _c("hr", { staticClass: "my-2" }), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.openLink("https://pixiv.pictures/?ref=booru.vercel.app");
-    } } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("img", { staticClass: "site_icon", attrs: { "src": "https://pixiv.pictures/favicon.ico", "loading": "lazy", "referrerpolicy": "no-referrer" } })]), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("Pixiv Viewer")])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.openLink("https://moeview.cocomi.eu.org/?ref=booru.vercel.app");
-    } } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("img", { staticClass: "site_icon", attrs: { "src": "https://moeview.cocomi.eu.org/favicon.ico", "loading": "lazy", "referrerpolicy": "no-referrer" } })]), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("Moeview")])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.openLink("https://r-34.xyz/?ref=booru.vercel.app");
-    } } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("img", { staticClass: "site_icon", attrs: { "src": "https://r-34.xyz/favicon.ico", "loading": "lazy", "referrerpolicy": "no-referrer" } })]), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("R-34.XYZ")])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.openLink("https://nekon.app/?ref=booru.vercel.app");
-    } } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("img", { staticClass: "site_icon", attrs: { "src": "https://nekon.app/favicon.ico", "loading": "lazy", "referrerpolicy": "no-referrer" } })]), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("Nekon")])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.openLink("https://www.someacg.top/?ref=booru.vercel.app");
-    } } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("img", { staticClass: "site_icon", attrs: { "src": "https://www.someacg.top/favicon.png", "loading": "lazy", "referrerpolicy": "no-referrer" } })]), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("SomeACG")])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.openLink("https://manyacg.top/?ref=booru.vercel.app");
-    } } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("img", { staticClass: "site_icon", attrs: { "src": "https://manyacg.top/favicon.ico", "loading": "lazy", "referrerpolicy": "no-referrer" } })]), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("ManyACG")])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.openLink("https://pic.cosine.ren/?ref=booru.vercel.app");
-    } } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("img", { staticClass: "site_icon", attrs: { "src": "https://pic.cosine.ren/favicon.ico", "loading": "lazy", "referrerpolicy": "no-referrer" } })]), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("Cosine Gallery")])], 1)], 1)], 2)], 1)], 1), _c("v-list", { attrs: { "dense": "", "nav": "" } }, [_c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.showSettingDrawer();
-    } } }, [_c("v-list-item-content", [_c("v-list-item-title", { staticClass: "title" }, [_vm._v(_vm._s(_vm.$t("UxxldE9xRwmQctrvba5Y8")))])], 1)], 1)], 1), _c("v-list", { attrs: { "dense": "", "nav": "" } }, [_c("v-list-group", { attrs: { "value": true, "no-action": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function() {
-      return [_c("v-list-item-content", [_c("v-list-item-title", { staticClass: "title" }, [_vm._v(_vm._s(_vm.$t("PT74UDfKA45vTVTst_-hD")))])], 1)];
-    }, proxy: true }]) }, [_c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.openLink("https://github.com/asadahimeka/yandere-masonry/blob/main/CHANGELOG.md");
-    } } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiInformationOutline))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("v" + _vm._s(_setup.version))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("iJ0h220tvMmUhkfIMYI-W")))])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.openLink("https://booru.cocomi.eu.org");
-    } } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiWeb))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("qWcqQRsE9nN43MaZ2BmN9")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("jerGO2OCuW9TdnEnGYRWd")))])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.openLink("https://github.com/asadahimeka/yandere-masonry/issues");
-    } } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiMessageAlertOutline))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("23iEYyiQlLVhFIqGbj527")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("4g1TUy2kwQrdOs-w4JobB")))])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
-      return _setup.openLink("https://github.com/asadahimeka/yandere-masonry");
-    } } }, [_c("v-list-item-icon", { staticClass: "mr-2" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiGithub))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("Github")]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("7Xq5puLNcT0mAvoxElqdf")))])], 1)], 1)], 1)], 1)], 1);
+    }, expression: "store.showDrawer" } }, [_c("v-list-item", { staticClass: "drawer-title-row" }, [_c("v-list-item-content", [_c("v-list-item-title", { staticClass: "title" }, [_vm._v("\u9009\u62E9\u7AD9\u70B9")]), _c("v-list-item-subtitle", [_vm._v("\u5E38\u7528\u56FE\u7AD9\u4E0E\u6D4F\u89C8\u5668")])], 1), _c("v-list-item-action", [_c("v-btn", { attrs: { "icon": "", "aria-label": "\u5173\u95ED" }, on: { "click": function($event) {
+      _setup.store.showDrawer = false;
+    } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiClose))])], 1)], 1)], 1), _c("v-divider"), _c("v-list", { staticClass: "site-switch-list", attrs: { "dense": "", "nav": "" } }, _vm._l(_setup.sites, function(site) {
+      return _c("v-list-item", { key: site.url, class: { "site-switch-active": site.host === _setup.locationHost }, attrs: { "link": "" }, on: { "click": function($event) {
+        return _setup.openSite(site.url);
+      } } }, [_c("v-list-item-icon", { staticClass: "mr-3" }, [_c("img", { staticClass: "site_icon", attrs: { "src": site.icon, "loading": "lazy", "referrerpolicy": "no-referrer" } })]), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(site.label))]), site.note ? _c("v-list-item-subtitle", [_vm._v(_vm._s(site.note))]) : _vm._e()], 1)], 1);
+    }), 1)], 1);
   };
   var _sfc_staticRenderFns$a = [];
   var __component__$a = /* @__PURE__ */ normalizeComponent(
@@ -8714,80 +8659,28 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     null
   );
   var NavDrawer = __component__$a.exports;
-  function canonicalPostUrl(post) {
-    const id = String(post.id);
-    const host = location.hostname;
-    if (host === "yande.re")
-      return `https://yande.re/post/show/${id}`;
-    if (host === "konachan.com")
-      return `https://konachan.com/post/show/${id}`;
-    if (host === "konachan.net")
-      return `https://konachan.net/post/show/${id}`;
-    if (host === "danbooru.donmai.us")
-      return `https://danbooru.donmai.us/posts/${id}`;
-    if (host === "gelbooru.com")
-      return `https://gelbooru.com/index.php?page=post&s=view&id=${id}`;
-    return post.postView || location.href;
-  }
-  async function sharePost(post) {
-    if (!post)
-      return false;
-    const url = canonicalPostUrl(post);
-    const title = `${location.hostname} #${post.id}`;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title, url });
-        return true;
-      }
-      await navigator.clipboard.writeText(url);
-      showMsg({ msg: "\u4F5C\u54C1\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
-      return true;
-    } catch (error) {
-      if (error?.name === "AbortError")
-        return false;
-      try {
-        await navigator.clipboard.writeText(url);
-        showMsg({ msg: "\u4F5C\u54C1\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
-        return true;
-      } catch (_copyError) {
-        const textarea = document.createElement("textarea");
-        textarea.value = url;
-        textarea.style.position = "fixed";
-        textarea.style.opacity = "0";
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        textarea.remove();
-        showMsg({ msg: "\u4F5C\u54C1\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
-        return true;
-      }
-    }
-  }
   var _sfc_main$9 = /* @__PURE__ */ Vue2.defineComponent({
     __name: "MobileBottomNav",
     setup(__props) {
       const isMobile2 = window.matchMedia("(max-width: 959px), (pointer: coarse)").matches;
-      const currentPost = Vue2.computed(() => store.imageList[store.imageSelectedIndex] || store.imageList[0]);
       function goHome() {
-        location.href = store.isYKSite ? "/post?_wf=1" : location.pathname;
+        location.href = "/post?_wf=1";
       }
       function goPopular() {
         location.href = "/post/popular_recent?period=1d&_wf=1";
       }
-      function openSearch() {
-        eventBus.$emit("mobileSearch");
+      function goRandom() {
+        location.href = "/post?tags=order%3Arandom&page=1&_wf=1";
       }
-      function shareCurrent() {
-        sharePost(currentPost.value);
+      function goPool() {
+        location.href = "/pool?page=1&_wf=1";
       }
-      return { __sfc: true, isMobile: isMobile2, currentPost, goHome, goPopular, openSearch, shareCurrent, mdiDotsHorizontal, mdiFire, mdiHome, mdiMagnify, mdiShareVariant, store };
+      return { __sfc: true, isMobile: isMobile2, goHome, goPopular, goRandom, goPool, mdiFire, mdiHome, mdiImageMultiple, mdiShuffle, store };
     }
   });
   var _sfc_render$9 = function render() {
     var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
-    return _setup.isMobile && _setup.store.showPostList && !_setup.store.showImageSelected ? _c("v-bottom-navigation", { staticClass: "mobile-bottom-nav", attrs: { "app": "", "fixed": "", "grow": "", "color": "primary" } }, [_c("v-btn", { on: { "click": _setup.goHome } }, [_c("span", [_vm._v("\u9996\u9875")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiHome))])], 1), _setup.store.isYKSite ? _c("v-btn", { on: { "click": _setup.goPopular } }, [_c("span", [_vm._v("\u4EBA\u6C14")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiFire))])], 1) : _vm._e(), _c("v-btn", { on: { "click": _setup.openSearch } }, [_c("span", [_vm._v("\u641C\u7D22")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiMagnify))])], 1), _c("v-btn", { attrs: { "disabled": !_setup.currentPost }, on: { "click": _setup.shareCurrent } }, [_c("span", [_vm._v("\u5206\u4EAB")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiShareVariant))])], 1), _c("v-btn", { on: { "click": function($event) {
-      _setup.store.showSettings = true;
-    } } }, [_c("span", [_vm._v("\u66F4\u591A")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiDotsHorizontal))])], 1)], 1) : _vm._e();
+    return _setup.isMobile && _setup.store.showPostList && !_setup.store.showImageSelected && _setup.store.isYKSite ? _c("v-bottom-navigation", { staticClass: "mobile-bottom-nav", attrs: { "app": "", "fixed": "", "grow": "", "color": "primary" } }, [_c("v-btn", { on: { "click": _setup.goHome } }, [_c("span", [_vm._v("\u9996\u9875")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiHome))])], 1), _c("v-btn", { on: { "click": _setup.goPopular } }, [_c("span", [_vm._v("\u4EBA\u6C14")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiFire))])], 1), _c("v-btn", { on: { "click": _setup.goRandom } }, [_c("span", [_vm._v("\u968F\u673A")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiShuffle))])], 1), _c("v-btn", { on: { "click": _setup.goPool } }, [_c("span", [_vm._v("\u56FE\u96C6")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiImageMultiple))])], 1)], 1) : _vm._e();
   };
   var _sfc_staticRenderFns$9 = [];
   var __component__$9 = /* @__PURE__ */ normalizeComponent(
@@ -9227,6 +9120,55 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     null
   );
   var PostExportTags = __component__$6.exports;
+  function canonicalPostUrl(post) {
+    const id = String(post.id);
+    const host = location.hostname;
+    if (host === "yande.re")
+      return `https://yande.re/post/show/${id}`;
+    if (host === "konachan.com")
+      return `https://konachan.com/post/show/${id}`;
+    if (host === "konachan.net")
+      return `https://konachan.net/post/show/${id}`;
+    if (host === "danbooru.donmai.us")
+      return `https://danbooru.donmai.us/posts/${id}`;
+    if (host === "gelbooru.com")
+      return `https://gelbooru.com/index.php?page=post&s=view&id=${id}`;
+    return post.postView || location.href;
+  }
+  async function sharePost(post) {
+    if (!post)
+      return false;
+    const url = canonicalPostUrl(post);
+    const title = `${location.hostname} #${post.id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url });
+        return true;
+      }
+      await navigator.clipboard.writeText(url);
+      showMsg({ msg: "\u4F5C\u54C1\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
+      return true;
+    } catch (error) {
+      if (error?.name === "AbortError")
+        return false;
+      try {
+        await navigator.clipboard.writeText(url);
+        showMsg({ msg: "\u4F5C\u54C1\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
+        return true;
+      } catch (_copyError) {
+        const textarea = document.createElement("textarea");
+        textarea.value = url;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+        showMsg({ msg: "\u4F5C\u54C1\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
+        return true;
+      }
+    }
+  }
   function isDanbooruPage() {
     return location.hostname == "danbooru.donmai.us";
   }
