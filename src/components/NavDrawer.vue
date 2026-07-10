@@ -31,7 +31,21 @@
         <v-list-item-content><v-list-item-title>图集</v-list-item-title></v-list-item-content>
       </v-list-item>
     </v-list>
-    <v-divider v-if="store.isYKSite" />
+    <v-list v-if="isDanbooru" dense nav class="drawer-shortcuts">
+      <v-subheader>Danbooru 浏览</v-subheader>
+      <v-list-item v-for="item in danbooruShortcuts" :key="item.url" link @click="openSite(item.url)">
+        <v-list-item-icon class="mr-3"><v-icon>{{ item.icon }}</v-icon></v-list-item-icon>
+        <v-list-item-content><v-list-item-title>{{ item.label }}</v-list-item-title></v-list-item-content>
+      </v-list-item>
+    </v-list>
+    <v-list v-if="isGelbooru" dense nav class="drawer-shortcuts">
+      <v-subheader>Gelbooru 浏览</v-subheader>
+      <v-list-item v-for="item in gelbooruShortcuts" :key="item.url" link @click="openSite(item.url)">
+        <v-list-item-icon class="mr-3"><v-icon>{{ item.icon }}</v-icon></v-list-item-icon>
+        <v-list-item-content><v-list-item-title>{{ item.label }}</v-list-item-title></v-list-item-content>
+      </v-list-item>
+    </v-list>
+    <v-divider v-if="store.isYKSite || isDanbooru || isGelbooru" />
     <v-list dense nav class="site-switch-list">
       <v-subheader>站点列表</v-subheader>
       <v-list-item
@@ -54,10 +68,25 @@
 </template>
 
 <script setup lang="ts">
-import { mdiClose, mdiFire, mdiHome, mdiImageMultiple, mdiShuffle } from '@mdi/js'
+import { mdiClose, mdiEye, mdiFire, mdiHome, mdiImageMultiple, mdiShuffle, mdiStar, mdiTrendingUp } from '@mdi/js'
 import { store } from '@/store'
 
 const locationHost = location.hostname
+const isDanbooru = locationHost === 'danbooru.donmai.us'
+const isGelbooru = locationHost === 'gelbooru.com'
+const danbooruShortcuts = [
+  { label: '首页', url: 'https://danbooru.donmai.us/posts?_wf=1', icon: mdiHome },
+  { label: '最多观看', url: 'https://danbooru.donmai.us/explore/posts/viewed?_wf=1', icon: mdiEye },
+  { label: '最受欢迎', url: 'https://danbooru.donmai.us/explore/posts/popular?_wf=1', icon: mdiStar },
+  { label: '热度最高', url: 'https://danbooru.donmai.us/posts?d=1&tags=order%3Arank&_wf=1', icon: mdiTrendingUp },
+  { label: '画集', url: 'https://danbooru.donmai.us/pools/gallery', icon: mdiImageMultiple },
+]
+const gelbooruShortcuts = [
+  { label: '首页', url: 'https://gelbooru.com/index.php?page=post&s=list&_wf=1', icon: mdiHome },
+  { label: '评分最高', url: 'https://gelbooru.com/index.php?page=post&s=list&tags=sort%3Ascore%3Adesc&_wf=1', icon: mdiStar },
+  { label: '最近更新', url: 'https://gelbooru.com/index.php?page=post&s=list&tags=sort%3Aupdated%3Adesc&_wf=1', icon: mdiTrendingUp },
+  { label: '画集', url: 'https://gelbooru.com/index.php?page=pool&s=list', icon: mdiImageMultiple },
+]
 const iconProxy = (host: string) => `https://kwc.cocomi.eu.org/https://${host}/favicon.ico`
 const konachanIcon = 'https://upload-bbs.miyoushe.com/upload/2023/01/14/190122060/cbd0b71ead30e0777e5b023170ba415c_4819570566325089051.png'
 const rule34Icon = 'https://upload-bbs.miyoushe.com/upload/2025/03/29/190122060/76ba90d4350a1455f899d2a1500fca69_8344852329496206545.png'
