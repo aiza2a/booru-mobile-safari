@@ -202,7 +202,9 @@ export async function fetchPools(page: number, query?: string): Promise<Pool[]> 
 }
 
 export function isYandereHtml() {
-  return location.hostname == 'yande.re' && location.pathname == '/post' && settings.isYandereFetchByHtml
+  const isKonachan = location.hostname === 'konachan.com' || location.hostname === 'konachan.net'
+  return (location.hostname === 'yande.re' && location.pathname === '/post' && settings.isYandereFetchByHtml)
+    || (isKonachan && location.pathname === '/post')
 }
 
 export async function fetchPostsByHtml(page: number, tags: string | null) {
@@ -211,12 +213,19 @@ export async function fetchPostsByHtml(page: number, tags: string | null) {
   tags && url.searchParams.set('tags', tags)
   const htmlResp = await fetch(url.href)
   const doc = new DOMParser().parseFromString(await htmlResp.text(), 'text/html')
-  const script = doc.querySelector<HTMLScriptElement>('form:has(select[name=locale]) + script')
-
-  const scriptText = script?.innerText.trim() || ''
+  const selectors = [
+    'form:has(select[name=locale]) + script',
+    'script:not([src])',
+  ]
+  const scriptTexts = selectors.flatMap(selector => [...doc.querySelectorAll<HTMLScriptElement>(selector)].map(e => e.innerText))
+  const scriptText = scriptTexts.find(text => text.includes('Post.register(')) || ''
   let results: any[] = []
   try {
-    results = scriptText.split('\n').slice(1).map(e => JSON.parse(e.match(/Post.register\((.*)\)/)?.[1] || '[]'))
+    results = scriptText.split('\n').flatMap(line => {
+      const match = line.match(/Post\.register\((.*)\);?\s*$/)
+      if (!match) return []
+      return [JSON.parse(match[1])]
+    })
   } catch (err) {
     console.log('err: ', err)
   }

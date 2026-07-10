@@ -1,4 +1,5 @@
 import type { Post } from '@himeka/booru'
+import { Post as BooruPost, SearchResults, forSite } from '@himeka/booru'
 import { showMsg } from '@/utils'
 import i18n from '@/utils/i18n'
 
@@ -63,4 +64,25 @@ export async function addFavoriteDanbooru(id: string) {
     showMsg({ msg: `${i18n.t('MWVfUiW8egLWq7MgV-wzc')}: ${result}`, type: 'error' })
     return false
   }
+}
+
+export function isDanbooruExplorePage() {
+  return isDanbooruPage() && location.pathname.startsWith('/explore/posts/')
+}
+
+export async function fetchDanbooruExplorePosts(): Promise<SearchResults> {
+  const url = new URL(location.href)
+  url.pathname += '.json'
+  url.searchParams.delete('_wf')
+  const response = await fetch(url)
+  if (!response.ok) throw new Error(`Danbooru explore ${response.status}`)
+  const result = await response.json()
+  const site = forSite(location.host)
+  const posts = result.map((data: any) => new BooruPost(data, site))
+  return new SearchResults(posts, [], {}, site)
+}
+
+export const danbooruExplore = {
+  is: isDanbooruExplorePage,
+  posts: async () => fetchDanbooruExplorePosts(),
 }
