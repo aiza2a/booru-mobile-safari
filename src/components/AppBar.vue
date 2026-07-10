@@ -80,7 +80,38 @@
           <v-icon>{{ mdiShuffle }}</v-icon>
         </v-btn>
       </template>
-      <template v-if="isSupportTagSearch || isSankakuSite">
+      <template v-if="isMobile && isSupportTagSearch">
+        <v-menu
+          v-model="searchState.showMenu"
+          :max-width="320"
+          max-height="60vh"
+          transition="slide-y-transition"
+          offset-y
+        >
+          <template #activator="{ on }">
+            <div class="mobile-tag-search" v-on="on">
+              <v-text-field
+                v-model="searchState.searchTerm"
+                placeholder="搜索标签"
+                :append-icon="mdiMagnify"
+                hide-details
+                dense
+                clearable
+                @input="onSearchTermInput"
+                @click="searchState.showMenu = true"
+                @click:append="fetchTaggedPosts(searchState.searchTerm)"
+                @keydown="onSearchTermKeydown"
+              />
+            </div>
+          </template>
+          <v-list v-if="searchState.searchItems.length" class="ac_tags_list" dense>
+            <v-list-item v-for="item in searchState.searchItems" :key="item" @click="selectTag(item)">
+              <v-list-item-title v-text="item" />
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </template>
+      <template v-else-if="isSupportTagSearch || isSankakuSite">
         <v-menu
           v-model="searchState.showMenu"
           :max-width="200"
@@ -235,6 +266,9 @@
         </v-list-item-group>
       </v-list>
     </v-menu>
+    <v-btn v-if="isMobile" title="沉浸模式" icon @click="toggleImmersive">
+      <v-icon>{{ store.isImmersive ? mdiFullscreenExit : mdiFullscreen }}</v-icon>
+    </v-btn>
     <v-btn :title="$t('UxxldE9xRwmQctrvba5Y8')" icon @click="store.showSettings = true">
       <v-icon :size="22">{{ mdiCog }}</v-icon>
     </v-btn>
@@ -295,6 +329,7 @@ import { isR34PahealHome } from '@/api/r34-paheal'
 import { isZerochanPage } from '@/api/zerochan'
 import i18n from '@/utils/i18n'
 
+const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const title = computed(() => `${getSiteTitle()} - ${store.imageList.length} Posts - Page `)
 
 const isNoSelected = computed(() => store.selectedImageList.length === 0)
@@ -599,6 +634,20 @@ function exitMasonry() {
   const url = new URL(location.href)
   url.searchParams.delete('_wf')
   location.assign(url)
+}
+
+async function toggleImmersive() {
+  store.isImmersive = !store.isImmersive
+  document.documentElement.classList.toggle('ym-immersive', store.isImmersive)
+  if (store.isImmersive) {
+    try {
+      await document.documentElement.requestFullscreen?.()
+    } catch (_error) {}
+  } else if (document.fullscreenElement) {
+    try {
+      await document.exitFullscreen()
+    } catch (_error) {}
+  }
 }
 
 async function toggleFullscreen() {

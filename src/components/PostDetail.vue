@@ -305,14 +305,6 @@
         </v-list>
       </v-menu>
       <v-progress-circular v-show="downloading" indeterminate class="ml-1 mr-2" color="primary" />
-      <v-tooltip bottom>
-        <template #activator="{ on, attrs }">
-          <v-btn fab small v-bind="attrs" class="mr-1 mobile-primary-share" v-on="on" @click.stop="sharePost(imageSelected)">
-            <v-icon>{{ mdiShareVariant }}</v-icon>
-          </v-btn>
-        </template>
-        <span>分享作品链接</span>
-      </v-tooltip>
       <v-tooltip v-if="notPartialSupportSite && notR34Fav" bottom>
         <template #activator="{ on, attrs }">
           <v-btn
@@ -419,14 +411,19 @@
       <v-btn icon aria-label="上一张" @click="showPrevPost">
         <v-icon>{{ mdiChevronLeft }}</v-icon>
       </v-btn>
-      <v-btn icon aria-label="打开作品页" @click="toDetailPage">
-        <v-icon>{{ mdiLinkVariant }}</v-icon>
-      </v-btn>
-      <v-btn class="mobile-share-main" fab aria-label="分享作品链接" @click="sharePost(imageSelected)">
-        <v-icon>{{ mdiShareVariant }}</v-icon>
-      </v-btn>
       <v-btn icon aria-label="下载原图" @click="download(imageSelected.fileUrl, imageSelected.fileDownloadName)">
         <v-icon>{{ mdiDownload }}</v-icon>
+      </v-btn>
+      <v-btn icon aria-label="分享帖子链接" @click="sharePost(imageSelected)">
+        <v-icon>{{ mdiShareVariant }}</v-icon>
+      </v-btn>
+      <v-btn
+        icon
+        :disabled="!validSourceUrl"
+        :aria-label="`分享来源 ${sourceName}`"
+        @click="shareSource"
+      >
+        <v-icon>{{ mdiLaunch }}</v-icon>
       </v-btn>
       <v-btn icon aria-label="下一张" @click="showNextPost">
         <v-icon>{{ mdiChevronRight }}</v-icon>
@@ -469,7 +466,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import DPlayer from './DPlayer.vue'
 import PostExportTags from './PostExportTags.vue'
 import { debounce, downloadFile, dragElement, formatRelativeTime, isURL, showMsg } from '@/utils'
-import { sharePost } from '@/utils/share'
+import { sharePost, shareUrl, sourceLabel } from '@/utils/share'
 import { gelbooru, realbooru, rule34, zerochan } from '@/api'
 import { type PostDetail } from '@/api/moebooru'
 import { addPostToFavorites, isFavBtnShow } from '@/api/fav'
@@ -598,6 +595,17 @@ function toPidPage(pid: string) {
 
 function toDetailPage() {
   window.open(imageSelected.value.postView, '_blank', 'noreferrer')
+}
+
+const validSourceUrl = computed(() => {
+  const url = imageSelected.value.sourceUrl
+  return url && isURL(url) ? url : ''
+})
+const sourceName = computed(() => sourceLabel(validSourceUrl.value))
+
+async function shareSource() {
+  if (!validSourceUrl.value) return
+  await shareUrl(validSourceUrl.value, `来源：${sourceName.value}`)
 }
 
 function toSourcePage() {
