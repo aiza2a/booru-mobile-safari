@@ -1024,3 +1024,60 @@ html.ym-immersive .posts-image-card {
   from { opacity: 0; transform: scale(.92); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* iOS-like visual layer */
+:root {
+  --ios-bg: #000;
+  --ios-surface: #1c1c1e;
+  --ios-surface-2: #2c2c2e;
+  --ios-label: #fff;
+  --ios-secondary-label: #98989d;
+  --ios-separator: rgba(84, 84, 88, .65);
+  --ios-accent: #bf8cff;
+}
+
+.theme--dark.v-application {
+  color: var(--ios-label) !important;
+  background: var(--ios-bg) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif !important;
+}
+
+.theme--dark .v-app-bar,
+.theme--dark .nav_drawer,
+.theme--dark .settings_drawer {
+  background: rgba(18, 18, 20, .94) !important;
+  border-color: var(--ios-separator) !important;
+  box-shadow: none !important;
+}
+
+.settings_drawer .v-list,
+.settings_drawer .v-list-item,
+.mobile-site-drawer .v-list,
+.mobile-site-drawer .v-list-item {
+  background: transparent !important;
+}
+
+.settings_drawer .v-list-item,
+.mobile-site-drawer .v-list-item {
+  min-height: 56px;
+  border-radius: 12px;
+}
+
+.settings_drawer .v-list-item__subtitle,
+.mobile-site-drawer .v-list-item__subtitle {
+  color: var(--ios-secondary-label) !important;
+}
+
+.theme--dark .v-input--switch .v-input--switch__track {
+  opacity: 1 !important;
+  background: #3a3a3c !important;
+}
+
+.theme--dark .v-input--switch.v-input--is-label-active .v-input--switch__track {
+  background: #8e5bc7 !important;
+}
+
+.theme--dark .v-btn:before,
+.theme--dark .v-list-item:before {
+  opacity: 0 !important;
+}
