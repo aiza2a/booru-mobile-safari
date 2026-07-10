@@ -33,5 +33,5 @@ module.exports = defineTmHeader({
     'https://rule34hentai.net/*'
   ],
   "supportURL": "https://github.com/aiza2a/yandere-masonry/issues",
-  "run-at": "document-start",
+  "run-at": "document-end",
 })
