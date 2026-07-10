@@ -140,18 +140,18 @@ var __publicField = (obj, key, value) => {
     if (doNotRun())
       return;
     addSiteStyle();
-    if (isAutoWf) {
-      document.documentElement.classList.add("ym-fast-enter");
-      initFastLoadingShell();
-    }
     if (document.readyState === "loading") {
       await new Promise((resolve) => document.addEventListener("DOMContentLoaded", () => resolve(), { once: true }));
     }
     if (isAutoWf) {
       setMasonryMode(async () => {
-        removeOldListeners();
-        await initMasonry();
-        callback?.();
+        try {
+          await initMasonry();
+          callback?.();
+        } catch (error) {
+          console.error("Masonry startup failed: ", error);
+          document.documentElement.classList.remove("ym-fast-enter");
+        }
       });
       return;
     }
@@ -168,7 +168,6 @@ var __publicField = (obj, key, value) => {
     if (!isAutoWf)
       await sleep(250);
     setMasonryMode(async () => {
-      removeOldListeners();
       await initMasonry();
       callback?.();
     });
@@ -237,24 +236,9 @@ var __publicField = (obj, key, value) => {
     });
   }
   async function initMasonry() {
-    replaceDocument();
     await loadDeps();
-  }
-  function initFastLoadingShell() {
-    const dark = initialSettings.darkMode !== "light";
-    const color = dark ? "#08090c" : "#f6f8fc";
-    const apply = () => {
-      const meta = document.querySelector('meta[name="theme-color"]') || document.createElement("meta");
-      meta.setAttribute("name", "theme-color");
-      meta.setAttribute("content", color);
-      if (!meta.parentNode)
-        (document.head || document.documentElement).appendChild(meta);
-      const style = document.createElement("style");
-      style.id = "ym-fast-enter-style";
-      style.textContent = `html.ym-fast-enter,html.ym-fast-enter body{background:${color}!important}html.ym-fast-enter body>*{visibility:hidden!important}`;
-      document.documentElement.appendChild(style);
-    };
-    document.documentElement ? apply() : document.addEventListener("readystatechange", apply, { once: true });
+    removeOldListeners();
+    replaceDocument();
   }
   function addSiteStyle() {
     GM_addStyle(prepareStyle);
@@ -389,30 +373,41 @@ var __publicField = (obj, key, value) => {
   }
   const specialSites = ["gelbooru.com"];
   function loadScript(src) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let script;
+      const timer = window.setTimeout(() => reject(new Error(`Script load timeout: ${src}`)), 12e3);
       if (specialSites.some((e) => location.hostname.includes(e))) {
         script = GM_addElement("script", { src });
         script.addEventListener("load", () => {
+          window.clearTimeout(timer);
           resolve();
+        }, false);
+        script.addEventListener("error", () => {
+          window.clearTimeout(timer);
+          reject(new Error(`Script load failed: ${src}`));
         }, false);
       } else {
         script = document.createElement("script");
         script.src = src;
         script.addEventListener("load", () => {
+          window.clearTimeout(timer);
           resolve();
+        }, false);
+        script.addEventListener("error", () => {
+          window.clearTimeout(timer);
+          reject(new Error(`Script load failed: ${src}`));
         }, false);
         document.head.appendChild(script);
       }
     });
   }
   async function loadDeps() {
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/vue/2.7.16/vue.min.js");
     await Promise.all([
-      loadScript("https://cdnjs.cloudflare.com/ajax/libs/vue/2.7.16/vue.min.js"),
+      loadScript("https://cdnjs.cloudflare.com/ajax/libs/vuetify/2.7.2/vuetify.min.js"),
       loadScript("https://cdnjs.cloudflare.com/ajax/libs/vue-i18n/8.28.2/vue-i18n.min.js"),
       loadScript("https://cdnjs.cloudflare.com/ajax/libs/fast-xml-parser/4.4.0/fxparser.min.js")
     ]);
-    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/vuetify/2.7.2/vuetify.min.js");
   }
   function replaceDocument() {
     const el = document.querySelector('[name="csrf-token"]');
