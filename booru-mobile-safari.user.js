@@ -42,7 +42,7 @@
 // @source               https://github.com/aiza2a/yandere-masonry
 // @icon                 https://upload-bbs.mihoyo.com/upload/2022/05/23/260511332/f1f6267537a5aff959ee63ec2c9e4e52_4821140735490026106.jpg
 // @supportURL           https://github.com/aiza2a/yandere-masonry/issues
-// @run-at               document-start
+// @run-at               document-end
 // @grant                GM_addStyle
 // @grant                unsafeWindow
 // @grant                GM_addElement
