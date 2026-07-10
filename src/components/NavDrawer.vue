@@ -1,261 +1,61 @@
 <template>
-  <v-navigation-drawer v-model="store.showDrawer" class="nav_drawer" app temporary>
-    <v-list-item>
-      <v-list-item-avatar>
-        <img width="40" src="https://upload-bbs.mihoyo.com/upload/2022/09/07/190122060/8505ff4b535cb1487b521d73c7f71d63_865024295271530650.png" alt="" loading="lazy">
-      </v-list-item-avatar>
+  <v-navigation-drawer v-model="store.showDrawer" class="nav_drawer mobile-site-drawer" app temporary>
+    <v-list-item class="drawer-title-row">
       <v-list-item-content>
-        <v-list-item-title class="title">Booru Masonry</v-list-item-title>
-        <v-list-item-subtitle :title="$t('l8CbIALt_VWUnzBl_Rmgf')">{{ $t('l8CbIALt_VWUnzBl_Rmgf') }}</v-list-item-subtitle>
+        <v-list-item-title class="title">选择站点</v-list-item-title>
+        <v-list-item-subtitle>常用图站与浏览器</v-list-item-subtitle>
       </v-list-item-content>
+      <v-list-item-action>
+        <v-btn icon aria-label="关闭" @click="store.showDrawer = false">
+          <v-icon>{{ mdiClose }}</v-icon>
+        </v-btn>
+      </v-list-item-action>
     </v-list-item>
     <v-divider />
-    <v-list v-if="store.isYKSite" dense nav>
-      <v-list-group :value="true" no-action>
-        <template #activator>
-          <v-list-item-content>
-            <v-list-item-title class="title">{{ $t('CacM8tispuPNrSxxpt9GX') }}</v-list-item-title>
-          </v-list-item-content>
-        </template>
-
-        <v-list-item v-if="userName" link href="/user/home">
-          <v-list-item-icon class="mr-2">
-            <v-icon>{{ mdiAccount }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ userName }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item v-if="userName" link :href="`/post?tags=vote%3A3%3A${userName}+order%3Avote&_wf=1`">
-          <v-list-item-icon class="mr-2">
-            <v-icon>{{ mdiStar }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ $t('zs8YTCc8d8XFUgRnp7m_w') }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link href="/pool?page=1">
-          <v-list-item-icon class="mr-2">
-            <v-icon>{{ mdiImageMultiple }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ $t('DXEhXAQbkiCMU_l252jo_') }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link href="/post/popular_recent?period=1d">
-          <v-list-item-icon class="mr-2">
-            <v-icon>{{ mdiFire }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ $t('7Cgsr4PUMbezDXNfWdvWH') }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link href="/post?tags=order%3Arandom&page=1">
-          <v-list-item-icon class="mr-2">
-            <v-icon>{{ mdiShuffle }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ $t('StU1-52QJmNFKQ5soJCyG') }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list-group>
-    </v-list>
-    <v-list dense nav>
-      <v-list-group :value="true" no-action>
-        <template #activator>
-          <v-list-item-content>
-            <v-list-item-title class="title">{{ $t('e2_EYvweJsVoIZlIWkPRV') }}</v-list-item-title>
-          </v-list-item-content>
-        </template>
-        <v-list-item-group :value="actSiteIndex" color="primary">
-          <v-list-item v-for="link in siteDomains" :key="link" :href="handleLink(link)" referrerpolicy="no-referrer">
-            <v-list-item-icon class="mr-2">
-              <img :src="handleFavicon(link)" loading="lazy" class="site_icon" referrerpolicy="no-referrer">
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>{{ getSiteTitle(link) }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <hr class="my-2">
-          <v-list-item link @click="openLink('https://pixiv.pictures/?ref=booru.vercel.app')">
-            <v-list-item-icon class="mr-2">
-              <img src="https://pixiv.pictures/favicon.ico" loading="lazy" class="site_icon" referrerpolicy="no-referrer">
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Pixiv Viewer</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item link @click="openLink('https://moeview.cocomi.eu.org/?ref=booru.vercel.app')">
-            <v-list-item-icon class="mr-2">
-              <img src="https://moeview.cocomi.eu.org/favicon.ico" loading="lazy" class="site_icon" referrerpolicy="no-referrer">
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Moeview</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item link @click="openLink('https://r-34.xyz/?ref=booru.vercel.app')">
-            <v-list-item-icon class="mr-2">
-              <img src="https://r-34.xyz/favicon.ico" loading="lazy" class="site_icon" referrerpolicy="no-referrer">
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>R-34.XYZ</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item link @click="openLink('https://nekon.app/?ref=booru.vercel.app')">
-            <v-list-item-icon class="mr-2">
-              <img src="https://nekon.app/favicon.ico" loading="lazy" class="site_icon" referrerpolicy="no-referrer">
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Nekon</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item link @click="openLink('https://www.someacg.top/?ref=booru.vercel.app')">
-            <v-list-item-icon class="mr-2">
-              <img src="https://www.someacg.top/favicon.png" loading="lazy" class="site_icon" referrerpolicy="no-referrer">
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>SomeACG</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item link @click="openLink('https://manyacg.top/?ref=booru.vercel.app')">
-            <v-list-item-icon class="mr-2">
-              <img src="https://manyacg.top/favicon.ico" loading="lazy" class="site_icon" referrerpolicy="no-referrer">
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>ManyACG</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item link @click="openLink('https://pic.cosine.ren/?ref=booru.vercel.app')">
-            <v-list-item-icon class="mr-2">
-              <img src="https://pic.cosine.ren/favicon.ico" loading="lazy" class="site_icon" referrerpolicy="no-referrer">
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Cosine Gallery</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list-group>
-    </v-list>
-    <v-list dense nav>
-      <v-list-item link @click="showSettingDrawer()">
+    <v-list dense nav class="site-switch-list">
+      <v-list-item
+        v-for="site in sites"
+        :key="site.url"
+        :class="{ 'site-switch-active': site.host === locationHost }"
+        link
+        @click="openSite(site.url)"
+      >
+        <v-list-item-icon class="mr-3">
+          <img :src="site.icon" class="site_icon" loading="lazy" referrerpolicy="no-referrer">
+        </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title class="title">{{ $t('UxxldE9xRwmQctrvba5Y8') }}</v-list-item-title>
+          <v-list-item-title>{{ site.label }}</v-list-item-title>
+          <v-list-item-subtitle v-if="site.note">{{ site.note }}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
-    </v-list>
-    <v-list dense nav>
-      <v-list-group :value="true" no-action>
-        <template #activator>
-          <v-list-item-content>
-            <v-list-item-title class="title">{{ $t('PT74UDfKA45vTVTst_-hD') }}</v-list-item-title>
-          </v-list-item-content>
-        </template>
-
-        <v-list-item link @click="openLink('https://github.com/asadahimeka/yandere-masonry/blob/main/CHANGELOG.md')">
-          <v-list-item-icon class="mr-2">
-            <v-icon>{{ mdiInformationOutline }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>v{{ version }}</v-list-item-title>
-            <v-list-item-subtitle>{{ $t('iJ0h220tvMmUhkfIMYI-W') }}</v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link @click="openLink('https://booru.cocomi.eu.org')">
-          <v-list-item-icon class="mr-2">
-            <v-icon>{{ mdiWeb }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ $t('qWcqQRsE9nN43MaZ2BmN9') }}</v-list-item-title>
-            <v-list-item-subtitle>{{ $t('jerGO2OCuW9TdnEnGYRWd') }}</v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-        <!-- <v-list-item link @click="openLink('https://pixiv.pictures/setting/recommend')">
-          <v-list-item-icon class="mr-2">
-            <v-icon>{{ mdiBookmarkBoxMultipleOutline }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ $t('eOxsWLzwqrlhBdVMwz-rH') }}</v-list-item-title>
-            <v-list-item-subtitle>{{ $t('jerGO2OCuW9TdnEnGYRWd') }}</v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item> -->
-        <v-list-item link @click="openLink('https://github.com/asadahimeka/yandere-masonry/issues')">
-          <v-list-item-icon class="mr-2">
-            <v-icon>{{ mdiMessageAlertOutline }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ $t('23iEYyiQlLVhFIqGbj527') }}</v-list-item-title>
-            <v-list-item-subtitle>{{ $t('4g1TUy2kwQrdOs-w4JobB') }}</v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link @click="openLink('https://github.com/asadahimeka/yandere-masonry')">
-          <v-list-item-icon class="mr-2">
-            <v-icon>{{ mdiGithub }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>Github</v-list-item-title>
-            <v-list-item-subtitle>{{ $t('7Xq5puLNcT0mAvoxElqdf') }}</v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list-group>
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
-import {
-  mdiAccount,
-  // mdiBookmarkBoxMultipleOutline,
-  mdiFire,
-  mdiGithub,
-  mdiImageMultiple,
-  mdiInformationOutline,
-  mdiMessageAlertOutline,
-  mdiShuffle,
-  mdiStar,
-  mdiWeb,
-} from '@mdi/js'
-import { computed, onMounted, ref } from 'vue'
-import { getSiteTitle, siteDomains } from '@/api/booru'
-import { getUsername } from '@/api/moebooru'
+import { mdiClose } from '@mdi/js'
 import { store } from '@/store'
 
-const userName = ref('')
-const version = ref(GM_info.script.version)
+const locationHost = location.hostname
+const iconProxy = (host: string) => `https://kwc.cocomi.eu.org/https://${host}/favicon.ico`
+const konachanIcon = 'https://upload-bbs.miyoushe.com/upload/2023/01/14/190122060/cbd0b71ead30e0777e5b023170ba415c_4819570566325089051.png'
+const rule34Icon = 'https://upload-bbs.miyoushe.com/upload/2025/03/29/190122060/76ba90d4350a1455f899d2a1500fca69_8344852329496206545.png'
 
-function openLink(link: string) {
-  window.open(link, '_blank', 'noreferrer')
-}
+const sites = [
+  { label: 'Yande.re', host: 'yande.re', url: 'https://yande.re/post?_wf=1', icon: iconProxy('yande.re') },
+  { label: 'Konachan', host: 'konachan.com', url: 'https://konachan.com/post?_wf=1', icon: konachanIcon },
+  { label: 'Konachan Safe', host: 'konachan.net', url: 'https://konachan.net/post?_wf=1', icon: konachanIcon },
+  { label: 'Danbooru', host: 'danbooru.donmai.us', url: 'https://danbooru.donmai.us/posts?_wf=1', icon: iconProxy('danbooru.donmai.us') },
+  { label: 'Gelbooru', host: 'gelbooru.com', url: 'https://gelbooru.com/index.php?page=post&s=list&_wf=1', icon: iconProxy('gelbooru.com') },
+  { label: 'Rule34', host: 'rule34.xxx', url: 'https://rule34.xxx/index.php?page=post&s=list&_wf=1', icon: rule34Icon },
+  { label: 'Safebooru', host: 'safebooru.org', url: 'https://safebooru.org/index.php?page=post&s=list&_wf=1', icon: iconProxy('safebooru.org') },
+  { label: 'Zerochan', host: 'www.zerochan.net', url: 'https://www.zerochan.net/', icon: iconProxy('www.zerochan.net') },
+  { label: 'Pixiv Viewer', host: 'pixiv.pictures', url: 'https://pixiv.pictures/', icon: 'https://pixiv.pictures/favicon.ico', note: 'Pixiv 浏览器' },
+  { label: 'Moeview', host: 'moeview.app', url: 'https://moeview.app/', icon: 'https://moeview.app/favicon.ico', note: '图片聚合浏览' },
+]
 
-function handleLink(link: string) {
-  if (link.includes('yande')) return 'https://yande.re/post?_wf=1'
-  if (link.includes('behoimi')) return 'http://behoimi.org'
-  return `https://${link}`
-}
-
-function handleFavicon(link: string) {
-  if (link.includes('konachan')) return 'https://upload-bbs.miyoushe.com/upload/2023/01/14/190122060/cbd0b71ead30e0777e5b023170ba415c_4819570566325089051.png'
-  if (link.includes('behoimi')) return 'https://upload-bbs.miyoushe.com/upload/2023/01/14/190122060/d3b97f45046795c87c12ad5704074f32_1333245617164582614.png'
-  if (link.includes('sankaku') || link.includes('idolcomplex')) return 'https://upload-bbs.miyoushe.com/upload/2025/03/29/190122060/4fa56922d173d28ac8e687caaa487f27_1885629069482225420.png'
-  if (link.includes('rule34.xxx')) return 'https://upload-bbs.miyoushe.com/upload/2025/03/29/190122060/76ba90d4350a1455f899d2a1500fca69_8344852329496206545.png'
-  if (link.includes('rule34hentai.net')) return 'https://prod-alicdn-community.kurobbs.com/forum/ee44a4b6a2cc4f08b693cfc4e364b1fa20260129.png'
-  if (link.includes('aibooru.online')) return 'https://prod-alicdn-community.kurobbs.com/forum/177e56ba1e704d6b85e492a365642dd920260129.png'
-  if (link.includes('allthefallen') || link.includes('allgirl')) return 'https://kwc.cocomi.eu.org/https://danbooru.donmai.us/favicon.ico'
-  return `https://kwc.cocomi.eu.org/https://${link.split('/')[0]}/favicon.ico`
-}
-
-const actSiteIndex = computed(() => {
-  return siteDomains.findIndex(e => location.href.includes(e))
-})
-
-function showSettingDrawer() {
+function openSite(url: string) {
   store.showDrawer = false
-  store.showSettings = true
+  location.href = url
 }
-
-onMounted(async () => {
-  if (store.isYKSite) {
-    const name = await getUsername()
-    if (name) userName.value = name
-  }
-})
 </script>

@@ -45,6 +45,7 @@ const defaultSettings = {
   justifiedBaseWidth: isMobile ? 240 : 340,
   detailButtonsBottom: isMobile,
   closePopupOnImgClick: isMobile,
+  longPressDirectShare: false,
   downloadBy: 'tm' as 'tm' | 'fsa' | 'newtab',
 }
 
