@@ -1,6 +1,12 @@
 <template>
   <v-dialog v-model="store.showImageSelected" fullscreen>
-    <div v-if="store.showImageSelected" class="img_detail_cont" @click="onDtlContClick">
+    <div
+      v-if="store.showImageSelected"
+      class="img_detail_cont"
+      @click="onDtlContClick"
+      @touchstart.passive="onTouchStart"
+      @touchend.passive="onTouchEnd"
+    >
       <template v-if="isVideo">
         <DPlayer
           v-if="isVideoShow"
@@ -299,6 +305,14 @@
         </v-list>
       </v-menu>
       <v-progress-circular v-show="downloading" indeterminate class="ml-1 mr-2" color="primary" />
+      <v-tooltip bottom>
+        <template #activator="{ on, attrs }">
+          <v-btn fab small v-bind="attrs" class="mr-1 mobile-primary-share" v-on="on" @click.stop="sharePost(imageSelected)">
+            <v-icon>{{ mdiShareVariant }}</v-icon>
+          </v-btn>
+        </template>
+        <span>分享作品链接</span>
+      </v-tooltip>
       <v-tooltip v-if="notPartialSupportSite && notR34Fav" bottom>
         <template #activator="{ on, attrs }">
           <v-btn
@@ -397,6 +411,27 @@
         <v-icon>{{ mdiChevronRight }}</v-icon>
       </v-btn>
     </div>
+    <div
+      v-if="isMobile && store.showImageSelected && showImageToolbar"
+      class="mobile-detail-nav"
+      @click.stop
+    >
+      <v-btn icon aria-label="上一张" @click="showPrevPost">
+        <v-icon>{{ mdiChevronLeft }}</v-icon>
+      </v-btn>
+      <v-btn icon aria-label="打开作品页" @click="toDetailPage">
+        <v-icon>{{ mdiLinkVariant }}</v-icon>
+      </v-btn>
+      <v-btn class="mobile-share-main" fab aria-label="分享作品链接" @click="sharePost(imageSelected)">
+        <v-icon>{{ mdiShareVariant }}</v-icon>
+      </v-btn>
+      <v-btn icon aria-label="下载原图" @click="download(imageSelected.fileUrl, imageSelected.fileDownloadName)">
+        <v-icon>{{ mdiDownload }}</v-icon>
+      </v-btn>
+      <v-btn icon aria-label="下一张" @click="showNextPost">
+        <v-icon>{{ mdiChevronRight }}</v-icon>
+      </v-btn>
+    </div>
     <PostExportTags
       v-if="isExportTagsEnable && store.showImageSelected"
       :show-dialog="isExportTagsShow"
@@ -426,6 +461,7 @@ import {
   mdiMagnifyPlusOutline,
   mdiPlaylistPlus,
   mdiRotateRight,
+  mdiShareVariant,
   mdiTableSplitCell,
   mdiTagMultiple,
 } from '@mdi/js'
@@ -433,6 +469,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import DPlayer from './DPlayer.vue'
 import PostExportTags from './PostExportTags.vue'
 import { debounce, downloadFile, dragElement, formatRelativeTime, isURL, showMsg } from '@/utils'
+import { sharePost } from '@/utils/share'
 import { gelbooru, realbooru, rule34, zerochan } from '@/api'
 import { type PostDetail } from '@/api/moebooru'
 import { addPostToFavorites, isFavBtnShow } from '@/api/fav'
@@ -453,6 +490,7 @@ const notR34Fav = ref(!(
   || zerochan.is()
   || realbooru.is()
 ))
+const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const showImageToolbar = ref(true)
 const imgLoading = ref(true)
 const innerWidth = ref(window.innerWidth)
@@ -504,6 +542,32 @@ const notYKSite = computed(() => {
 const imgCreateTime = computed(() => {
   return formatRelativeTime(imageSelected.value.createdAt)
 })
+
+let touchStartX = 0
+let touchStartY = 0
+let touchStartedAt = 0
+
+function onTouchStart(ev: TouchEvent) {
+  if (!isMobile || ev.touches.length !== 1 || scaleOn.value) return
+  touchStartX = ev.touches[0].clientX
+  touchStartY = ev.touches[0].clientY
+  touchStartedAt = Date.now()
+}
+
+function onTouchEnd(ev: TouchEvent) {
+  if (!isMobile || scaleOn.value || !touchStartedAt) return
+  const touch = ev.changedTouches[0]
+  const dx = touch.clientX - touchStartX
+  const dy = touch.clientY - touchStartY
+  const elapsed = Date.now() - touchStartedAt
+  touchStartedAt = 0
+  if (elapsed > 700) return
+  if (Math.abs(dx) > 64 && Math.abs(dx) > Math.abs(dy) * 1.35) {
+    dx < 0 ? showNextPost() : showPrevPost()
+    return
+  }
+  if (dy > 96 && Math.abs(dy) > Math.abs(dx) * 1.35) close()
+}
 
 function close() {
   store.showImageSelected = false
