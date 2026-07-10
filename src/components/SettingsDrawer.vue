@@ -120,6 +120,15 @@
           <v-switch v-model="settings.showNSFWContents" inset color="deep-orange darken-1" />
         </v-list-item-action>
       </v-list-item>
+      <v-list-item v-if="isMobile">
+        <v-list-item-content>
+          <v-list-item-title>长按立即分享帖子</v-list-item-title>
+          <v-list-item-subtitle>关闭时长按显示操作菜单；开启时直接打开 iOS 分享面板</v-list-item-subtitle>
+        </v-list-item-content>
+        <v-list-item-action>
+          <v-switch v-model="settings.longPressDirectShare" inset />
+        </v-list-item-action>
+      </v-list-item>
       <v-list-item v-if="!settings.useFancybox">
         <v-list-item-content>
           <v-list-item-title>{{ $t('_nQfaNuwbvPAIFKOY6_7u') }}</v-list-item-title>
@@ -379,6 +388,7 @@ import { showMsg } from '@/utils'
 import i18n from '@/utils/i18n'
 import { getMainDirHandle, isFsaSupported, setMainDirHandle } from '@/utils/fsa'
 
+const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const isBoorus = ref(isBooruSite())
 const isYandere = ref(location.hostname == 'yande.re')
 

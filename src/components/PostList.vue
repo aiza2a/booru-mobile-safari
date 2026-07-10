@@ -285,6 +285,10 @@ function getImgSrc(img?: Post) {
 function onCtxMenu(ev: MouseEvent, img: Post) {
   if (isR34Fav.value) return
   ev.preventDefault()
+  if (isMobile && settings.longPressDirectShare) {
+    sharePost(img)
+    return
+  }
   showMenu.value = false
   x.value = ev.clientX
   y.value = ev.clientY
