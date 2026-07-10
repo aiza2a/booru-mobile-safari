@@ -1170,7 +1170,7 @@ var __publicField = (obj, key, value) => {
     }
     return { width, height };
   }
-  var _sfc_main$e = /* @__PURE__ */ Vue2.defineComponent({
+  var _sfc_main$d = /* @__PURE__ */ Vue2.defineComponent({
     __name: "VirtualWaterfall",
     props: {
       virtual: { type: Boolean, default: true },
@@ -1344,7 +1344,7 @@ var __publicField = (obj, key, value) => {
       options
     };
   }
-  var _sfc_render$e = function render() {
+  var _sfc_render$d = function render() {
     var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
     return _c("div", { ref: "content", style: {
       position: "relative",
@@ -1361,18 +1361,18 @@ var __publicField = (obj, key, value) => {
       }, attrs: { "data-index": data.index } }, [_vm._t("default", null, { "item": data.item, "index": data.index })], 2);
     }), 0);
   };
-  var _sfc_staticRenderFns$e = [];
-  var __component__$e = /* @__PURE__ */ normalizeComponent(
-    _sfc_main$e,
-    _sfc_render$e,
-    _sfc_staticRenderFns$e,
+  var _sfc_staticRenderFns$d = [];
+  var __component__$d = /* @__PURE__ */ normalizeComponent(
+    _sfc_main$d,
+    _sfc_render$d,
+    _sfc_staticRenderFns$d,
     false,
     null,
     null,
     null,
     null
   );
-  var VirtualWaterfall = __component__$e.exports;
+  var VirtualWaterfall = __component__$d.exports;
   function installVuetify() {
     Vue__default["default"].use(Vuetify__default["default"]);
     return new Vuetify__default["default"]({
@@ -2397,7 +2397,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       return e.id !== id;
     });
   }
-  var _sfc_main$d = /* @__PURE__ */ Vue2.defineComponent({
+  var _sfc_main$c = /* @__PURE__ */ Vue2.defineComponent({
     __name: "WfLayout",
     setup(__props) {
       const wfType = Vue2.computed(() => settings.masonryLayout || "masonry");
@@ -2434,22 +2434,22 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       return { __sfc: true, wfType, isMasonry, wfClass, columnCount, columnCount2 };
     }
   });
-  var _sfc_render$d = function render() {
+  var _sfc_render$c = function render() {
     var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
     return _c("div", { staticClass: "wf-layout", class: _setup.wfClass }, [_setup.wfType === "masonry2" ? _c("true-masonry", { staticClass: "true-masonry", attrs: { "gap": { default: 8 }, "cols": _setup.columnCount2 } }, [_vm._t("default")], 2) : _setup.isMasonry ? _c("masonry", { attrs: { "cols": _setup.columnCount, "gutter": "8px" } }, [_vm._t("default")], 2) : _c("div", { staticClass: "justified-container" }, [_vm._t("default")], 2)], 1);
   };
-  var _sfc_staticRenderFns$d = [];
-  var __component__$d = /* @__PURE__ */ normalizeComponent(
-    _sfc_main$d,
-    _sfc_render$d,
-    _sfc_staticRenderFns$d,
+  var _sfc_staticRenderFns$c = [];
+  var __component__$c = /* @__PURE__ */ normalizeComponent(
+    _sfc_main$c,
+    _sfc_render$c,
+    _sfc_staticRenderFns$c,
     false,
     null,
     null,
     null,
     null
   );
-  var WfLayout = __component__$d.exports;
+  var WfLayout = __component__$c.exports;
   var mdiBrightness6 = "M12,18V6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,15.31L23.31,12L20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31Z";
   var mdiCalendar = "M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z";
   var mdiCalendarBlank = "M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1";
@@ -8200,7 +8200,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   const isAutocompleteAct = Object.keys(autocompleteActions).includes(location.hostname);
   const fetchAutocomplete = autocompleteActions[location.hostname] || (() => {
   });
-  var _sfc_main$c = /* @__PURE__ */ Vue2.defineComponent({
+  var _sfc_main$b = /* @__PURE__ */ Vue2.defineComponent({
     __name: "AppBar",
     setup(__props) {
       const isMobile2 = window.matchMedia("(max-width: 959px), (pointer: coarse)").matches;
@@ -8540,7 +8540,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       return { __sfc: true, isMobile: isMobile2, title, isNoSelected, isOneOrMoreSelected, isAllSelected, loadingValue, selectAll, removeFromList, tagsQuery, showMobileSearch, searchState, onSearchTermInput, selectTag, userName, fetchTaggedPosts, selectMobileTag, submitMobileSearch, showTagsInput, onSearchTermKeydown, showPopAction, periodMap, periodByDateMap, getRecentPeriod, isPopularRecent, getPopTitle, popTitle, isPopSearchByDate, recentPeriod, periodComputedMap, showPopDatePicker, popSearchDate, fetchPopularPosts, selPeriod, loadPrevPeriod, loadNextPeriod, goToPopularPage, showPool, poolQueryTerm, searchPool, download, downloadUrlKey, downloadNameMap, downloadNameKey, isGelbooru, startDownload, isExportUrlDecode, isExportUrlEncode, exportFileUrls, vuetify, toggleDarkmode, keyActions, goToPage, exitMasonry, toggleImmersive, toggleFullscreen, selectLang, mdiBrightness6, mdiCalendar, mdiCalendarSearch, mdiCheckUnderlineCircle, mdiCheckboxBlankOutline, mdiCheckboxIntermediate, mdiCheckboxMarked, mdiChevronLeft, mdiChevronRight, mdiClose, mdiCog, mdiDelete, mdiDownload, mdiFileClockOutline, mdiFire, mdiFullscreen, mdiFullscreenExit, mdiHome, mdiImageMultiple, mdiLocationExit, mdiMagnify, mdiShuffle, mdiStar, mdiTranslate, settings, store, toggleDrawer, langList, isSupportTagSearch, notPartialSupportSite, isSankakuSite, isZerochanPage };
     }
   });
-  var _sfc_render$c = function render() {
+  var _sfc_render$b = function render() {
     var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
     return _c("v-app-bar", { attrs: { "app": "", "dense": "", "flat": "", "elevation": 2 } }, [_c("v-app-bar-nav-icon", { on: { "click": function($event) {
       return _setup.toggleDrawer();
@@ -8642,19 +8642,19 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       } } }, [_c("v-list-item-title", { domProps: { "textContent": _vm._s(item) } })], 1);
     }), 1) : _vm._e()], 1)], 1), _c("v-progress-linear", { attrs: { "active": _setup.store.requestLoading, "height": 6, "indeterminate": "", "absolute": "", "bottom": "" } })], 2);
   };
-  var _sfc_staticRenderFns$c = [];
-  var __component__$c = /* @__PURE__ */ normalizeComponent(
-    _sfc_main$c,
-    _sfc_render$c,
-    _sfc_staticRenderFns$c,
+  var _sfc_staticRenderFns$b = [];
+  var __component__$b = /* @__PURE__ */ normalizeComponent(
+    _sfc_main$b,
+    _sfc_render$b,
+    _sfc_staticRenderFns$b,
     false,
     null,
     null,
     null,
     null
   );
-  var AppBar = __component__$c.exports;
-  var _sfc_main$b = /* @__PURE__ */ Vue2.defineComponent({
+  var AppBar = __component__$b.exports;
+  var _sfc_main$a = /* @__PURE__ */ Vue2.defineComponent({
     __name: "NavDrawer",
     setup(__props) {
       const locationHost = location.hostname;
@@ -8677,55 +8677,28 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         store.showDrawer = false;
         location.href = url;
       }
-      return { __sfc: true, locationHost, iconProxy, konachanIcon, rule34Icon, sites: sites2, openSite, mdiClose, store };
+      return { __sfc: true, locationHost, iconProxy, konachanIcon, rule34Icon, sites: sites2, openSite, mdiClose, mdiFire, mdiHome, mdiImageMultiple, mdiShuffle, store };
     }
   });
-  var _sfc_render$b = function render() {
+  var _sfc_render$a = function render() {
     var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
     return _c("v-navigation-drawer", { staticClass: "nav_drawer mobile-site-drawer", attrs: { "app": "", "temporary": "" }, model: { value: _setup.store.showDrawer, callback: function($$v) {
       _vm.$set(_setup.store, "showDrawer", $$v);
     }, expression: "store.showDrawer" } }, [_c("v-list-item", { staticClass: "drawer-title-row" }, [_c("v-list-item-content", [_c("v-list-item-title", { staticClass: "title" }, [_vm._v("\u9009\u62E9\u7AD9\u70B9")]), _c("v-list-item-subtitle", [_vm._v("\u5E38\u7528\u56FE\u7AD9\u4E0E\u6D4F\u89C8\u5668")])], 1), _c("v-list-item-action", [_c("v-btn", { attrs: { "icon": "", "aria-label": "\u5173\u95ED" }, on: { "click": function($event) {
       _setup.store.showDrawer = false;
-    } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiClose))])], 1)], 1)], 1), _c("v-divider"), _c("v-list", { staticClass: "site-switch-list", attrs: { "dense": "", "nav": "" } }, _vm._l(_setup.sites, function(site) {
+    } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiClose))])], 1)], 1)], 1), _c("v-divider"), _setup.store.isYKSite ? _c("v-list", { staticClass: "drawer-shortcuts", attrs: { "dense": "", "nav": "" } }, [_c("v-subheader", [_vm._v("\u5FEB\u6377\u5165\u53E3")]), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
+      return _setup.openSite("/post?_wf=1");
+    } } }, [_c("v-list-item-icon", { staticClass: "mr-3" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiHome))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u9996\u9875")])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
+      return _setup.openSite("/post/popular_recent?period=1d&_wf=1");
+    } } }, [_c("v-list-item-icon", { staticClass: "mr-3" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiFire))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u4EBA\u6C14\u4F5C\u54C1")])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
+      return _setup.openSite("/post?tags=order%3Arandom&page=1&_wf=1");
+    } } }, [_c("v-list-item-icon", { staticClass: "mr-3" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiShuffle))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u968F\u673A\u4F5C\u54C1")])], 1)], 1), _c("v-list-item", { attrs: { "link": "" }, on: { "click": function($event) {
+      return _setup.openSite("/pool?page=1&_wf=1");
+    } } }, [_c("v-list-item-icon", { staticClass: "mr-3" }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiImageMultiple))])], 1), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u56FE\u96C6")])], 1)], 1)], 1) : _vm._e(), _setup.store.isYKSite ? _c("v-divider") : _vm._e(), _c("v-list", { staticClass: "site-switch-list", attrs: { "dense": "", "nav": "" } }, [_c("v-subheader", [_vm._v("\u7AD9\u70B9\u5217\u8868")]), _vm._l(_setup.sites, function(site) {
       return _c("v-list-item", { key: site.url, class: { "site-switch-active": site.host === _setup.locationHost }, attrs: { "link": "" }, on: { "click": function($event) {
         return _setup.openSite(site.url);
       } } }, [_c("v-list-item-icon", { staticClass: "mr-3" }, [_c("img", { staticClass: "site_icon", attrs: { "src": site.icon, "loading": "lazy", "referrerpolicy": "no-referrer" } })]), _c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(site.label))]), site.note ? _c("v-list-item-subtitle", [_vm._v(_vm._s(site.note))]) : _vm._e()], 1)], 1);
-    }), 1)], 1);
-  };
-  var _sfc_staticRenderFns$b = [];
-  var __component__$b = /* @__PURE__ */ normalizeComponent(
-    _sfc_main$b,
-    _sfc_render$b,
-    _sfc_staticRenderFns$b,
-    false,
-    null,
-    null,
-    null,
-    null
-  );
-  var NavDrawer = __component__$b.exports;
-  var _sfc_main$a = /* @__PURE__ */ Vue2.defineComponent({
-    __name: "MobileBottomNav",
-    setup(__props) {
-      const isMobile2 = window.matchMedia("(max-width: 959px), (pointer: coarse)").matches;
-      function goHome() {
-        location.href = "/post?_wf=1";
-      }
-      function goPopular() {
-        location.href = "/post/popular_recent?period=1d&_wf=1";
-      }
-      function goRandom() {
-        location.href = "/post?tags=order%3Arandom&page=1&_wf=1";
-      }
-      function goPool() {
-        location.href = "/pool?page=1&_wf=1";
-      }
-      return { __sfc: true, isMobile: isMobile2, goHome, goPopular, goRandom, goPool, mdiFire, mdiHome, mdiImageMultiple, mdiShuffle, store };
-    }
-  });
-  var _sfc_render$a = function render() {
-    var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
-    return _setup.isMobile && _setup.store.showPostList && !_setup.store.showImageSelected && _setup.store.isYKSite ? _c("v-bottom-navigation", { staticClass: "mobile-bottom-nav", attrs: { "app": "", "fixed": "", "grow": "", "color": "primary" } }, [_c("v-btn", { on: { "click": _setup.goHome } }, [_c("span", [_vm._v("\u9996\u9875")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiHome))])], 1), _c("v-btn", { on: { "click": _setup.goPopular } }, [_c("span", [_vm._v("\u4EBA\u6C14")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiFire))])], 1), _c("v-btn", { on: { "click": _setup.goRandom } }, [_c("span", [_vm._v("\u968F\u673A")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiShuffle))])], 1), _c("v-btn", { on: { "click": _setup.goPool } }, [_c("span", [_vm._v("\u56FE\u96C6")]), _c("v-icon", [_vm._v(_vm._s(_setup.mdiImageMultiple))])], 1)], 1) : _vm._e();
+    })], 2)], 1);
   };
   var _sfc_staticRenderFns$a = [];
   var __component__$a = /* @__PURE__ */ normalizeComponent(
@@ -8738,7 +8711,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     null,
     null
   );
-  var MobileBottomNav = __component__$a.exports;
+  var NavDrawer = __component__$a.exports;
   var _sfc_main$9 = /* @__PURE__ */ Vue2.defineComponent({
     __name: "ImmersiveExit",
     setup(__props) {
@@ -9939,6 +9912,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       );
       const showNoMore = Vue2.computed(() => !store.requestLoading && store.requestStop);
       const showLoadMore = Vue2.computed(() => !store.requestLoading && !store.requestStop);
+      const longPressPreview = Vue2.ref();
       const ctxActPost = Vue2.ref();
       const showMenu = Vue2.ref(false);
       const x = Vue2.ref(0);
@@ -9983,6 +9957,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         if (longPressTimer)
           window.clearTimeout(longPressTimer);
         longPressTimer = void 0;
+        if (!longPressTriggered)
+          longPressPreview.value = void 0;
         pendingDirectSharePost = void 0;
       }
       function onPostTouchStart(ev, img) {
@@ -9996,11 +9972,13 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         cancelPostLongPress();
         longPressTimer = window.setTimeout(() => {
           longPressTriggered = true;
+          longPressPreview.value = img;
+          navigator.vibrate?.(18);
           if (settings.longPressDirectShare)
             pendingDirectSharePost = img;
           else
             openPostMenu(img, touch.clientX, touch.clientY);
-        }, 520);
+        }, 360);
       }
       function onPostTouchMove(ev) {
         const touch = ev.touches[0];
@@ -10015,6 +9993,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           ev.preventDefault();
         const post = pendingDirectSharePost;
         pendingDirectSharePost = void 0;
+        longPressPreview.value = void 0;
         cancelPostLongPress();
         if (post)
           sharePost(post);
@@ -10126,7 +10105,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       Vue2.onUnmounted(() => {
         window.removeEventListener("scroll", scrollFn);
       });
-      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, longPressTimer, longPressStartX, longPressStartY, longPressTriggered, pendingDirectSharePost, showNoMore, showLoadMore, ctxActPost, showMenu, x, y, maxHeightStyle, imgCardStyle, getImgSrc, openPostMenu, cancelPostLongPress, onPostTouchStart, onPostTouchMove, onPostTouchEnd, onImageClick, onCtxMenu, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, downloadCtxPost, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
+      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, longPressTimer, longPressStartX, longPressStartY, longPressTriggered, pendingDirectSharePost, showNoMore, showLoadMore, longPressPreview, ctxActPost, showMenu, x, y, maxHeightStyle, imgCardStyle, getImgSrc, openPostMenu, cancelPostLongPress, onPostTouchStart, onPostTouchMove, onPostTouchEnd, onImageClick, onCtxMenu, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, downloadCtxPost, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
     }
   });
   var _sfc_render$4 = function render() {
@@ -10185,7 +10164,9 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiHeartPlusOutline))])], 1) : _vm._e()], 1) : _vm._e()], 2);
     }), 1), _c("div", { staticClass: "d-flex justify-center" }, [_c("v-btn", { directives: [{ name: "show", rawName: "v-show", value: _setup.store.requestLoading, expression: "store.requestLoading" }], attrs: { "color": "primary", "text": "" } }, [_vm._v(" " + _vm._s(_vm.$t("RN4dt81l_fZMWODsskZob")) + "... ")]), _c("v-btn", { directives: [{ name: "show", rawName: "v-show", value: _setup.showLoadMore, expression: "showLoadMore" }], attrs: { "color": "primary", "text": "" }, on: { "click": function($event) {
       return _setup.searchPosts();
-    } } }, [_vm._v(" " + _vm._s(_vm.$t("fC8XNfCl04zK7vgeaRZMQ")) + " ")]), _c("v-btn", { directives: [{ name: "show", rawName: "v-show", value: _setup.showNoMore, expression: "showNoMore" }], staticClass: "mt-2", attrs: { "color": "primary", "text": "" } }, [_vm._v(" " + _vm._s(_vm.$t("Z4pa8GhgE63OGGvCqAld0")) + "... ")])], 1), _c("v-menu", { attrs: { "position-x": _setup.x, "position-y": _setup.y, "absolute": "", "offset-y": "" }, model: { value: _setup.showMenu, callback: function($$v) {
+    } } }, [_vm._v(" " + _vm._s(_vm.$t("fC8XNfCl04zK7vgeaRZMQ")) + " ")]), _c("v-btn", { directives: [{ name: "show", rawName: "v-show", value: _setup.showNoMore, expression: "showNoMore" }], staticClass: "mt-2", attrs: { "color": "primary", "text": "" } }, [_vm._v(" " + _vm._s(_vm.$t("Z4pa8GhgE63OGGvCqAld0")) + "... ")])], 1), _setup.longPressPreview ? _c("div", { staticClass: "long-press-preview", on: { "contextmenu": function($event) {
+      $event.preventDefault();
+    } } }, [_c("img", { attrs: { "src": _setup.longPressPreview.sampleUrl || _setup.longPressPreview.fileUrl, "alt": "" } })]) : _vm._e(), _c("v-menu", { attrs: { "position-x": _setup.x, "position-y": _setup.y, "absolute": "", "offset-y": "" }, model: { value: _setup.showMenu, callback: function($$v) {
       _setup.showMenu = $$v;
     }, expression: "showMenu" } }, [_c("v-list", [_setup.ctxActPost ? _c("v-list-item", { on: { "click": function($event) {
       return _setup.sharePost(_setup.ctxActPost);
@@ -10373,12 +10354,12 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       Vue2.onMounted(() => {
         vuetify.theme.dark = settings.darkMode === "dark";
       });
-      return { __sfc: true, vuetify, AppBar, NavDrawer, MobileBottomNav, ImmersiveExit, SettingsDrawer, AppContainer };
+      return { __sfc: true, vuetify, AppBar, NavDrawer, ImmersiveExit, SettingsDrawer, AppContainer };
     }
   });
   var _sfc_render = function render() {
     var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
-    return _c("v-app", [_c(_setup.AppBar), _c(_setup.NavDrawer), _c(_setup.MobileBottomNav), _c(_setup.ImmersiveExit), _c("v-main", { attrs: { "app": "" } }, [_c(_setup.AppContainer), _c(_setup.SettingsDrawer)], 1)], 1);
+    return _c("v-app", [_c(_setup.AppBar), _c(_setup.NavDrawer), _c(_setup.ImmersiveExit), _c("v-main", { attrs: { "app": "" } }, [_c(_setup.AppContainer), _c(_setup.SettingsDrawer)], 1)], 1);
   };
   var _sfc_staticRenderFns = [];
   var __component__ = /* @__PURE__ */ normalizeComponent(
