@@ -2378,7 +2378,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     isYKSite: ykFlag,
     showPostList: !poolFlag,
     showPoolList: ykFlag && poolFlag,
-    isFullscreen: false
+    isFullscreen: false,
+    isImmersive: false
   });
   function toggleDrawer() {
     store.showDrawer = !store.showDrawer;
@@ -2493,7 +2494,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   var mdiMagnifyMinusOutline = "M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.5L20.5,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14M7,9H12V10H7V9Z";
   var mdiMagnifyPlusOutline = "M15.5,14L20.5,19L19,20.5L14,15.5V14.71L13.73,14.43C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.43,13.73L14.71,14H15.5M9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14M12,10H10V12H9V10H7V9H9V7H10V9H12V10Z";
   var mdiPlaylistPlus = "M3 16H10V14H3M18 14V10H16V14H12V16H16V20H18V16H22V14M14 6H3V8H14M14 10H3V12H14V10Z";
-  var mdiRefresh = "M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z";
   var mdiRotateRight = "M16.89,15.5L18.31,16.89C19.21,15.73 19.76,14.39 19.93,13H17.91C17.77,13.87 17.43,14.72 16.89,15.5M13,17.9V19.92C14.39,19.75 15.74,19.21 16.9,18.31L15.46,16.87C14.71,17.41 13.87,17.76 13,17.9M19.93,11C19.76,9.61 19.21,8.27 18.31,7.11L16.89,8.53C17.43,9.28 17.77,10.13 17.91,11M15.55,5.55L11,1V4.07C7.06,4.56 4,7.92 4,12C4,16.08 7.05,19.44 11,19.93V17.91C8.16,17.43 6,14.97 6,12C6,9.03 8.16,6.57 11,6.09V10L15.55,5.55Z";
   var mdiShareVariant = "M18,16.08C17.24,16.08 16.56,16.38 16.04,16.85L8.91,12.7C8.96,12.47 9,12.24 9,12C9,11.76 8.96,11.53 8.91,11.3L15.96,7.19C16.5,7.69 17.21,8 18,8A3,3 0 0,0 21,5A3,3 0 0,0 18,2A3,3 0 0,0 15,5C15,5.24 15.04,5.47 15.09,5.7L8.04,9.81C7.5,9.31 6.79,9 6,9A3,3 0 0,0 3,12A3,3 0 0,0 6,15C6.79,15 7.5,14.69 8.04,14.19L15.16,18.34C15.11,18.55 15.08,18.77 15.08,19C15.08,20.61 16.39,21.91 18,21.91C19.61,21.91 20.92,20.61 20.92,19A2.92,2.92 0 0,0 18,16.08Z";
   var mdiShuffle = "M14.83,13.41L13.42,14.82L16.55,17.95L14.5,20H20V14.5L17.96,16.54L14.83,13.41M14.5,4L16.54,6.04L4,18.59L5.41,20L17.96,7.46L20,9.5V4M10.59,9.17L5.41,4L4,5.41L9.17,10.58L10.59,9.17Z";
@@ -9138,25 +9138,23 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       return `https://gelbooru.com/index.php?page=post&s=view&id=${id}`;
     return post.postView || location.href;
   }
-  async function sharePost(post) {
-    if (!post)
+  async function shareUrl(url, title) {
+    if (!url)
       return false;
-    const url = canonicalPostUrl(post);
-    const title = `${location.hostname} #${post.id}`;
     try {
       if (navigator.share) {
         await navigator.share({ title, url });
         return true;
       }
       await navigator.clipboard.writeText(url);
-      showMsg({ msg: "\u4F5C\u54C1\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
+      showMsg({ msg: "\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
       return true;
     } catch (error) {
       if (error?.name === "AbortError")
         return false;
       try {
         await navigator.clipboard.writeText(url);
-        showMsg({ msg: "\u4F5C\u54C1\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
+        showMsg({ msg: "\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
         return true;
       } catch (_copyError) {
         const textarea = document.createElement("textarea");
@@ -9167,10 +9165,15 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         textarea.select();
         document.execCommand("copy");
         textarea.remove();
-        showMsg({ msg: "\u4F5C\u54C1\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
+        showMsg({ msg: "\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
         return true;
       }
     }
+  }
+  async function sharePost(post) {
+    if (!post)
+      return false;
+    return shareUrl(canonicalPostUrl(post), `${location.hostname} #${post.id}`);
   }
   function isDanbooruPage() {
     return location.hostname == "danbooru.donmai.us";
@@ -9820,7 +9823,10 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       const isMobile2 = window.matchMedia("(max-width: 959px), (pointer: coarse)").matches;
       const isR34Fav = Vue2.ref(isRule34FavPage() || isGelbooruFavPage());
       const showImageList = Vue2.ref(true);
-      const showFab = Vue2.ref(false);
+      let longPressTimer;
+      let longPressStartX = 0;
+      let longPressStartY = 0;
+      let longPressTriggered = false;
       Vue2.watch(
         () => settings.selectedColumn,
         () => {
@@ -9863,6 +9869,56 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         }
         return src || img?.fileUrl || void 0;
       }
+      function openPostMenu(img, xPos, yPos) {
+        showMenu.value = false;
+        x.value = xPos;
+        y.value = yPos;
+        Vue2.nextTick(() => {
+          ctxActPost.value = img;
+          showMenu.value = true;
+        });
+      }
+      function cancelPostLongPress() {
+        if (longPressTimer)
+          window.clearTimeout(longPressTimer);
+        longPressTimer = void 0;
+      }
+      function onPostTouchStart(ev, img) {
+        if (!isMobile2 || ev.touches.length !== 1)
+          return;
+        const touch = ev.touches[0];
+        longPressStartX = touch.clientX;
+        longPressStartY = touch.clientY;
+        longPressTriggered = false;
+        cancelPostLongPress();
+        longPressTimer = window.setTimeout(() => {
+          longPressTriggered = true;
+          if (settings.longPressDirectShare)
+            sharePost(img);
+          else
+            openPostMenu(img, touch.clientX, touch.clientY);
+        }, 520);
+      }
+      function onPostTouchMove(ev) {
+        const touch = ev.touches[0];
+        if (!touch)
+          return;
+        if (Math.abs(touch.clientX - longPressStartX) > 12 || Math.abs(touch.clientY - longPressStartY) > 12) {
+          cancelPostLongPress();
+        }
+      }
+      function onPostTouchEnd(ev) {
+        if (longPressTriggered)
+          ev.preventDefault();
+        cancelPostLongPress();
+      }
+      function onImageClick(index) {
+        if (longPressTriggered) {
+          longPressTriggered = false;
+          return;
+        }
+        showImgModal(index);
+      }
       function onCtxMenu(ev, img) {
         if (isR34Fav.value)
           return;
@@ -9871,13 +9927,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           sharePost(img);
           return;
         }
-        showMenu.value = false;
-        x.value = ev.clientX;
-        y.value = ev.clientY;
-        Vue2.nextTick(() => {
-          ctxActPost.value = img;
-          showMenu.value = true;
-        });
+        openPostMenu(img, ev.clientX, ev.clientY);
       }
       function showImgModal(index) {
         if (settings.useFancybox) {
@@ -9955,17 +10005,12 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       function calcItemHeight(item, itemWidth) {
         return item.height * (itemWidth / item.width);
       }
-      const scrollFn = throttleScroll((scroll) => {
-        if (!showFab.value && scroll > 200)
-          showFab.value = true;
+      const scrollFn = throttleScroll((_scroll) => {
         if (store.requestStop)
           return;
         if (store.requestLoading)
           return;
         notReachBottom() && searchPosts(true);
-      }, () => {
-        if (showFab.value)
-          showFab.value = false;
       });
       Vue2.onMounted(async () => {
         await initPosts();
@@ -9974,15 +10019,17 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       Vue2.onUnmounted(() => {
         window.removeEventListener("scroll", scrollFn);
       });
-      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, showFab, showNoMore, showLoadMore, ctxActPost, showMenu, x, y, maxHeightStyle, imgCardStyle, getImgSrc, onCtxMenu, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, downloadCtxPost, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiRefresh, mdiShareVariant, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, refreshPosts, searchPosts, settings, store };
+      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, longPressTimer, longPressStartX, longPressStartY, longPressTriggered, showNoMore, showLoadMore, ctxActPost, showMenu, x, y, maxHeightStyle, imgCardStyle, getImgSrc, openPostMenu, cancelPostLongPress, onPostTouchStart, onPostTouchMove, onPostTouchEnd, onImageClick, onCtxMenu, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, downloadCtxPost, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
     }
   });
   var _sfc_render$4 = function render() {
     var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
     return _setup.showImageList ? _c("div", { style: _setup.settings.masonryLayout === "virtual" ? "height:93vh" : "" }, [_setup.settings.masonryLayout === "virtual" ? _c("virtual-waterfall", { staticClass: "virtual-waterfall", class: { "wf-no-fit-screen": _setup.notFitScreen }, staticStyle: { "min-height": "93vh" }, attrs: { "gap": 10, "preload-screen-count": [1, 1], "item-min-width": 300, "items": _setup.store.imageList, "max-column-count": _setup.virtualMaxCol, "calc-item-height": _setup.calcItemHeight }, scopedSlots: _vm._u([{ key: "default", fn: function({ item, index }) {
       return [_c("div", { staticClass: "posts-image-card" }, [_c("img", { staticClass: "post-image-v", attrs: { "alt": "", "loading": "lazy", "src": _setup.getImgSrc(item), "role": "button", "tabindex": "0" }, on: { "click": function($event) {
-        return _setup.showImgModal(index);
-      }, "contextmenu": function($event) {
+        return _setup.onImageClick(index);
+      }, "touchstart": function($event) {
+        return _setup.onPostTouchStart($event, item);
+      }, "touchmove": _setup.onPostTouchMove, "touchend": _setup.onPostTouchEnd, "touchcancel": _setup.cancelPostLongPress, "contextmenu": function($event) {
         return _setup.onCtxMenu($event, item);
       }, "error": function($event) {
         return _setup.onImageLoadError(item?.id || "");
@@ -9998,25 +10045,26 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         $event.stopPropagation();
         return _setup.addFavorite(item?.id);
       } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiHeartPlusOutline))])], 1) : _vm._e()], 1) : _vm._e()], 2)];
-    } }], null, false, 1028004845) }) : _c("wf-layout", _vm._l(_setup.store.imageList, function(image, index) {
+    } }], null, false, 3922649296) }) : _c("wf-layout", _vm._l(_setup.store.imageList, function(image, index) {
       return _c("v-card", { key: index, staticClass: "posts-image-card", style: _setup.imgCardStyle(image) }, [_setup.settings.masonryLayout === "justified" ? [_c("img", { staticClass: "post-image", attrs: { "alt": "", "loading": "lazy", "src": _setup.getImgSrc(image), "role": "button", "tabindex": "0" }, on: { "click": function($event) {
-        return _setup.showImgModal(index);
-      }, "contextmenu": function($event) {
+        return _setup.onImageClick(index);
+      }, "touchstart": function($event) {
+        return _setup.onPostTouchStart($event, image);
+      }, "touchmove": _setup.onPostTouchMove, "touchend": _setup.onPostTouchEnd, "touchcancel": _setup.cancelPostLongPress, "contextmenu": function($event) {
         return _setup.onCtxMenu($event, image);
       }, "error": function($event) {
         return _setup.onImageLoadError(image?.id || "");
       } } })] : _c("v-img", { attrs: { "transition": "scroll-y-transition", "src": _setup.getImgSrc(image), "aspect-ratio": image?.aspectRatio }, on: { "click": function($event) {
-        return _setup.showImgModal(index);
-      }, "contextmenu": function($event) {
+        return _setup.onImageClick(index);
+      }, "touchstart": function($event) {
+        return _setup.onPostTouchStart($event, image);
+      }, "touchmove": _setup.onPostTouchMove, "touchend": _setup.onPostTouchEnd, "touchcancel": _setup.cancelPostLongPress, "contextmenu": function($event) {
         return _setup.onCtxMenu($event, image);
       }, "error": function($event) {
         return _setup.onImageLoadError(image?.id);
       } }, scopedSlots: _vm._u([{ key: "placeholder", fn: function() {
         return [_c("v-row", { staticClass: "fill-height ma-0", attrs: { "align": "center", "justify": "center" } }, [_c("v-progress-circular", { attrs: { "indeterminate": "", "color": "deep-purple" } })], 1)];
-      }, proxy: true }], null, true) }), _setup.store.isYKSite ? [image?.data?.has_children ? _c("v-icon", { staticClass: "posts-image-type", attrs: { "dense": "" } }, [_vm._v(" " + _vm._s(_setup.mdiFileTree) + " ")]) : _vm._e(), image?.data?.parent_id ? _c("v-icon", { staticClass: "posts-image-type", attrs: { "dense": "" } }, [_vm._v(" " + _vm._s(_setup.mdiFolderNetwork) + " ")]) : _vm._e(), _setup.isMobile ? _c("div", { staticClass: "mobile-card-share" }, [_c("v-btn", { attrs: { "icon": "", "color": "#fff", "aria-label": "\u5206\u4EAB\u4F5C\u54C1\u94FE\u63A5" }, on: { "click": function($event) {
-        $event.stopPropagation();
-        return _setup.sharePost(image);
-      } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiShareVariant))])], 1)], 1) : _vm._e()] : _vm._e(), image?.fileExt.toLowerCase() === "gif" ? _c("v-icon", { staticClass: "posts-image-type" }, [_vm._v(" " + _vm._s(_setup.mdiFileGifBox) + " ")]) : _vm._e(), ["mp4", "webm"].includes(image?.fileExt.toLowerCase()) ? _c("v-icon", { staticClass: "posts-image-type" }, [_vm._v(" " + _vm._s(_setup.mdiVideo) + " ")]) : _vm._e(), !_setup.isR34Fav && _setup.settings.showPostCheckbox ? _c("div", { staticClass: "posts-image-checkbox" }, [_c("v-checkbox", { staticClass: "ma-0 pa-0", attrs: { "value": _setup.isPostChecked(image?.id), "hide-details": "" }, on: { "change": function($event) {
+      }, proxy: true }], null, true) }), _setup.store.isYKSite ? [image?.data?.has_children ? _c("v-icon", { staticClass: "posts-image-type", attrs: { "dense": "" } }, [_vm._v(" " + _vm._s(_setup.mdiFileTree) + " ")]) : _vm._e(), image?.data?.parent_id ? _c("v-icon", { staticClass: "posts-image-type", attrs: { "dense": "" } }, [_vm._v(" " + _vm._s(_setup.mdiFolderNetwork) + " ")]) : _vm._e()] : _vm._e(), image?.fileExt.toLowerCase() === "gif" ? _c("v-icon", { staticClass: "posts-image-type" }, [_vm._v(" " + _vm._s(_setup.mdiFileGifBox) + " ")]) : _vm._e(), ["mp4", "webm"].includes(image?.fileExt.toLowerCase()) ? _c("v-icon", { staticClass: "posts-image-type" }, [_vm._v(" " + _vm._s(_setup.mdiVideo) + " ")]) : _vm._e(), !_setup.isR34Fav && _setup.settings.showPostCheckbox ? _c("div", { staticClass: "posts-image-checkbox" }, [_c("v-checkbox", { staticClass: "ma-0 pa-0", attrs: { "value": _setup.isPostChecked(image?.id), "hide-details": "" }, on: { "change": function($event) {
         return _setup.onPostCheckboxChange($event, image);
       } } })], 1) : _vm._e(), _setup.settings.showListPostReso ? _c("div", { staticClass: "posts-image-wh" }, [_vm._v(_vm._s(image?.width) + " \xD7 " + _vm._s(image?.height))]) : _vm._e(), !_setup.isR34Fav ? _c("div", { staticClass: "posts-image-actions" }, [_c("v-btn", { attrs: { "icon": "", "color": "#fff", "title": _vm.$t("EsiorRgoeHI8h7IHMLDA4"), "href": image?.postView, "target": "_blank", "rel": "noreferrer" } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiLinkVariant))])], 1), _setup.notPartialSupportSite ? _c("v-btn", { staticClass: "hidden-md-and-down", attrs: { "icon": "", "color": "#fff", "title": _vm.$t("hVmfDxXoj8vkgVQabEOSr") }, on: { "click": function($event) {
         $event.stopPropagation();
@@ -10042,9 +10090,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       return _setup.openDetail();
     } } }, [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("EsiorRgoeHI8h7IHMLDA4")))])], 1), _setup.notPartialSupportSite ? _c("v-list-item", { staticClass: "hidden-md-and-down", on: { "click": function($event) {
       return _setup.addToSelectedList();
-    } } }, [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("hVmfDxXoj8vkgVQabEOSr")))])], 1) : _vm._e()], 1)], 1), _c("v-fab-transition", [_c("v-btn", { directives: [{ name: "show", rawName: "v-show", value: _setup.showFab, expression: "showFab" }], staticClass: "refresh_posts_btn", attrs: { "fab": "", "dark": "", "fixed": "", "bottom": "", "right": "", "color": "pink" }, on: { "click": function($event) {
-      return _setup.refreshPosts();
-    } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiRefresh))])], 1)], 1), _c(_setup.PostDetail)], 1) : _vm._e();
+    } } }, [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("hVmfDxXoj8vkgVQabEOSr")))])], 1) : _vm._e()], 1)], 1), _c(_setup.PostDetail)], 1) : _vm._e();
   };
   var _sfc_staticRenderFns$4 = [];
   var __component__$4 = /* @__PURE__ */ normalizeComponent(
