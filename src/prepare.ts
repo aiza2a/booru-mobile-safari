@@ -22,6 +22,21 @@ function isMoebooru() {
 export async function prepareApp(callback?: () => void) {
   if (doNotRun()) return
   addSiteStyle()
+  if (isAutoWf) {
+    document.documentElement.classList.add('ym-fast-enter')
+    initFastLoadingShell()
+  }
+  if (document.readyState === 'loading') {
+    await new Promise<void>(resolve => document.addEventListener('DOMContentLoaded', () => resolve(), { once: true }))
+  }
+  if (isAutoWf) {
+    setMasonryMode(async () => {
+      removeOldListeners()
+      await initMasonry()
+      callback?.()
+    })
+    return
+  }
   if (isMoebooru()) {
     bindDblclick()
     setMoebooruLocale()
@@ -32,7 +47,7 @@ export async function prepareApp(callback?: () => void) {
   } else {
     translateDanbooruTags()
   }
-  await sleep(1000)
+  if (!isAutoWf) await sleep(250)
   setMasonryMode(async () => {
     removeOldListeners()
     await initMasonry()
@@ -110,6 +125,22 @@ function addWfTypeSelect() {
 async function initMasonry() {
   replaceDocument()
   if (import.meta.env.PROD) await loadDeps()
+}
+
+function initFastLoadingShell() {
+  const dark = initialSettings.darkMode !== 'light'
+  const color = dark ? '#08090c' : '#f6f8fc'
+  const apply = () => {
+    const meta = document.querySelector('meta[name="theme-color"]') || document.createElement('meta')
+    meta.setAttribute('name', 'theme-color')
+    meta.setAttribute('content', color)
+    if (!meta.parentNode) (document.head || document.documentElement).appendChild(meta)
+    const style = document.createElement('style')
+    style.id = 'ym-fast-enter-style'
+    style.textContent = `html.ym-fast-enter,html.ym-fast-enter body{background:${color}!important}html.ym-fast-enter body>*{visibility:hidden!important}`
+    document.documentElement.appendChild(style)
+  }
+  document.documentElement ? apply() : document.addEventListener('readystatechange', apply, { once: true })
 }
 
 function addSiteStyle() {
@@ -251,10 +282,12 @@ export function loadScript(src: string) {
 }
 
 async function loadDeps() {
-  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/vue/2.7.16/vue.min.js')
+  await Promise.all([
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/vue/2.7.16/vue.min.js'),
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/vue-i18n/8.28.2/vue-i18n.min.js'),
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/fast-xml-parser/4.4.0/fxparser.min.js'),
+  ])
   await loadScript('https://cdnjs.cloudflare.com/ajax/libs/vuetify/2.7.2/vuetify.min.js')
-  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/vue-i18n/8.28.2/vue-i18n.min.js')
-  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/fast-xml-parser/4.4.0/fxparser.min.js')
 }
 
 function replaceDocument() {
@@ -264,6 +297,7 @@ function replaceDocument() {
   document.head.innerHTML = /* html */`
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="theme-color" content="${initialSettings.darkMode !== 'light' ? '#08090c' : '#f6f8fc'}">
     <title>${location.host.toUpperCase()} Masonry</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">

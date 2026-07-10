@@ -22,7 +22,7 @@ const langMap: Record<string, typeof langList[number]['value']> = {
 const isMobile = navigator.userAgent.includes('Mobile')
 const defaultSettings = {
   lang: langMap[navigator.language] || 'en',
-  darkMode: 'light' as 'light' | 'dark',
+  darkMode: 'dark' as 'light' | 'dark',
   blacklist: localStorage.getItem('__blacklist')?.split(',').filter(Boolean) || [] as string[],
   selectedColumn: '0',
   showNSFWContents: true,
