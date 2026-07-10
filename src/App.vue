@@ -2,6 +2,7 @@
   <v-app>
     <AppBar />
     <NavDrawer />
+    <MobileBottomNav />
     <v-main app>
       <AppContainer />
       <SettingsDrawer />
@@ -16,12 +17,14 @@
 import { onMounted, watch } from 'vue'
 import AppBar from './components/AppBar.vue'
 import NavDrawer from './components/NavDrawer.vue'
+import MobileBottomNav from './components/MobileBottomNav.vue'
 import SettingsDrawer from './components/SettingsDrawer.vue'
 import AppContainer from './components/AppContainer.vue'
 import { useVuetify } from './plugins/vuetify'
 import { settings } from './store'
 
 const vuetify = useVuetify()
+vuetify.theme.dark = settings.darkMode !== 'light'
 
 watch(() => settings, val => {
   localStorage.setItem('YM_APP_SETTINGS', JSON.stringify(val))
