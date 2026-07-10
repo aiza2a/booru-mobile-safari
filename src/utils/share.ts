@@ -31,8 +31,16 @@ export async function sharePost(post?: Post): Promise<boolean> {
       showMsg({ msg: '作品链接已复制', type: 'success' })
       return true
     } catch (_copyError) {
-      window.prompt('复制作品链接', url)
-      return false
+      const textarea = document.createElement('textarea')
+      textarea.value = url
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      textarea.remove()
+      showMsg({ msg: '作品链接已复制', type: 'success' })
+      return true
     }
   }
 }

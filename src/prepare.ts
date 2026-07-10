@@ -19,6 +19,12 @@ function isMoebooru() {
   return ['yande.re', 'konachan', 'lolibooru', 'sakugabooru'].some(e => location.host.includes(e))
 }
 
+const isAutoWf = (() => {
+  const params = new URLSearchParams(location.search)
+  if (params.get('_wf')) return true
+  return initialSettings.autoWaterfall
+})()
+
 export async function prepareApp(callback?: () => void) {
   if (doNotRun()) return
   addSiteStyle()
@@ -98,12 +104,6 @@ async function initLayout() {
   const wfType = initialSettings.masonryLayout || 'masonry'
   wfTypeActions[wfType]?.(listEl)
 }
-
-const isAutoWf = (() => {
-  const params = new URLSearchParams(location.search)
-  if (params.get('_wf')) return true
-  return initialSettings.autoWaterfall
-})()
 
 function addWfTypeSelect() {
   if (!location.href.includes('yande.re/post')) return
