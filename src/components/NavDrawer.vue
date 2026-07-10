@@ -12,7 +12,28 @@
       </v-list-item-action>
     </v-list-item>
     <v-divider />
+    <v-list v-if="store.isYKSite" dense nav class="drawer-shortcuts">
+      <v-subheader>快捷入口</v-subheader>
+      <v-list-item link @click="openSite('/post?_wf=1')">
+        <v-list-item-icon class="mr-3"><v-icon>{{ mdiHome }}</v-icon></v-list-item-icon>
+        <v-list-item-content><v-list-item-title>首页</v-list-item-title></v-list-item-content>
+      </v-list-item>
+      <v-list-item link @click="openSite('/post/popular_recent?period=1d&_wf=1')">
+        <v-list-item-icon class="mr-3"><v-icon>{{ mdiFire }}</v-icon></v-list-item-icon>
+        <v-list-item-content><v-list-item-title>人气作品</v-list-item-title></v-list-item-content>
+      </v-list-item>
+      <v-list-item link @click="openSite('/post?tags=order%3Arandom&page=1&_wf=1')">
+        <v-list-item-icon class="mr-3"><v-icon>{{ mdiShuffle }}</v-icon></v-list-item-icon>
+        <v-list-item-content><v-list-item-title>随机作品</v-list-item-title></v-list-item-content>
+      </v-list-item>
+      <v-list-item link @click="openSite('/pool?page=1&_wf=1')">
+        <v-list-item-icon class="mr-3"><v-icon>{{ mdiImageMultiple }}</v-icon></v-list-item-icon>
+        <v-list-item-content><v-list-item-title>图集</v-list-item-title></v-list-item-content>
+      </v-list-item>
+    </v-list>
+    <v-divider v-if="store.isYKSite" />
     <v-list dense nav class="site-switch-list">
+      <v-subheader>站点列表</v-subheader>
       <v-list-item
         v-for="site in sites"
         :key="site.url"
@@ -33,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { mdiClose } from '@mdi/js'
+import { mdiClose, mdiFire, mdiHome, mdiImageMultiple, mdiShuffle } from '@mdi/js'
 import { store } from '@/store'
 
 const locationHost = location.hostname

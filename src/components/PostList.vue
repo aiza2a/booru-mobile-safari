@@ -185,6 +185,9 @@
         {{ $t('Z4pa8GhgE63OGGvCqAld0') }}...
       </v-btn>
     </div>
+    <div v-if="longPressPreview" class="long-press-preview" @contextmenu.prevent>
+      <img :src="longPressPreview.sampleUrl || longPressPreview.fileUrl" alt="">
+    </div>
     <v-menu v-model="showMenu" :position-x="x" :position-y="y" absolute offset-y>
       <v-list>
         <v-list-item v-if="ctxActPost" @click="sharePost(ctxActPost)">
@@ -247,6 +250,7 @@ watch(
 const showNoMore = computed(() => !store.requestLoading && store.requestStop)
 const showLoadMore = computed(() => !store.requestLoading && !store.requestStop)
 
+const longPressPreview = ref<Post>()
 const ctxActPost = ref<Post>()
 const showMenu = ref(false)
 const x = ref(0)
@@ -292,6 +296,7 @@ function openPostMenu(img: Post, xPos: number, yPos: number) {
 function cancelPostLongPress() {
   if (longPressTimer) window.clearTimeout(longPressTimer)
   longPressTimer = undefined
+  if (!longPressTriggered) longPressPreview.value = undefined
   pendingDirectSharePost = undefined
 }
 
@@ -305,9 +310,11 @@ function onPostTouchStart(ev: TouchEvent, img: Post) {
   cancelPostLongPress()
   longPressTimer = window.setTimeout(() => {
     longPressTriggered = true
+    longPressPreview.value = img
+    navigator.vibrate?.(18)
     if (settings.longPressDirectShare) pendingDirectSharePost = img
     else openPostMenu(img, touch.clientX, touch.clientY)
-  }, 520)
+  }, 360)
 }
 
 function onPostTouchMove(ev: TouchEvent) {
@@ -322,6 +329,7 @@ function onPostTouchEnd(ev: TouchEvent) {
   if (longPressTriggered) ev.preventDefault()
   const post = pendingDirectSharePost
   pendingDirectSharePost = undefined
+  longPressPreview.value = undefined
   cancelPostLongPress()
   if (post) sharePost(post)
 }
