@@ -4,6 +4,9 @@
     <div v-if="store.isYKSite && showPopAction" style="display:flex" class="align-center">
       <v-toolbar-title class="mr-4 hidden-md-and-down" v-text="popTitle" />
       <v-switch v-model="isPopSearchByDate" class="hidden-sm-and-down" hide-details :label="isPopSearchByDate ? $t('nd4UjZy2ILsc-iW9iu7xR') : $t('elkBQ9moOZ-KMcy5bt_Ts')" />
+      <v-btn v-if="isMobile" class="mobile-pop-mode" small icon @click="isPopSearchByDate = !isPopSearchByDate">
+        <v-icon>{{ isPopSearchByDate ? mdiCalendar : mdiFire }}</v-icon>
+      </v-btn>
       <v-menu transition="slide-y-transition" offset-y>
         <template #activator="{ on, attrs }">
           <v-btn small class="ml-4" v-bind="attrs" v-on="on">
@@ -28,7 +31,7 @@
         min-width="auto"
       >
         <template #activator="{ on, attrs }">
-          <div v-show="isPopSearchByDate" class="ml-1 align-center hidden-sm-and-down" style="display: flex;width: 211px;">
+          <div v-show="isPopSearchByDate" class="ml-1 align-center mobile-pop-date" style="display: flex;">
             <v-btn icon @click="loadPrevPeriod()">
               <v-icon>{{ mdiChevronLeft }}</v-icon>
             </v-btn>
@@ -81,35 +84,9 @@
         </v-btn>
       </template>
       <template v-if="isMobile && isSupportTagSearch">
-        <v-menu
-          v-model="searchState.showMenu"
-          :max-width="320"
-          max-height="60vh"
-          transition="slide-y-transition"
-          offset-y
-        >
-          <template #activator="{ on }">
-            <div class="mobile-tag-search" v-on="on">
-              <v-text-field
-                v-model="searchState.searchTerm"
-                placeholder="搜索标签"
-                :append-icon="mdiMagnify"
-                hide-details
-                dense
-                clearable
-                @input="onSearchTermInput"
-                @click="searchState.showMenu = true"
-                @click:append="fetchTaggedPosts(searchState.searchTerm)"
-                @keydown="onSearchTermKeydown"
-              />
-            </div>
-          </template>
-          <v-list v-if="searchState.searchItems.length" class="ac_tags_list" dense>
-            <v-list-item v-for="item in searchState.searchItems" :key="item" @click="selectTag(item)">
-              <v-list-item-title v-text="item" />
-            </v-list-item>
-          </v-list>
-        </v-menu>
+        <v-btn class="mobile-search-trigger" title="搜索标签" icon @click="showMobileSearch = true">
+          <v-icon>{{ mdiMagnify }}</v-icon>
+        </v-btn>
       </template>
       <template v-else-if="isSupportTagSearch || isSankakuSite">
         <v-menu
@@ -269,12 +246,46 @@
     <v-btn v-if="isMobile" title="沉浸模式" icon @click="toggleImmersive">
       <v-icon>{{ store.isImmersive ? mdiFullscreenExit : mdiFullscreen }}</v-icon>
     </v-btn>
-    <v-btn :title="$t('UxxldE9xRwmQctrvba5Y8')" icon @click="store.showSettings = true">
+    <v-btn
+      v-if="isMobile"
+      class="mobile-settings-btn"
+      :title="$t('UxxldE9xRwmQctrvba5Y8')"
+      icon
+      @click="store.showSettings = true"
+    >
+      <v-icon :size="22">{{ mdiCog }}</v-icon>
+    </v-btn>
+    <v-btn v-else :title="$t('UxxldE9xRwmQctrvba5Y8')" icon @click="store.showSettings = true">
       <v-icon :size="22">{{ mdiCog }}</v-icon>
     </v-btn>
     <v-btn class="hidden-md-and-down" :title="$t('ClZdL9hGweOokP7Mn_Ptq')" icon @click="exitMasonry">
       <v-icon>{{ mdiLocationExit }}</v-icon>
     </v-btn>
+    <v-dialog v-model="showMobileSearch" fullscreen transition="dialog-bottom-transition">
+      <v-card class="mobile-search-sheet">
+        <v-toolbar flat>
+          <v-btn icon @click="showMobileSearch = false">
+            <v-icon>{{ mdiClose }}</v-icon>
+          </v-btn>
+          <v-text-field
+            v-model="searchState.searchTerm"
+            class="mobile-search-input"
+            placeholder="输入英文标签"
+            autofocus
+            clearable
+            hide-details
+            @input="onSearchTermInput"
+            @keydown.enter="submitMobileSearch"
+          />
+          <v-btn text @click="submitMobileSearch">搜索</v-btn>
+        </v-toolbar>
+        <v-list v-if="searchState.searchItems.length" class="mobile-search-suggestions" dense>
+          <v-list-item v-for="item in searchState.searchItems" :key="item" @click="selectMobileTag(item)">
+            <v-list-item-title v-text="item" />
+          </v-list-item>
+        </v-list>
+      </v-card>
+    </v-dialog>
     <v-progress-linear
       :active="store.requestLoading"
       :height="6"
@@ -300,6 +311,7 @@ import {
   mdiCheckboxMarked,
   mdiChevronLeft,
   mdiChevronRight,
+  mdiClose,
   mdiCog,
   mdiDelete,
   mdiDownload,
@@ -362,6 +374,7 @@ function removeFromList(id: string) {
 }
 
 const tagsQuery = new URLSearchParams(location.search).get('tags')
+const showMobileSearch = ref(false)
 const searchState = reactive({
   showInput: !!tagsQuery,
   showMenu: false,
@@ -406,6 +419,16 @@ function fetchTaggedPosts(tags: string) {
   history.pushState('', '', url)
   searchState.searchTerm = tags
   loadPostsByTags(tags)
+}
+
+function selectMobileTag(tag: string) {
+  selectTag(tag)
+  searchState.showMenu = false
+}
+
+function submitMobileSearch() {
+  showMobileSearch.value = false
+  fetchTaggedPosts(searchState.searchTerm)
 }
 
 function showTagsInput() {

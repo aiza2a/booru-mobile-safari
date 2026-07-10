@@ -3,6 +3,7 @@
     <AppBar />
     <NavDrawer />
     <MobileBottomNav />
+    <ImmersiveExit />
     <v-main app>
       <AppContainer />
       <SettingsDrawer />
@@ -18,6 +19,7 @@ import { onMounted, watch } from 'vue'
 import AppBar from './components/AppBar.vue'
 import NavDrawer from './components/NavDrawer.vue'
 import MobileBottomNav from './components/MobileBottomNav.vue'
+import ImmersiveExit from './components/ImmersiveExit.vue'
 import SettingsDrawer from './components/SettingsDrawer.vue'
 import AppContainer from './components/AppContainer.vue'
 import { useVuetify } from './plugins/vuetify'
