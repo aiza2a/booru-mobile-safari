@@ -28,6 +28,7 @@ export const store = Vue.observable({
   showPostList: !poolFlag,
   showPoolList: ykFlag && poolFlag,
   isFullscreen: false,
+  isImmersive: false,
 })
 
 export function toggleDrawer() {

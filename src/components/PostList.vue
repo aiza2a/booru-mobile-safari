@@ -21,7 +21,11 @@
             :src="getImgSrc(item)"
             role="button"
             tabindex="0"
-            @click="showImgModal(index)"
+            @click="onImageClick(index)"
+            @touchstart="onPostTouchStart($event, item)"
+            @touchmove="onPostTouchMove"
+            @touchend="onPostTouchEnd"
+            @touchcancel="cancelPostLongPress"
             @contextmenu="onCtxMenu($event, item)"
             @error="onImageLoadError(item?.id || '')"
           >
@@ -91,7 +95,11 @@
             :src="getImgSrc(image)"
             role="button"
             tabindex="0"
-            @click="showImgModal(index)"
+            @click="onImageClick(index)"
+            @touchstart="onPostTouchStart($event, image)"
+            @touchmove="onPostTouchMove"
+            @touchend="onPostTouchEnd"
+            @touchcancel="cancelPostLongPress"
             @contextmenu="onCtxMenu($event, image)"
             @error="onImageLoadError(image?.id || '')"
           >
@@ -101,7 +109,11 @@
           transition="scroll-y-transition"
           :src="getImgSrc(image)"
           :aspect-ratio="image?.aspectRatio"
-          @click="showImgModal(index)"
+          @click="onImageClick(index)"
+          @touchstart="onPostTouchStart($event, image)"
+          @touchmove="onPostTouchMove"
+          @touchend="onPostTouchEnd"
+          @touchcancel="cancelPostLongPress"
           @contextmenu="onCtxMenu($event, image)"
           @error="onImageLoadError(image?.id)"
         >
@@ -128,11 +140,7 @@
           >
             {{ mdiFolderNetwork }}
           </v-icon>
-          <div v-if="isMobile" class="mobile-card-share">
-            <v-btn icon color="#fff" aria-label="分享作品链接" @click.stop="sharePost(image)">
-              <v-icon>{{ mdiShareVariant }}</v-icon>
-            </v-btn>
-          </div>
+          <!-- Mobile actions are available through long press. -->
         </template>
         <v-icon
           v-if="image?.fileExt.toLowerCase() === 'gif'"
@@ -196,27 +204,12 @@
         </v-list-item>
       </v-list>
     </v-menu>
-    <v-fab-transition>
-      <v-btn
-        v-show="showFab"
-        fab
-        dark
-        fixed
-        bottom
-        right
-        color="pink"
-        class="refresh_posts_btn"
-        @click="refreshPosts()"
-      >
-        <v-icon>{{ mdiRefresh }}</v-icon>
-      </v-btn>
-    </v-fab-transition>
     <PostDetail />
   </div>
 </template>
 
 <script setup lang="ts">
-import { mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiRefresh, mdiShareVariant, mdiVideo } from '@mdi/js'
+import { mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo } from '@mdi/js'
 import { computed, nextTick, onMounted, onUnmounted, ref, set, watch } from 'vue'
 import type { Post } from '@himeka/booru'
 import PostDetail from './PostDetail.vue'
@@ -227,7 +220,7 @@ import { addPostToFavorites, isFavBtnShow } from '@/api/fav'
 import { isRule34FavPage } from '@/api/rule34'
 import { isGelbooruFavPage } from '@/api/gelbooru'
 import { isR34PahealHome } from '@/api/r34-paheal'
-import { initPosts, refreshPosts, searchPosts } from '@/store/actions/post'
+import { initPosts, searchPosts } from '@/store/actions/post'
 import { removeFromSelectedList, settings, store, addToSelectedList as storeAddToSelectedList } from '@/store'
 import i18n from '@/utils/i18n'
 
@@ -235,7 +228,10 @@ const notFitScreen = ref(localStorage.getItem('__fitScreen') == '0')
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const isR34Fav = ref(isRule34FavPage() || isGelbooruFavPage())
 const showImageList = ref(true)
-const showFab = ref(false)
+let longPressTimer: number | undefined
+let longPressStartX = 0
+let longPressStartY = 0
+let longPressTriggered = false
 
 watch(
   () => settings.selectedColumn,
@@ -282,6 +278,56 @@ function getImgSrc(img?: Post) {
   return src || img?.fileUrl || void 0
 }
 
+function openPostMenu(img: Post, xPos: number, yPos: number) {
+  showMenu.value = false
+  x.value = xPos
+  y.value = yPos
+  nextTick(() => {
+    ctxActPost.value = img
+    showMenu.value = true
+  })
+}
+
+function cancelPostLongPress() {
+  if (longPressTimer) window.clearTimeout(longPressTimer)
+  longPressTimer = undefined
+}
+
+function onPostTouchStart(ev: TouchEvent, img: Post) {
+  if (!isMobile || ev.touches.length !== 1) return
+  const touch = ev.touches[0]
+  longPressStartX = touch.clientX
+  longPressStartY = touch.clientY
+  longPressTriggered = false
+  cancelPostLongPress()
+  longPressTimer = window.setTimeout(() => {
+    longPressTriggered = true
+    if (settings.longPressDirectShare) sharePost(img)
+    else openPostMenu(img, touch.clientX, touch.clientY)
+  }, 520)
+}
+
+function onPostTouchMove(ev: TouchEvent) {
+  const touch = ev.touches[0]
+  if (!touch) return
+  if (Math.abs(touch.clientX - longPressStartX) > 12 || Math.abs(touch.clientY - longPressStartY) > 12) {
+    cancelPostLongPress()
+  }
+}
+
+function onPostTouchEnd(ev: TouchEvent) {
+  if (longPressTriggered) ev.preventDefault()
+  cancelPostLongPress()
+}
+
+function onImageClick(index: number) {
+  if (longPressTriggered) {
+    longPressTriggered = false
+    return
+  }
+  showImgModal(index)
+}
+
 function onCtxMenu(ev: MouseEvent, img: Post) {
   if (isR34Fav.value) return
   ev.preventDefault()
@@ -289,13 +335,7 @@ function onCtxMenu(ev: MouseEvent, img: Post) {
     sharePost(img)
     return
   }
-  showMenu.value = false
-  x.value = ev.clientX
-  y.value = ev.clientY
-  nextTick(() => {
-    ctxActPost.value = img
-    showMenu.value = true
-  })
+  openPostMenu(img, ev.clientX, ev.clientY)
 }
 
 function showImgModal(index: number) {
@@ -377,13 +417,10 @@ function calcItemHeight(item: any, itemWidth: number) {
   return item.height * (itemWidth / item.width)
 }
 
-const scrollFn = throttleScroll(scroll => {
-  if (!showFab.value && scroll > 200) showFab.value = true
+const scrollFn = throttleScroll(_scroll => {
   if (store.requestStop) return
   if (store.requestLoading) return
   notReachBottom() && searchPosts(true)
-}, () => {
-  if (showFab.value) showFab.value = false
 })
 
 onMounted(async () => {
