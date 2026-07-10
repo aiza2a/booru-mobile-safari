@@ -223,7 +223,7 @@
         </v-list>
       </v-menu>
     </template>
-    <v-btn :title="$t('u8mEnSo4mxDRUbj7FeAll')" icon @click="toggleDarkmode">
+    <v-btn v-if="!isMobile" :title="$t('u8mEnSo4mxDRUbj7FeAll')" icon @click="toggleDarkmode">
       <v-icon>{{ mdiBrightness6 }}</v-icon>
     </v-btn>
     <v-btn class="hidden-md-and-down" :title="$t('OrwwNKZ7I70-ecpspE8d_')" icon @click="toggleFullscreen">
