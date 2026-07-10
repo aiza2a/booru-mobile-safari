@@ -7019,6 +7019,84 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       return results;
     }
   };
+  function isDanbooruPage() {
+    return location.hostname == "danbooru.donmai.us";
+  }
+  const isCNLang$3 = i18n.locale.includes("zh");
+  const tagSortOrder$2 = ["artist", "copyright", "character", "general"];
+  function getDanbooruTagDetail(image) {
+    const { data, tags } = image;
+    const tagMap2 = {
+      artist: [i18n.t("Ym0HIEu9Q80qXB31LuC6c"), "#FB8C00", data.tag_string_artist.split(/\s+/)],
+      copyright: [i18n.t("juT6gwLOg5r1h2vFpFf6P"), "#AB47BC", data.tag_string_copyright.split(/\s+/)],
+      character: [i18n.t("aonlPAu9kEkkwNvQg0DBk"), "#66BB6A", data.tag_string_character.split(/\s+/)]
+    };
+    return {
+      voted: false,
+      tags: tags.map((tag2) => {
+        const tagCN = isCNLang$3 && window.__tagsCN?.[tag2.replace(/_/g, " ")];
+        const typedTag = { type: "", text: "", color: "" };
+        for (const [key, val] of Object.entries(tagMap2)) {
+          if (val[2].includes(tag2)) {
+            typedTag.type = key;
+            typedTag.text = val[0];
+            typedTag.color = val[1];
+            break;
+          }
+        }
+        const tagText = [
+          typedTag.text && `[ ${typedTag.text} ] `,
+          tag2,
+          tagCN && ` [ ${tagCN} ]`
+        ].filter(Boolean).join("");
+        return {
+          tag: tag2,
+          tagText,
+          color: typedTag.color || "#8F77B5",
+          type: typedTag.type || "general"
+        };
+      }).sort((a, b) => {
+        return tagSortOrder$2.indexOf(a.type) - tagSortOrder$2.indexOf(b.type);
+      })
+    };
+  }
+  async function addFavoriteDanbooru(id) {
+    const response = await fetch(`https://danbooru.donmai.us/favorites?post_id=${id}`, {
+      method: "POST",
+      headers: { "x-csrf-token": sessionStorage.getItem("csrf-token") ?? "" }
+    });
+    if (!response.ok) {
+      showMsg({ msg: `${i18n.t("MWVfUiW8egLWq7MgV-wzc")}: ${response.status}`, type: "error" });
+      return false;
+    }
+    const result = await response.text();
+    if (result.includes('toggleClass("fav-buttons-true")')) {
+      showMsg({ msg: i18n.t("ctWGhVvqB2k_1TX2iY0l2").toString() });
+      return true;
+    } else {
+      showMsg({ msg: `${i18n.t("MWVfUiW8egLWq7MgV-wzc")}: ${result}`, type: "error" });
+      return false;
+    }
+  }
+  function isDanbooruExplorePage() {
+    return isDanbooruPage() && location.pathname.startsWith("/explore/posts/");
+  }
+  async function fetchDanbooruExplorePosts() {
+    const url = new URL(location.href);
+    url.pathname += ".json";
+    url.searchParams.delete("_wf");
+    const response = await fetch(url);
+    if (!response.ok)
+      throw new Error(`Danbooru explore ${response.status}`);
+    const result = await response.json();
+    const site = booruForSite(location.host);
+    const posts = result.map((data) => new Post(data, site));
+    return new SearchResults(posts, [], {}, site);
+  }
+  const danbooruExplore = {
+    is: isDanbooruExplorePage,
+    posts: async () => fetchDanbooruExplorePosts()
+  };
   function isEshuushuuPage() {
     return location.hostname == "e-shuushuu.net";
   }
@@ -7102,8 +7180,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     });
     return results;
   }
-  const isCNLang$3 = i18n.locale.includes("zh");
-  const tagSortOrder$2 = ["artist", "copyright", "character", "general"];
+  const isCNLang$2 = i18n.locale.includes("zh");
+  const tagSortOrder$1 = ["artist", "copyright", "character", "general"];
   const tagMap = {
     Artist: [i18n.t("Ym0HIEu9Q80qXB31LuC6c"), "#FB8C00", "artist"],
     Source: [i18n.t("juT6gwLOg5r1h2vFpFf6P"), "#AB47BC", "copyright"],
@@ -7114,7 +7192,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     return {
       voted: false,
       tags: tags.map((tag2) => {
-        const tagCN = isCNLang$3 && window.__tagsCN?.[tag2.name.replace(/_/g, " ")];
+        const tagCN = isCNLang$2 && window.__tagsCN?.[tag2.name.replace(/_/g, " ")];
         const tagType = tagMap[tag2.type_name];
         const tagText = [
           tagType?.[0] && `[ ${tagType[0]} ] `,
@@ -7128,7 +7206,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           type: tagType?.[2] || "general"
         };
       }).sort((a, b) => {
-        return tagSortOrder$2.indexOf(a.type) - tagSortOrder$2.indexOf(b.type);
+        return tagSortOrder$1.indexOf(a.type) - tagSortOrder$1.indexOf(b.type);
       })
     };
   }
@@ -7385,8 +7463,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     general: ["", "#E87A90cc"],
     faults: ["", "#AB3B3Ada"]
   };
-  const tagSortOrder$1 = ["circle", "artist", "copyright", "character", "general"];
-  const isCNLang$2 = i18n.locale.includes("zh");
+  const tagSortOrder = ["circle", "artist", "copyright", "character", "general"];
+  const isCNLang$1 = i18n.locale.includes("zh");
   async function getPostDetail(id) {
     try {
       if (!id)
@@ -7401,7 +7479,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           const tagText = [
             typeText && `[ ${typeText} ] `,
             tag2,
-            isCNLang$2 && tagCN && ` [ ${tagCN} ]`
+            isCNLang$1 && tagCN && ` [ ${tagCN} ]`
           ].filter(Boolean).join("");
           return {
             tag: tag2,
@@ -7410,7 +7488,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
             color: tagInfoMap[type]?.[1] || tagInfoMap.general[1]
           };
         }).sort((a, b) => {
-          return tagSortOrder$1.indexOf(a.type) - tagSortOrder$1.indexOf(b.type);
+          return tagSortOrder.indexOf(a.type) - tagSortOrder.indexOf(b.type);
         })
       };
     } catch (error) {
@@ -7500,7 +7578,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     return results;
   }
   function isYandereHtml() {
-    return location.hostname == "yande.re" && location.pathname == "/post" && settings.isYandereFetchByHtml;
+    const isKonachan = location.hostname === "konachan.com" || location.hostname === "konachan.net";
+    return location.hostname === "yande.re" && location.pathname === "/post" && settings.isYandereFetchByHtml || isKonachan && location.pathname === "/post";
   }
   async function fetchPostsByHtml(page, tags) {
     const url = new URL(location.href);
@@ -7508,11 +7587,20 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     tags && url.searchParams.set("tags", tags);
     const htmlResp = await fetch(url.href);
     const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const script = doc.querySelector("form:has(select[name=locale]) + script");
-    const scriptText = script?.innerText.trim() || "";
+    const selectors = [
+      "form:has(select[name=locale]) + script",
+      "script:not([src])"
+    ];
+    const scriptTexts = selectors.flatMap((selector) => [...doc.querySelectorAll(selector)].map((e) => e.innerText));
+    const scriptText = scriptTexts.find((text) => text.includes("Post.register(")) || "";
     let results = [];
     try {
-      results = scriptText.split("\n").slice(1).map((e) => JSON.parse(e.match(/Post.register\((.*)\)/)?.[1] || "[]"));
+      results = scriptText.split("\n").flatMap((line) => {
+        const match2 = line.match(/Post\.register\((.*)\);?\s*$/);
+        if (!match2)
+          return [];
+        return [JSON.parse(match2[1])];
+      });
     } catch (err) {
       console.log("err: ", err);
     }
@@ -8012,6 +8100,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     moebooru.popular,
     moebooru.pool,
     moebooru.yanderehtml,
+    danbooruExplore,
     gelbooru,
     gelbooru.fav,
     rule34.fav,
@@ -9249,65 +9338,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       return host;
     } catch (_error) {
       return "\u6765\u6E90";
-    }
-  }
-  function isDanbooruPage() {
-    return location.hostname == "danbooru.donmai.us";
-  }
-  const isCNLang$1 = i18n.locale.includes("zh");
-  const tagSortOrder = ["artist", "copyright", "character", "general"];
-  function getDanbooruTagDetail(image) {
-    const { data, tags } = image;
-    const tagMap2 = {
-      artist: [i18n.t("Ym0HIEu9Q80qXB31LuC6c"), "#FB8C00", data.tag_string_artist.split(/\s+/)],
-      copyright: [i18n.t("juT6gwLOg5r1h2vFpFf6P"), "#AB47BC", data.tag_string_copyright.split(/\s+/)],
-      character: [i18n.t("aonlPAu9kEkkwNvQg0DBk"), "#66BB6A", data.tag_string_character.split(/\s+/)]
-    };
-    return {
-      voted: false,
-      tags: tags.map((tag2) => {
-        const tagCN = isCNLang$1 && window.__tagsCN?.[tag2.replace(/_/g, " ")];
-        const typedTag = { type: "", text: "", color: "" };
-        for (const [key, val] of Object.entries(tagMap2)) {
-          if (val[2].includes(tag2)) {
-            typedTag.type = key;
-            typedTag.text = val[0];
-            typedTag.color = val[1];
-            break;
-          }
-        }
-        const tagText = [
-          typedTag.text && `[ ${typedTag.text} ] `,
-          tag2,
-          tagCN && ` [ ${tagCN} ]`
-        ].filter(Boolean).join("");
-        return {
-          tag: tag2,
-          tagText,
-          color: typedTag.color || "#8F77B5",
-          type: typedTag.type || "general"
-        };
-      }).sort((a, b) => {
-        return tagSortOrder.indexOf(a.type) - tagSortOrder.indexOf(b.type);
-      })
-    };
-  }
-  async function addFavoriteDanbooru(id) {
-    const response = await fetch(`https://danbooru.donmai.us/favorites?post_id=${id}`, {
-      method: "POST",
-      headers: { "x-csrf-token": sessionStorage.getItem("csrf-token") ?? "" }
-    });
-    if (!response.ok) {
-      showMsg({ msg: `${i18n.t("MWVfUiW8egLWq7MgV-wzc")}: ${response.status}`, type: "error" });
-      return false;
-    }
-    const result = await response.text();
-    if (result.includes('toggleClass("fav-buttons-true")')) {
-      showMsg({ msg: i18n.t("ctWGhVvqB2k_1TX2iY0l2").toString() });
-      return true;
-    } else {
-      showMsg({ msg: `${i18n.t("MWVfUiW8egLWq7MgV-wzc")}: ${result}`, type: "error" });
-      return false;
     }
   }
   const favActions = {
