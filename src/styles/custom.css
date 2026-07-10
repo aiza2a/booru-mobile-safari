@@ -912,3 +912,76 @@ html.ym-immersive .v-main {
 html.ym-immersive .posts-image-card {
   border-radius: 0 !important;
 }
+
+.mobile-settings-btn {
+  flex: 0 0 44px !important;
+}
+
+.mobile-search-sheet {
+  color: #f5f5f7 !important;
+  background: #08090c !important;
+}
+
+.mobile-search-sheet .v-toolbar {
+  padding-top: env(safe-area-inset-top);
+  background: #111318 !important;
+}
+
+.mobile-search-input {
+  margin: 0 8px;
+}
+
+.mobile-search-suggestions {
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #08090c !important;
+}
+
+.immersive-exit-button {
+  position: fixed;
+  z-index: 9999;
+  top: calc(10px + env(safe-area-inset-top));
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(17, 19, 24, .78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+html.ym-immersive .wf-layout,
+html.ym-immersive .wf-layout > div,
+html.ym-immersive .v-main__wrap {
+  width: 100vw !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.ym-immersive .posts-image-card {
+  margin: 0 !important;
+}
+
+@media screen and (max-width: 959px) {
+  .mobile-pop-mode {
+    margin-left: 2px !important;
+  }
+
+  .mobile-pop-date {
+    width: 154px;
+    min-width: 154px;
+  }
+
+  .mobile-pop-date .v-text-field {
+    width: 96px;
+  }
+
+  .mobile-pop-date .v-input__prepend-outer {
+    display: none;
+  }
+}
