@@ -232,6 +232,7 @@ let longPressTimer: number | undefined
 let longPressStartX = 0
 let longPressStartY = 0
 let longPressTriggered = false
+let pendingDirectSharePost: Post | undefined
 
 watch(
   () => settings.selectedColumn,
@@ -291,6 +292,7 @@ function openPostMenu(img: Post, xPos: number, yPos: number) {
 function cancelPostLongPress() {
   if (longPressTimer) window.clearTimeout(longPressTimer)
   longPressTimer = undefined
+  pendingDirectSharePost = undefined
 }
 
 function onPostTouchStart(ev: TouchEvent, img: Post) {
@@ -298,11 +300,12 @@ function onPostTouchStart(ev: TouchEvent, img: Post) {
   const touch = ev.touches[0]
   longPressStartX = touch.clientX
   longPressStartY = touch.clientY
+  pendingDirectSharePost = undefined
   longPressTriggered = false
   cancelPostLongPress()
   longPressTimer = window.setTimeout(() => {
     longPressTriggered = true
-    if (settings.longPressDirectShare) sharePost(img)
+    if (settings.longPressDirectShare) pendingDirectSharePost = img
     else openPostMenu(img, touch.clientX, touch.clientY)
   }, 520)
 }
@@ -317,7 +320,10 @@ function onPostTouchMove(ev: TouchEvent) {
 
 function onPostTouchEnd(ev: TouchEvent) {
   if (longPressTriggered) ev.preventDefault()
+  const post = pendingDirectSharePost
+  pendingDirectSharePost = undefined
   cancelPostLongPress()
+  if (post) sharePost(post)
 }
 
 function onImageClick(index: number) {

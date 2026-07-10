@@ -35,10 +35,10 @@ export async function shareUrl(url: string, title: string): Promise<boolean> {
       textarea.style.opacity = '0'
       document.body.appendChild(textarea)
       textarea.select()
-      document.execCommand('copy')
+      const copied = document.execCommand('copy')
       textarea.remove()
-      showMsg({ msg: '链接已复制', type: 'success' })
-      return true
+      showMsg({ msg: copied ? '链接已复制' : `无法打开分享：${url}`, type: copied ? 'success' : 'error' })
+      return copied
     }
   }
 }
