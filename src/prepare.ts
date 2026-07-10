@@ -127,10 +127,6 @@ async function initMasonry() {
   replaceDocument()
 }
 
-function initFastLoadingShell() {
-  // Kept for compatibility; the original page remains visible until dependencies are ready.
-}
-
 function addSiteStyle() {
   GM_addStyle(prepareStyle)
   if (location.host.includes('yande.re')) {
