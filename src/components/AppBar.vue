@@ -619,6 +619,10 @@ function selectLang(val: typeof settings.lang) {
 }
 
 onMounted(() => {
+  eventBus.$on('mobileSearch', () => {
+    searchState.showInput = true
+    setTimeout(() => document.querySelector<HTMLInputElement>('.app-bar-tag-input input')?.focus(), 80)
+  })
   document.addEventListener('fullscreenchange', () => {
     store.isFullscreen = !!document.fullscreenElement
   })

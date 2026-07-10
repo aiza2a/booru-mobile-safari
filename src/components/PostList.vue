@@ -128,6 +128,11 @@
           >
             {{ mdiFolderNetwork }}
           </v-icon>
+          <div v-if="isMobile" class="mobile-card-share">
+            <v-btn icon color="#fff" aria-label="分享作品链接" @click.stop="sharePost(image)">
+              <v-icon>{{ mdiShareVariant }}</v-icon>
+            </v-btn>
+          </div>
         </template>
         <v-icon
           v-if="image?.fileExt.toLowerCase() === 'gif'"
@@ -174,6 +179,9 @@
     </div>
     <v-menu v-model="showMenu" :position-x="x" :position-y="y" absolute offset-y>
       <v-list>
+        <v-list-item v-if="ctxActPost" @click="sharePost(ctxActPost)">
+          <v-list-item-title>分享作品链接</v-list-item-title>
+        </v-list-item>
         <v-list-item v-if="isFavBtnShow" @click="addFavorite()">
           <v-list-item-title>{{ $t('Dnnio9m9RZA6bkTLytc99') }}</v-list-item-title>
         </v-list-item>
@@ -208,11 +216,12 @@
 </template>
 
 <script setup lang="ts">
-import { mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiRefresh, mdiVideo } from '@mdi/js'
+import { mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiRefresh, mdiShareVariant, mdiVideo } from '@mdi/js'
 import { computed, nextTick, onMounted, onUnmounted, ref, set, watch } from 'vue'
 import type { Post } from '@himeka/booru'
 import PostDetail from './PostDetail.vue'
 import { downloadFile, fancyboxShow, notReachBottom, showMsg, throttleScroll } from '@/utils'
+import { sharePost } from '@/utils/share'
 import { notPartialSupportSite } from '@/api/booru'
 import { addPostToFavorites, isFavBtnShow } from '@/api/fav'
 import { isRule34FavPage } from '@/api/rule34'
@@ -223,6 +232,7 @@ import { removeFromSelectedList, settings, store, addToSelectedList as storeAddT
 import i18n from '@/utils/i18n'
 
 const notFitScreen = ref(localStorage.getItem('__fitScreen') == '0')
+const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const isR34Fav = ref(isRule34FavPage() || isGelbooruFavPage())
 const showImageList = ref(true)
 const showFab = ref(false)
