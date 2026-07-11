@@ -72,8 +72,8 @@ export function isDanbooruExplorePage() {
 
 export async function fetchDanbooruExplorePosts(): Promise<SearchResults> {
   const url = new URL(location.href)
-  url.pathname += '.json'
   url.searchParams.delete('_wf')
+  url.pathname += '.json'
   const response = await fetch(url)
   if (!response.ok) throw new Error(`Danbooru explore ${response.status}`)
   const result = await response.json()

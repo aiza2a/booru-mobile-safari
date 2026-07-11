@@ -332,7 +332,7 @@ import { useVuetify } from '@/plugins/vuetify'
 import { addDate, debounce, downloadFile, downloadText, eventBus, formatDate, showMsg, subDate } from '@/utils'
 import { settings, store, toggleDrawer } from '@/store'
 import { langList } from '@/store/settings'
-import { loadPostsByPage, loadPostsByTags, refreshPosts } from '@/store/actions/post'
+import { loadPostsByPage, loadPostsByTags } from '@/store/actions/post'
 import { getRecentTags, getUsername, isPopularPage } from '@/api/moebooru'
 import { defCompTags, getSiteTitle, isSupportTagSearch, notPartialSupportSite } from '@/api/booru'
 import { fetchAutocomplete, isAutocompleteAct } from '@/api/autocomplete'
@@ -508,14 +508,12 @@ const popSearchDate = ref((() => {
 })())
 
 function fetchPopularPosts(type: string) {
-  let url = `/post/popular_recent?period=${type}`
+  let url = `/post/popular_recent?period=${type}&_wf=1`
   if (isPopSearchByDate.value) {
     const [year, month, day] = popSearchDate.value.split('-')
-    url = `/post/popular_by_${periodMap[type][2]}?day=${day}&month=${month}&year=${year}`
+    url = `/post/popular_by_${periodMap[type][2]}?day=${day}&month=${month}&year=${year}&_wf=1`
   }
-  history.pushState('', '', url)
-  popTitle.value = getPopTitle()
-  refreshPosts()
+  location.assign(url)
 }
 
 function selPeriod(key: string) {
