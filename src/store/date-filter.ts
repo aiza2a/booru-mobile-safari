@@ -11,6 +11,8 @@ export const dateFilter = reactive({
   mode: parsed.mode,
   scale: parsed.scale,
   date: parsed.date,
+  rangeStart: parsed.date,
+  rangeEnd: parsed.date,
   routeKind: parsed.routeKind,
 })
 

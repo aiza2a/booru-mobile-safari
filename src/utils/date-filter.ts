@@ -1,4 +1,4 @@
-export type DateScale = 'day' | 'week' | 'month' | 'year'
+export type DateScale = 'day' | 'week' | 'month' | 'year' | 'range'
 
 export interface DateRange {
   date: string
@@ -17,6 +17,7 @@ export function formatISODate(date: Date) {
 
 export function getDateRange(dateText: string, scale: DateScale): DateRange {
   const date = new Date(`${dateText}T12:00:00`)
+  if (scale === 'range') return { date: dateText, start: dateText, end: dateText, scale }
   const start = new Date(date)
   const end = new Date(date)
   if (scale === 'week') {
@@ -39,6 +40,7 @@ export function getDateRange(dateText: string, scale: DateScale): DateRange {
 }
 
 export function shiftDate(dateText: string, scale: DateScale, offset: number) {
+  if (scale === 'range') return dateText
   const date = new Date(`${dateText}T12:00:00`)
   if (scale === 'day') date.setDate(date.getDate() + offset)
   if (scale === 'week') date.setDate(date.getDate() + offset * 7)
@@ -56,6 +58,7 @@ export function clampFutureDate(dateText: string, today = new Date()) {
 export function formatDateDisplay(dateText: string, scale: DateScale) {
   const range = getDateRange(dateText, scale)
   const slash = (value: string) => value.slice(5).replace('-', '/')
+  if (scale === 'range') return dateText
   if (scale === 'day') return slash(range.date)
   if (scale === 'week') {
     const start = slash(range.start)

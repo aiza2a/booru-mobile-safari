@@ -9,6 +9,8 @@ export interface DateRouteInput {
   date: string
   scale: DateScale
   mode?: 'all' | 'latest' | 'date'
+  rangeStart?: string
+  rangeEnd?: string
 }
 
 export const siteDateCapabilities: Record<SupportedDateSite, DateRouteKind[]> = {
@@ -32,6 +34,17 @@ export function buildDateRoute(input: DateRouteInput) {
   const range = getDateRange(date, scale)
   if (!siteDateCapabilities[site].includes(kind)) {
     throw new Error(`${site} does not support ${kind} date routes`)
+  }
+
+  if (input.mode === 'date' && scale === 'range') {
+    const start = input.rangeStart || date
+    const end = input.rangeEnd || date
+    const tags = `date:>=${start} date:<=${end}`
+    if (site === 'yandere' || site.startsWith('konachan')) return `${moeOrigin(site)}/post?tags=${encodedTags(tags)}&_wf=1`
+    if (site === 'danbooru') {
+      const order = kind === 'ranked' ? 'order:score ' : ''
+      return `https://danbooru.donmai.us/posts?tags=${encodedTags(`${order}${tags}`)}&_wf=1`
+    }
   }
 
   if (input.mode === 'all') {

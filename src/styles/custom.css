@@ -1089,7 +1089,7 @@ html.ym-immersive .posts-image-card {
   min-width: 0;
   max-width: calc(100vw - 164px);
   margin-left: 2px;
-  overflow: hidden;
+  overflow: visible;
   white-space: nowrap;
 }
 
@@ -1156,10 +1156,15 @@ html.ym-immersive .posts-image-card {
 }
 
 .ios-date-sheet {
-  max-height: 82vh;
-  overflow: auto;
+  overflow: visible;
   border-radius: 22px 22px 0 0 !important;
   background: var(--ios-surface) !important;
+}
+
+.ios-date-sheet .v-picker,
+.ios-date-sheet .v-date-picker-table {
+  width: 100% !important;
+  min-height: 360px;
 }
 
 .ios-date-sheet .v-card__title {
@@ -1176,4 +1181,29 @@ html.ym-immersive .posts-image-card {
   max-height: 48vh;
   padding: 12px;
   overflow: auto;
+}
+
+.mobile-date-filter .range-display {
+  min-width: 108px !important;
+  max-width: 118px;
+  font-size: 13px;
+}
+
+.ios-range-picker {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  max-height: 62vh;
+  padding: 0 10px 10px;
+  overflow: auto;
+}
+
+.ios-range-picker .v-picker {
+  min-height: 340px;
+}
+
+.range-label {
+  padding: 8px 12px 4px;
+  color: var(--ios-secondary-label);
+  font-size: 14px;
 }
