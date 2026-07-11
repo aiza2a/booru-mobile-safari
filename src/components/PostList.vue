@@ -64,11 +64,11 @@
           >
             {{ mdiVideo }}
           </v-icon>
-          <div v-if="!isR34Fav && settings.showPostCheckbox" class="posts-image-checkbox">
+          <div v-if="settings.showPostCheckbox" class="posts-image-checkbox">
             <v-checkbox class="ma-0 pa-0" :value="isPostChecked(item?.id)" hide-details @change="onPostCheckboxChange($event, item)" />
           </div>
           <div v-if="settings.showListPostReso" class="posts-image-wh">{{ item?.width }} × {{ item?.height }}</div>
-          <div v-if="!isR34Fav" class="posts-image-actions">
+          <div v-if="true" class="posts-image-actions">
             <v-btn icon color="#fff" :title="$t('EsiorRgoeHI8h7IHMLDA4')" :href="item?.postView" target="_blank" rel="noreferrer">
               <v-icon>{{ mdiLinkVariant }}</v-icon>
             </v-btn>
@@ -157,11 +157,11 @@
         >
           {{ mdiVideo }}
         </v-icon>
-        <div v-if="!isR34Fav && settings.showPostCheckbox" class="posts-image-checkbox">
+        <div v-if="settings.showPostCheckbox" class="posts-image-checkbox">
           <v-checkbox class="ma-0 pa-0" :value="isPostChecked(image?.id)" hide-details @change="onPostCheckboxChange($event, image)" />
         </div>
         <div v-if="settings.showListPostReso" class="posts-image-wh">{{ image?.width }} × {{ image?.height }}</div>
-        <div v-if="!isR34Fav" class="posts-image-actions">
+        <div v-if="true" class="posts-image-actions">
           <v-btn icon color="#fff" :title="$t('EsiorRgoeHI8h7IHMLDA4')" :href="image?.postView" target="_blank" rel="noreferrer">
             <v-icon>{{ mdiLinkVariant }}</v-icon>
           </v-btn>
@@ -213,11 +213,10 @@ import { mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiL
 import { computed, nextTick, onMounted, onUnmounted, ref, set, watch } from 'vue'
 import type { Post } from '@himeka/booru'
 import PostDetail from './PostDetail.vue'
-import { fancyboxShow, notReachBottom, throttleScroll } from '@/utils'
+import { notReachBottom, throttleScroll } from '@/utils'
 import { sharePost } from '@/utils/share'
 import { notPartialSupportSite } from '@/api/booru'
 import { addPostToFavorites, isFavBtnShow } from '@/api/fav'
-import { isRule34FavPage } from '@/api/rule34'
 import { isGelbooruFavPage } from '@/api/gelbooru'
 import { initPosts, searchPosts } from '@/store/actions/post'
 import { removeFromSelectedList, settings, store, addToSelectedList as storeAddToSelectedList } from '@/store'
@@ -225,7 +224,7 @@ import i18n from '@/utils/i18n'
 
 const notFitScreen = ref(localStorage.getItem('__fitScreen') == '0')
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
-const isR34Fav = ref(isRule34FavPage() || isGelbooruFavPage())
+const isR34Fav = ref(isGelbooruFavPage())
 const showImageList = ref(true)
 
 let openedDetailIndex = -1
@@ -446,10 +445,6 @@ async function preloadDetailImage(post: Post) {
 }
 
 async function showImgModal(index: number) {
-  if (settings.useFancybox) {
-    fancyboxShow(store.imageList, index)
-    return
-  }
   openedDetailIndex = index
   store.imageSelectedIndex = index
   await preloadDetailImage(store.imageList[index])

@@ -64,7 +64,7 @@
     <div v-else-if="!isMobile && store.showPostList" style="display:flex" class="align-center">
       <v-toolbar-title class="hidden-md-and-down" v-text="title" />
       <input
-        v-if="!isSankakuSite"
+        v-if="true"
         :value="store.currentPage"
         class="ml-1 mr-2 text-center rounded"
         :style="{ width: '40px', height: '30px', border: '1px solid #bbb', color: 'inherit' }"
@@ -89,7 +89,7 @@
           <v-icon>{{ mdiMagnify }}</v-icon>
         </v-btn>
       </template>
-      <template v-else-if="isSupportTagSearch || isSankakuSite">
+      <template v-else-if="isSupportTagSearch">
         <v-menu
           v-model="searchState.showMenu"
           :max-width="200"
@@ -254,7 +254,7 @@ import { loadPostsByPage, loadPostsByTags } from '@/store/actions/post'
 import { getRecentTags, getUsername, isPopularPage } from '@/api/moebooru'
 import { defCompTags, getSiteTitle, isSupportTagSearch } from '@/api/booru'
 import { fetchAutocomplete, isAutocompleteAct } from '@/api/autocomplete'
-import { isSankakuSite } from '@/api/sankaku'
+
 import i18n from '@/utils/i18n'
 
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches

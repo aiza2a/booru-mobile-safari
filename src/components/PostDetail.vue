@@ -291,41 +291,6 @@
         </template>
         <span>{{ $t('B_ptN5O-9PhmG5ymGGtc6') }}</span>
       </v-tooltip>
-      <v-menu v-if="notR34Fav" dense open-on-hover offset-y>
-        <template #activator="{ on, attrs }">
-          <v-btn
-            v-show="!downloading"
-            fab
-            small
-            class="mr-1"
-            v-bind="attrs"
-            v-on="on"
-          >
-            <v-icon>{{ mdiDownload }}</v-icon>
-          </v-btn>
-        </template>
-        <v-list dense flat>
-          <v-list-item v-if="imageSelected.sampleUrl" two-line link dense>
-            <v-list-item-content @click.stop="download(imageSelected.sampleUrl, imageSelected.sampleDownloadName)">
-              <v-list-item-title>{{ $t('wI4KHHIe3zNRziW4lDZrp') }}</v-list-item-title>
-              <v-list-item-subtitle v-text="imageSelected.sampleDownloadText" />
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item v-if="imageSelected.jpegUrl" two-line link dense>
-            <v-list-item-content @click.stop="download(imageSelected.jpegUrl, imageSelected.jpegDownloadName)">
-              <v-list-item-title>{{ $t('k4YzDnBtd_S2UpAQucGxF') }}</v-list-item-title>
-              <v-list-item-subtitle v-text="imageSelected.jpegDownloadText" />
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item two-line link dense>
-            <v-list-item-content @click.stop="download(imageSelected.fileUrl, imageSelected.fileDownloadName)">
-              <v-list-item-title>{{ $t('VpuyxZtIoDF9-YyOm0tK_') }}</v-list-item-title>
-              <v-list-item-subtitle v-text="imageSelected.fileDownloadText" />
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-      <v-progress-circular v-show="downloading" indeterminate class="ml-1 mr-2" color="primary" />
       <v-tooltip v-if="notPartialSupportSite && notR34Fav" bottom>
         <template #activator="{ on, attrs }">
           <v-btn
@@ -362,17 +327,6 @@
         >
           <v-icon left>{{ mdiTagMultiple }}</v-icon>
           <span>{{ settings.showTagChipGroup ? $t('gM92sLo0Cqfl2rCaXlOhc') : $t('l5W-EtJ_ar-SY2lF4H5Zm') }}</span>
-        </v-chip>
-        <v-chip
-          v-if="isExportTagsEnable && postDetail.tags?.length"
-          small
-          class="mr-1"
-          role="button"
-          tabindex="0"
-          @click.stop="openExportTags()"
-        >
-          <v-icon left>{{ mdiTagMultiple }}</v-icon>
-          <span>{{ $t('QH_xm27zhgs5E1077asf1') }}</span>
         </v-chip>
         <template v-if="store.isYKSite">
           <v-chip
@@ -432,9 +386,6 @@
       <v-btn icon aria-label="上一张" @click="showPrevPost">
         <v-icon>{{ mdiChevronLeft }}</v-icon>
       </v-btn>
-      <v-btn icon aria-label="下载原图" @click="download(imageSelected.fileUrl, imageSelected.fileDownloadName)">
-        <v-icon>{{ mdiDownload }}</v-icon>
-      </v-btn>
       <v-btn icon aria-label="分享帖子链接" @click="sharePost(imageSelected)">
         <v-icon>{{ mdiShareVariant }}</v-icon>
       </v-btn>
@@ -450,13 +401,6 @@
         <v-icon>{{ mdiChevronRight }}</v-icon>
       </v-btn>
     </div>
-    <PostExportTags
-      v-if="isExportTagsEnable && store.showImageSelected"
-      :show-dialog="isExportTagsShow"
-      :update-show-dialog="//@ts-ignore
-        val => isExportTagsShow = val"
-      :tags="postDetail?.tags || []"
-    />
   </component>
 </template>
 
@@ -465,7 +409,6 @@ import {
   mdiChevronLeft,
   mdiChevronRight,
   mdiClose,
-  mdiDownload,
   mdiFileTree,
   mdiFitToScreenOutline,
   mdiFolderNetwork,
@@ -485,14 +428,12 @@ import {
 } from '@mdi/js'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import DPlayer from './DPlayer.vue'
-import PostExportTags from './PostExportTags.vue'
-import { debounce, downloadFile, dragElement, formatRelativeTime, isURL, showMsg } from '@/utils'
+import { debounce, dragElement, formatRelativeTime, isURL } from '@/utils'
 import { sharePost, shareUrl, sourceLabel } from '@/utils/share'
 import { gelbooru, realbooru, rule34, zerochan } from '@/api'
 import { type PostDetail } from '@/api/moebooru'
 import { addPostToFavorites, isFavBtnShow } from '@/api/fav'
 import { notPartialSupportSite } from '@/api/booru'
-import { isR34PahealHome } from '@/api/r34-paheal'
 import { isDanbooruPage } from '@/api/danbooru'
 import { getZerochanFileUrl } from '@/api/zerochan'
 import { addToSelectedList, settings, store } from '@/store'
@@ -524,7 +465,6 @@ const detailColorStyle = computed(() => ({
 const imgLoading = ref(true)
 const innerWidth = ref(window.innerWidth)
 const innerHeight = ref(window.innerHeight)
-const downloading = ref(false)
 const scaleOn = ref(false)
 
 const imageSelected = computed(() => store.imageList[store.imageSelectedIndex] ?? {})
@@ -713,30 +653,6 @@ function toSourcePage() {
   window.open(sourceUrl, '_blank', 'noreferrer')
 }
 
-async function download(url: string | null, name: string) {
-  if (!url) return
-  if (location.host.includes('gelbooru')) {
-    setTimeout(() => {
-      downloading.value = false
-    }, 1000)
-  }
-  if (store.isYKSite) {
-    name = `${location.hostname} ${imageSelected.value.id} ${imageSelected.value.tags.join(' ')}`
-  }
-  if (isR34PahealHome()) {
-    // @ts-expect-error protected prop
-    name = `${name}.${imageSelected.value.data.file_name.split('.').pop()}`
-  }
-  try {
-    downloading.value = true
-    await downloadFile(url, name)
-    downloading.value = false
-  } catch (error) {
-    downloading.value = false
-    showMsg({ msg: `${i18n.t('FAqj5ONm50QMfIt9Vq2p1')}: ${error}`, type: 'error' })
-  }
-}
-
 function addToList() {
   addToSelectedList(imageSelected.value)
 }
@@ -755,12 +671,6 @@ async function addFavorite() {
   if (!isFavBtnShow || postDetail.value.voted) return
   const isSuccess = await addPostToFavorites(imageSelected.value.id)
   if (isSuccess) postDetail.value.voted = true
-}
-
-const isExportTagsEnable = ref(true)
-const isExportTagsShow = ref(false)
-function openExportTags() {
-  isExportTagsShow.value = true
 }
 
 const preloadImgEl = new Image()
@@ -970,7 +880,6 @@ const isTriggerEvent = computed(() => {
   if (!store.showImageSelected) return false
   if (isVideo.value) return false
   if (scaleOn.value && imgScaleState.value !== 'FitToPage') return false
-  if (isExportTagsShow.value) return false
   return true
 })
 
