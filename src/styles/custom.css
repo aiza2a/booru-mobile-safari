@@ -215,37 +215,7 @@
   background: #ddd;
 }
 
-.v-date-picker-table>table>thead>tr>th {
-  padding: 0;
-}
-
-.v-date-picker-table>table>thead>tr>th:nth-child(1):before {
-  content: '日';
-}
-
-.v-date-picker-table>table>thead>tr>th:nth-child(2):before {
-  content: '一';
-}
-
-.v-date-picker-table>table>thead>tr>th:nth-child(3):before {
-  content: '二';
-}
-
-.v-date-picker-table>table>thead>tr>th:nth-child(4):before {
-  content: '三';
-}
-
-.v-date-picker-table>table>thead>tr>th:nth-child(5):before {
-  content: '四';
-}
-
-.v-date-picker-table>table>thead>tr>th:nth-child(6):before {
-  content: '五';
-}
-
-.v-date-picker-table>table>thead>tr>th:nth-child(7):before {
-  content: '六';
-}
+/* Mobile date selection uses MobileCalendarGrid; do not override Vuetify weekday cells globally. */
 
 .poa_left_center {
   position: absolute;
@@ -1171,6 +1141,37 @@ html.ym-immersive .posts-image-card {
   color: var(--ios-label);
   font-size: 17px;
   font-weight: 600;
+}
+
+.ios-month-picker {
+  display: grid;
+  gap: 14px;
+  padding: 12px 20px 20px;
+  color: var(--ios-label);
+}
+
+.ios-month-picker input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--ios-separator);
+  border-radius: 10px;
+  color: inherit;
+  background: var(--ios-surface);
+  font: inherit;
+  color-scheme: dark;
+}
+
+.theme--light .ios-month-picker input {
+  color-scheme: light;
+}
+
+.range-selection-summary {
+  display: grid;
+  gap: 4px;
+  padding: 0 20px 8px;
+  color: var(--ios-secondary-label);
+  font-size: 13px;
 }
 
 .ios-year-picker {
