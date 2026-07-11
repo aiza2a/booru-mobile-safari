@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="store.showImageSelected" fullscreen>
     <div
-      v-show="store.showImageSelected"
+      v-if="store.showImageSelected"
       class="img_detail_cont"
       @click="onDtlContClick"
       @touchstart.passive="onTouchStart"
@@ -29,7 +29,7 @@
           draggable="false"
           alt=""
           :src="imgSrc"
-          :width="imageSelectedWidth"
+          :width="imgLoading ? 0 : imageSelectedWidth"
           @click.stop="toggleToolbar"
           @load="imgLoading = false"
           @error="onImageLoadError"
@@ -847,21 +847,6 @@ async function reqFullscreen() {
   }
 }
 
-async function restoreDetailScrollPosition() {
-  const saved = store.detailReturnState
-  if (!saved) return
-  await nextTick()
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
-  const card = saved.postId ? document.getElementById(`post-card-${saved.postId}`) : null
-  if (card) {
-    const delta = card.getBoundingClientRect().top - saved.cardTop
-    window.scrollTo(0, window.scrollY + delta)
-  } else {
-    window.scrollTo(0, saved.scrollY)
-  }
-  store.detailReturnState = null
-}
-
 watch(() => store.showImageSelected, async val => {
   if (val) {
     imgLoading.value = true
@@ -869,9 +854,8 @@ watch(() => store.showImageSelected, async val => {
     preloadNextImg()
   } else {
     scaleOn.value = false
-    await restoreDetailScrollPosition()
-    await nextTick()
     postDetail.value = {}
+    await nextTick()
     showPreviewThumb.value = true
   }
 })
