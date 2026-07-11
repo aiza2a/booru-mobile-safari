@@ -141,89 +141,6 @@
       </v-btn>
     </div>
     <v-spacer />
-    <template v-if="store.showPostList && notPartialSupportSite">
-      <span
-        v-show="store.selectedImageList.length"
-        class="hidden-md-and-down ml-1 mr-1"
-        style="margin-top: 2px;"
-      >
-        {{ store.selectedImageList.length }}
-      </span>
-      <v-btn class="hidden-md-and-down" icon @click="selectAll">
-        <v-icon v-show="isNoSelected">{{ mdiCheckboxBlankOutline }}</v-icon>
-        <v-icon v-show="isOneOrMoreSelected">{{ mdiCheckboxIntermediate }}</v-icon>
-        <v-icon v-show="isAllSelected">{{ mdiCheckboxMarked }}</v-icon>
-      </v-btn>
-      <v-menu dense offset-y :close-on-content-click="false">
-        <template #activator="{ on, attrs }">
-          <v-btn class="hidden-md-and-down" :title="$t('OKs1ePekQA4Ona839U114')" icon v-bind="attrs" v-on="on">
-            <v-icon>{{ mdiDownload }}</v-icon>
-          </v-btn>
-        </template>
-        <v-list dense flat style="min-width: 300px;max-height: 80vh;overflow: auto;">
-          <v-subheader class="ml-2">
-            <span class="mr-4">{{ $t('OKs1ePekQA4Ona839U114') }}</span>
-            <v-btn v-show="store.selectedImageList.length > 0" small @click="startDownload">
-              {{ $t('cKn4cfAxzdgh_HD6OFibB') }}
-            </v-btn>
-            <v-btn v-show="store.selectedImageList.length > 0" class="ml-2" small @click="exportFileUrls">
-              {{ $t('J2Ckb_-LITfmww4aEksqk') }}
-            </v-btn>
-          </v-subheader>
-          <div v-if="store.isYKSite" class="d-flex align-center mt-1 ml-2">
-            <v-radio-group
-              v-model="downloadUrlKey"
-              class="mr-1 mt-0"
-              hide-details
-              dense
-              row
-            >
-              <v-radio :label="$t('aVqN9TBRCbNGsW3Y2D2Nm')" value="jpegUrl" />
-              <v-radio :label="$t('jDjashxA-oBPo19DXI504')" value="fileUrl" />
-            </v-radio-group>
-            <v-switch
-              v-model="isExportUrlDecode"
-              class="mt-0 mr-1"
-              label="Decode URL"
-              hide-details
-              dense
-            />
-          </div>
-          <div v-if="!isZerochanPage()" class="d-flex align-center mt-1 ml-2">
-            <v-switch
-              v-model="isExportUrlEncode"
-              class="mt-0 mr-1"
-              label="Encode URL"
-              hide-details
-              dense
-            />
-          </div>
-          <v-list-item-group color="primary">
-            <v-list-item v-for="item in store.selectedImageList" :key="item.id" dense two-line>
-              <v-list-item-avatar>
-                <v-btn v-if="!item.loading && !item.loaded" icon>
-                  <v-icon>{{ mdiFileClockOutline }}</v-icon>
-                </v-btn>
-                <v-btn v-if="item.loaded" icon color="green">
-                  <v-icon>{{ mdiCheckUnderlineCircle }}</v-icon>
-                </v-btn>
-                <v-progress-circular v-if="item.loading" :rotate="-90" :size="28" :value="loadingValue" color="pink" />
-              </v-list-item-avatar>
-              <v-list-item-content style="max-width: 240px;">
-                <!-- <v-list-item-title :title="item[downloadNameKey]" v-text="item[downloadNameKey]" /> -->
-                <v-list-item-subtitle :title="item.fileNameWithTags" v-text="item.fileNameWithTags" />
-                <v-list-item-subtitle :title="item[downloadUrlKey]" v-text="item[downloadUrlKey]" />
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-btn icon @click="removeFromList(item.id)">
-                  <v-icon>{{ mdiDelete }}</v-icon>
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list-item-group>
-        </v-list>
-      </v-menu>
-    </template>
     <v-btn v-if="!isMobile" :title="$t('u8mEnSo4mxDRUbj7FeAll')" icon @click="toggleDarkmode">
       <v-icon>{{ mdiBrightness6 }}</v-icon>
     </v-btn>
@@ -312,17 +229,10 @@ import {
   mdiCalendarText,
   mdiCalendarToday,
   mdiCalendarWeek,
-  mdiCheckUnderlineCircle,
-  mdiCheckboxBlankOutline,
-  mdiCheckboxIntermediate,
-  mdiCheckboxMarked,
   mdiChevronLeft,
   mdiChevronRight,
   mdiClose,
   mdiCog,
-  mdiDelete,
-  mdiDownload,
-  mdiFileClockOutline,
   mdiFire,
   mdiFullscreen,
   mdiFullscreenExit,
@@ -334,52 +244,21 @@ import {
   mdiStar,
   mdiTranslate,
 } from '@mdi/js'
-import { computed, onMounted, reactive, ref, set, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import MobileDateFilter from './MobileDateFilter.vue'
 import { useVuetify } from '@/plugins/vuetify'
-import { addDate, debounce, downloadFile, downloadText, eventBus, formatDate, showMsg, subDate } from '@/utils'
+import { addDate, debounce, eventBus, formatDate, subDate } from '@/utils'
 import { settings, store, toggleDrawer } from '@/store'
 import { langList } from '@/store/settings'
 import { loadPostsByPage, loadPostsByTags } from '@/store/actions/post'
 import { getRecentTags, getUsername, isPopularPage } from '@/api/moebooru'
-import { defCompTags, getSiteTitle, isSupportTagSearch, notPartialSupportSite } from '@/api/booru'
+import { defCompTags, getSiteTitle, isSupportTagSearch } from '@/api/booru'
 import { fetchAutocomplete, isAutocompleteAct } from '@/api/autocomplete'
 import { isSankakuSite } from '@/api/sankaku'
-import { isR34PahealHome } from '@/api/r34-paheal'
-import { isZerochanPage } from '@/api/zerochan'
 import i18n from '@/utils/i18n'
 
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const title = computed(() => `${getSiteTitle()} - ${store.imageList.length} Posts - Page `)
-
-const isNoSelected = computed(() => store.selectedImageList.length === 0)
-const isOneOrMoreSelected = computed(() => store.selectedImageList.length > 0 && store.selectedImageList.length < store.imageList.length)
-const isAllSelected = computed(() => store.selectedImageList.length > 0 && store.selectedImageList.length === store.imageList.length)
-const loadingValue = ref(0)
-
-function selectAll() {
-  if (isNoSelected.value || isOneOrMoreSelected.value) {
-    setTimeout(() => {
-      const arr = [...store.imageList]
-      arr.forEach(item => {
-        Object.assign(item, { fileNameWithTags: `${location.hostname} ${item.id} ${item.tags.join(' ')}` })
-      })
-      store.selectedImageList = arr
-    })
-  }
-  if (isAllSelected.value) {
-    setTimeout(() => {
-      store.selectedImageList = []
-    })
-  }
-}
-
-function removeFromList(id: string) {
-  store.selectedImageList = store.selectedImageList.filter(e => {
-    if (e.loading) return true
-    return e.id !== id
-  })
-}
 
 const tagsQuery = new URLSearchParams(location.search).get('tags')
 const searchState = reactive({
@@ -561,81 +440,6 @@ function showPool() {
 const poolQueryTerm = ref('')
 function searchPool() {
   eventBus.$emit('loadPoolsByQuery', poolQueryTerm.value)
-}
-
-function download(url: string, name: string) {
-  loadingValue.value = 0
-  return downloadFile(url, name, {
-    saveAs: false,
-    onprogress: d => {
-      loadingValue.value = (d.loaded / d.total) * 100
-    },
-  })
-}
-
-type ImgUrlKeys = 'fileUrl' | 'jpegUrl'
-type ImgNameKeys = 'jpegDownloadName' | 'fileDownloadName'
-const downloadUrlKey = ref<ImgUrlKeys>('fileUrl')
-const downloadNameMap: Record<ImgUrlKeys, ImgNameKeys> = {
-  fileUrl: 'fileDownloadName',
-  jpegUrl: 'jpegDownloadName',
-}
-const downloadNameKey = computed(() => {
-  return downloadNameMap[downloadUrlKey.value] || 'fileDownloadName'
-})
-const isGelbooru = location.host.includes('gelbooru')
-async function startDownload() {
-  try {
-    const len = store.selectedImageList.length
-    if (isGelbooru) {
-      for (let index = 0; index < len; index++) {
-        const item = store.selectedImageList[index]
-        const downloadUrl = item[downloadUrlKey.value] || item.fileUrl
-        const downloadName = item[downloadNameKey.value]
-        if (!downloadUrl) continue
-        download(downloadUrl, `${downloadName}`)
-      }
-      return
-    }
-    for (let index = 0; index < len; index++) {
-      const item = store.selectedImageList[index]
-      const downloadUrl = item[downloadUrlKey.value] || item.fileUrl
-      let downloadName = store.isYKSite ? item.fileNameWithTags : item[downloadNameKey.value]
-      if (isR34PahealHome()) {
-        // @ts-expect-error protected prop
-        downloadName = `${downloadName}.${item.data.file_name.split('.').pop()}`
-      }
-      if (!downloadUrl) continue
-      if (item.loaded) continue
-      set(item, 'loading', true)
-      await download(downloadUrl, `${downloadName}`)
-      set(item, 'loading', false)
-      set(item, 'loaded', true)
-    }
-  } catch (error) {
-    console.log('download error: ', error)
-    const msg = error as string
-    showMsg({ msg, type: 'error' })
-  }
-}
-
-const isExportUrlDecode = ref(true)
-const isExportUrlEncode = ref(false)
-async function exportFileUrls() {
-  const urlText = store.selectedImageList.map(e => {
-    let url = e[downloadUrlKey.value] || e.fileUrl || ''
-    if (store.isYKSite && isExportUrlDecode.value) {
-      try {
-        url = decodeURIComponent(url)
-        url = decodeURI(url)
-      } catch (e) {}
-    }
-    if (isExportUrlEncode.value || isZerochanPage()) {
-      url = encodeURI(url)
-    }
-    return url
-  }).join('\r\n')
-  downloadText(urlText, 'image-urls.txt')
 }
 
 const vuetify = useVuetify()
