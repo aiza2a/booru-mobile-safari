@@ -21,6 +21,8 @@
 import { computed } from 'vue'
 import { settings } from '@/store'
 
+const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
+
 const wfType = computed(() => settings.masonryLayout || 'masonry')
 const isMasonry = computed(() => ['masonry', 'grid'].includes(wfType.value))
 const wfClass = computed(() => ({
@@ -71,6 +73,7 @@ const responsiveDefaultColumn = () => {
 }
 const columnCount2 = computed(() => {
   if (typeof columnCount.value == 'number') return { default: columnCount.value }
+  if (isMobile) return { default: 2 }
   return { ...columnCount.value, default: responsiveDefaultColumn() }
 })
 </script>
