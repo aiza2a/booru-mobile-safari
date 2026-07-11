@@ -2174,38 +2174,3 @@ html.mobile-detail-open body {
     line-height: 20px;
   }
 }
-
-/* Dedicated visual backing for the iOS status area; it never participates in layout. */
-@media screen and (max-width: 959px), (pointer: coarse) {
-  .mobile-status-backdrop {
-    position: fixed;
-    z-index: 4;
-    top: 0;
-    right: 0;
-    left: 0;
-    height: calc(env(safe-area-inset-top) + 8px);
-    pointer-events: none;
-    background-color: #111318;
-    background-position: center top;
-    background-size: cover;
-    filter: saturate(1.08);
-    transform: translateZ(0);
-  }
-
-  .mobile-status-backdrop::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(8, 9, 12, .16);
-    backdrop-filter: blur(18px) saturate(145%);
-    -webkit-backdrop-filter: blur(18px) saturate(145%);
-  }
-
-  .theme--light .mobile-status-backdrop {
-    background-color: #f2f2f7;
-  }
-
-  .theme--light .mobile-status-backdrop::after {
-    background: rgba(242, 242, 247, .12);
-  }
-}
