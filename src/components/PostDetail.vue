@@ -2,15 +2,19 @@
   <v-dialog v-model="store.showImageSelected" fullscreen content-class="ios-detail-dialog">
     <div
       v-if="store.showImageSelected"
-      class="detail-ambient-bg"
-      :style="detailAmbientStyle"
-      aria-hidden="true"
-    ></div>
-    <div
-      v-if="store.showImageSelected"
-      class="detail-ambient-shade"
-      aria-hidden="true"
-    ></div>
+      class="detail-glass-panel"
+      :class="`detail-glass-panel--${detailVisualState}`"
+    >
+      <div
+        class="detail-ambient-bg"
+        :style="detailAmbientStyle"
+        aria-hidden="true"
+      ></div>
+      <div
+        class="detail-ambient-shade"
+        aria-hidden="true"
+      ></div>
+    </div>
     <div
       v-if="store.showImageSelected"
       class="img_detail_cont"
@@ -501,6 +505,7 @@ const notR34Fav = ref(!(
 ))
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const showImageToolbar = ref(true)
+const detailVisualState = ref<'closed' | 'opening' | 'open' | 'closing'>('closed')
 const imgLoading = ref(true)
 const innerWidth = ref(window.innerWidth)
 const innerHeight = ref(window.innerHeight)
@@ -585,7 +590,10 @@ function onTouchEnd(ev: TouchEvent) {
   if (dy > 96 && Math.abs(dy) > Math.abs(dx) * 1.35) close()
 }
 
-function close() {
+async function close() {
+  if (detailVisualState.value === 'closing' || detailVisualState.value === 'closed') return
+  detailVisualState.value = 'closing'
+  await new Promise(resolve => window.setTimeout(resolve, 150))
   store.showImageSelected = false
 }
 
@@ -864,10 +872,14 @@ async function reqFullscreen() {
 
 watch(() => store.showImageSelected, async val => {
   if (val) {
+    detailVisualState.value = 'opening'
     imgLoading.value = true
+    await nextTick()
+    requestAnimationFrame(() => { detailVisualState.value = 'open' })
     await setPostDetail(imageSelected, postDetail)
     preloadNextImg()
   } else {
+    detailVisualState.value = 'closed'
     scaleOn.value = false
     postDetail.value = {}
     await nextTick()
