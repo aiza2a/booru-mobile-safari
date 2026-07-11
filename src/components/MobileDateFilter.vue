@@ -18,7 +18,7 @@
     </v-menu>
     <template v-if="dateFilter.mode === 'date'">
       <template v-if="dateFilter.scale !== 'range'">
-        <v-btn icon small @click="move(-1)"><v-icon>{{ mdiChevronLeft }}</v-icon></v-btn>
+        <v-btn class="date-nav-button" icon small @click="move(-1)"><v-icon>{{ mdiChevronLeft }}</v-icon></v-btn>
         <div v-if="dateFilter.scale !== 'year'" class="native-date-trigger">
           <v-btn class="date-display" small text tabindex="-1">{{ displayDate }}</v-btn>
           <input
@@ -31,7 +31,7 @@
           >
         </div>
         <v-btn v-else class="date-display" small text @click="showYearPicker = true">{{ displayDate }}</v-btn>
-        <v-btn v-if="canMoveNext" icon small @click="move(1)"><v-icon>{{ mdiChevronRight }}</v-icon></v-btn>
+        <v-btn class="date-nav-button" icon small :disabled="!canMoveNext" @click="move(1)"><v-icon>{{ mdiChevronRight }}</v-icon></v-btn>
       </template>
       <v-btn v-else class="date-display range-display" small text @click="openRangePicker">{{ rangeDisplay }}</v-btn>
       <v-dialog v-model="showRangePicker" content-class="ios-date-dialog">
@@ -74,7 +74,7 @@ import { computed, ref, watch } from 'vue'
 import { mdiCalendarMonthOutline, mdiCalendarStar, mdiChevronLeft, mdiChevronRight, mdiFire, mdiViewGridOutline } from '@mdi/js'
 import { currentDateSite, currentRouteKind, siteCapabilities } from '@/config/site-capabilities'
 import { type DateFilterMode, dateFilter, updateDateFilter } from '@/store/date-filter'
-import { type DateScale, clampFutureDate, formatDateDisplay, formatISODate, shiftDate } from '@/utils/date-filter'
+import { type DateScale, clampFutureDate, formatDateDisplay, formatISODate, getDateRange, shiftDate } from '@/utils/date-filter'
 import { buildDateRoute } from '@/utils/site-date-routes'
 
 const site = currentDateSite()
@@ -97,7 +97,15 @@ const scales = computed<DateScale[]>(() => {
 })
 const labels: Record<DateScale, string> = { day: '日', week: '周', month: '月', year: '年', range: '域' }
 const scaleLabel = computed(() => labels[dateFilter.scale])
-const displayDate = computed(() => formatDateDisplay(dateFilter.date, dateFilter.scale))
+const displayDate = computed(() => {
+  const { start, end } = getDateRange(dateFilter.date, dateFilter.scale)
+  if (dateFilter.scale === 'week') {
+    const startMonth = start.slice(5, 7)
+    const endText = startMonth === end.slice(5, 7) ? end.slice(8) : end.slice(5).replace('-', '/')
+    return `${start.slice(5).replace('-', '/')}–${endText}`
+  }
+  return formatDateDisplay(dateFilter.date, dateFilter.scale).replace('-', '/')
+})
 const today = formatISODate(new Date())
 const showYearPicker = ref(false)
 const showRangePicker = ref(false)

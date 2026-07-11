@@ -440,13 +440,29 @@ function onCtxMenu(ev: MouseEvent, img: Post) {
   openPostMenu(img, ev.clientX, ev.clientY)
 }
 
-function showImgModal(index: number) {
+async function preloadDetailImage(post: Post) {
+  const src = post.sampleUrl || post.fileUrl || post.previewUrl
+  if (!src) return
+  const image = new Image()
+  image.src = src
+  try {
+    await Promise.race([
+      image.decode(),
+      new Promise(resolve => window.setTimeout(resolve, 450)),
+    ])
+  } catch (_error) {
+    // The detail view will retain the thumbnail as its first frame.
+  }
+}
+
+async function showImgModal(index: number) {
   if (settings.useFancybox) {
     fancyboxShow(store.imageList, index)
     return
   }
   openedDetailIndex = index
   store.imageSelectedIndex = index
+  await preloadDetailImage(store.imageList[index])
   store.showImageSelected = true
 }
 

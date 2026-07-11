@@ -511,10 +511,13 @@ const showImageToolbar = ref(true)
 const detailVisualState = ref<'closed' | 'opening' | 'open' | 'closing'>('closed')
 const detailColors = ref(['38, 40, 46', '24, 27, 34', '68, 62, 76'])
 let detailLockedScrollY = 0
+const detailImageRect = ref({ width: 0, height: 0 })
 const detailColorStyle = computed(() => ({
   '--detail-color-a': detailColors.value[0],
   '--detail-color-b': detailColors.value[1],
   '--detail-color-c': detailColors.value[2],
+  '--detail-glass-width': `${detailImageRect.value.width + 28}px`,
+  '--detail-glass-height': `${detailImageRect.value.height + 28}px`,
 }))
 const imgLoading = ref(true)
 const innerWidth = ref(window.innerWidth)
@@ -638,9 +641,23 @@ function extractDetailColors(image: HTMLImageElement) {
   }
 }
 
+function updateDetailImageRect(image: HTMLImageElement) {
+  const availableWidth = Math.max(0, innerWidth.value - 36)
+  const availableHeight = Math.max(0, innerHeight.value - 110 - 36)
+  const naturalWidth = image.naturalWidth || imageSelected.value.sampleWidth || availableWidth
+  const naturalHeight = image.naturalHeight || imageSelected.value.sampleHeight || availableHeight
+  const ratio = Math.min(availableWidth / naturalWidth, availableHeight / naturalHeight, 1)
+  detailImageRect.value = {
+    width: Math.round(naturalWidth * ratio),
+    height: Math.round(naturalHeight * ratio),
+  }
+}
+
 function onDetailImageLoad(event: Event) {
+  const image = event.target as HTMLImageElement
   imgLoading.value = false
-  extractDetailColors(event.target as HTMLImageElement)
+  updateDetailImageRect(image)
+  extractDetailColors(image)
 }
 
 async function close() {
