@@ -2,7 +2,7 @@
 // @name                 Booru Mobile Safari
 // @name:en              Booru Mobile Safari
 // @name:zh              Booru 手机瀑布流
-// @version              0.37.5
+// @version              0.40.0
 // @description          面向 iPhone Safari 的 Yande.re、Konachan、Danbooru、Gelbooru 瀑布流与快速分享
 // @description:en       Mobile-first masonry browsing and native sharing for Yande.re, Konachan, Danbooru and Gelbooru.
 // @description:zh       面向 iPhone Safari 的 Yande.re、Konachan、Danbooru、Gelbooru 瀑布流与快速分享
@@ -14,33 +14,9 @@
 // @match                https://konachan.net/*
 // @match                https://danbooru.donmai.us/*
 // @match                https://gelbooru.com/*
-// @match                https://rule34.xxx/*
-// @match                https://lolibooru.moe/*
-// @match                https://www.sakugabooru.com/*
-// @match                https://safebooru.org/*
-// @match                https://tbib.org/*
-// @match                https://xbooru.com/*
-// @match                http://behoimi.org/*
-// @match                https://rule34.paheal.net/*
-// @match                https://realbooru.com/*
-// @match                https://booru.allthefallen.moe/*
-// @match                https://aibooru.online/*
-// @match                https://e-shuushuu.net/*
-// @match                https://www.zerochan.net/*
-// @match                https://sankaku.app/*
-// @match                https://chan.sankakucomplex.com/*
-// @match                https://www.sankakucomplex.com/*
-// @match                https://www.idolcomplex.com/*
-// @match                https://anime-pictures.net/*
-// @match                https://allgirl.booru.org/*
-// @match                https://booru.eu/*
-// @match                https://kusowanka.com/*
-// @match                https://anihonetwallpaper.com/*
-// @match                https://nozomi.la/*
-// @match                https://rule34hentai.net/*
 // @homepage             https://github.com/aiza2a/yandere-masonry
 // @source               https://github.com/aiza2a/yandere-masonry
-// @icon                 https://upload-bbs.mihoyo.com/upload/2022/05/23/260511332/f1f6267537a5aff959ee63ec2c9e4e52_4821140735490026106.jpg
+// @icon                 https://img.nagi.xx.kg/file/github:github_1783748006551_qtg8z0.png
 // @supportURL           https://github.com/aiza2a/yandere-masonry/issues
 // @run-at               document-end
 // @grant                GM_addStyle
