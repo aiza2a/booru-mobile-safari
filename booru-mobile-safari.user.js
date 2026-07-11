@@ -10544,9 +10544,11 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         return `${id}-${imageRenderVersions.value[id] || 0}`;
       }
       function refreshDetailNeighbourImages(index) {
-        const start = Math.max(0, index - 8);
+        const radius = 12;
+        const start = Math.max(0, index - radius);
+        const end = Math.min(store.imageList.length - 1, index + radius);
         const versions = { ...imageRenderVersions.value };
-        for (let current = start; current <= index; current++) {
+        for (let current = start; current <= end; current++) {
           const image = store.imageList[current];
           if (!image)
             continue;
