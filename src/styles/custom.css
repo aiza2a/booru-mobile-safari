@@ -774,13 +774,13 @@ html:has(#app.theme--dark) {
   .ios-detail-dialog .detail-glass-panel {
     position: fixed;
     z-index: 1;
-    top: max(8px, env(safe-area-inset-top));
-    right: 8px;
-    bottom: calc(8px + env(safe-area-inset-bottom));
-    left: 8px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     overflow: hidden;
     border: 0;
-    border-radius: 26px;
+    border-radius: 0;
     background: transparent;
     box-shadow: none;
     opacity: 1;
@@ -803,15 +803,18 @@ html:has(#app.theme--dark) {
   .ios-detail-dialog .detail-ambient-shade {
     position: absolute;
     z-index: 0;
-    inset: -48px;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
   }
 
   .ios-detail-dialog .detail-ambient-bg {
     background-position: center;
     background-size: cover;
-    filter: blur(38px) brightness(.58) saturate(1.25);
-    transform: scale(1.12);
+    filter: blur(34px) brightness(.58) saturate(1.2);
+    transform: scale(1.08);
+    transform-origin: center center;
   }
 
   .ios-detail-dialog .detail-ambient-shade {
@@ -838,7 +841,7 @@ html:has(#app.theme--dark) {
     transform: scale(1);
     transition: opacity .15s ease, transform .18s ease;
     box-sizing: border-box;
-    padding: max(14px, env(safe-area-inset-top)) 12px calc(86px + env(safe-area-inset-bottom));
+    padding: max(14px, env(safe-area-inset-top)) 16px calc(86px + env(safe-area-inset-bottom));
     background: transparent !important;
   }
 
@@ -849,7 +852,7 @@ html:has(#app.theme--dark) {
 
   .ios-detail-dialog .img_detail_sample {
     width: auto !important;
-    max-width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 32px) !important;
     max-height: calc(100vh - 112px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
     border-radius: 16px;
     object-fit: contain;
@@ -858,13 +861,13 @@ html:has(#app.theme--dark) {
 
   .ios-detail-dialog .img_detail_loading {
     box-sizing: border-box;
-    padding: max(14px, env(safe-area-inset-top)) 12px calc(86px + env(safe-area-inset-bottom));
+    padding: max(14px, env(safe-area-inset-top)) 16px calc(86px + env(safe-area-inset-bottom));
     border-radius: 0;
     background: rgba(8, 9, 12, .28);
   }
 
   .ios-detail-dialog .img_detail_loading img {
-    max-width: calc(100vw - 24px);
+    max-width: calc(100vw - 32px);
     max-height: calc(100vh - 112px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     border-radius: 16px;
     object-fit: contain;
