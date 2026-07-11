@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import { clampFutureDate, formatISODate, parseDateFilterParams, type DateScale } from '@/utils/date-filter'
+import { type DateScale, clampFutureDate, formatISODate, parseDateFilterParams } from '@/utils/date-filter'
 
 export type DateFilterMode = 'latest' | 'date'
 export type DateRouteKind = 'home' | 'random' | 'popular' | 'viewed' | 'ranked' | 'updated'
