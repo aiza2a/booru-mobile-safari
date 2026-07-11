@@ -2372,7 +2372,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     showDrawer: false,
     showSettings: false,
     showMobileSearch: false,
-    detailReturnState: null,
     showFab: false,
     currentPage: 1,
     imageList: [],
@@ -10281,21 +10280,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           console.log("toggleFullscreen error: ", error);
         }
       }
-      async function restoreDetailScrollPosition() {
-        const saved = store.detailReturnState;
-        if (!saved)
-          return;
-        await Vue2.nextTick();
-        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-        const card = saved.postId ? document.getElementById(`post-card-${saved.postId}`) : null;
-        if (card) {
-          const delta = card.getBoundingClientRect().top - saved.cardTop;
-          window.scrollTo(0, window.scrollY + delta);
-        } else {
-          window.scrollTo(0, saved.scrollY);
-        }
-        store.detailReturnState = null;
-      }
       Vue2.watch(() => store.showImageSelected, async (val) => {
         if (val) {
           imgLoading.value = true;
@@ -10303,9 +10287,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           preloadNextImg();
         } else {
           scaleOn.value = false;
-          await restoreDetailScrollPosition();
-          await Vue2.nextTick();
           postDetail.value = {};
+          await Vue2.nextTick();
           showPreviewThumb.value = true;
         }
       });
@@ -10355,28 +10338,28 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         settings.isListenWheelEvent && window.removeEventListener("wheel", onWheel);
         settings.isListenKeyupEvent && window.removeEventListener("keyup", onKeyup);
       });
-      return { __sfc: true, notR34Fav, isMobile: isMobile2, showImageToolbar, imgLoading, innerWidth, innerHeight, downloading, scaleOn, imageSelected, isVideo, imgSrc, imgLasySrc, imageSelectedWidth, notYKSite, imgCreateTime, touchStartX, touchStartY, touchStartedAt, onTouchStart, onTouchEnd, close, toggleToolbar, toTagsPage, toPidPage, toDetailPage, validSourceUrl, sourceName, shareSource, toSourcePage, download, addToList, onDtlContClick, postDetail, metaTags, addFavorite, isExportTagsEnable, isExportTagsShow, openExportTags, preloadImgEl, preloadImg, preloadNextImg, isVideoShow, toggleVideoShow, showPreviewThumb, showPrevPost, showNextPost, onImageLoadError, scaleImgSrc, onScaleImgError, scaleImgStyleMap, imgScaleState, imgRotateDeg, rotateImg, scaleImgStyle, clearDragEv, zoomInImg, zoomOutImg, reqFullscreen, restoreDetailScrollPosition, onResize, isTriggerEvent, onWheel, onKeyup, mdiChevronLeft, mdiChevronRight, mdiClose, mdiDownload, mdiFileTree, mdiFitToScreenOutline, mdiFolderNetwork, mdiFullscreen, mdiHeart, mdiHeartPlusOutline, mdiLaunch, mdiLinkVariant, mdiLoupe, mdiMagnifyMinusOutline, mdiMagnifyPlusOutline, mdiPlaylistPlus, mdiRotateRight, mdiShareVariant, mdiTableSplitCell, mdiTagMultiple, DPlayer, PostExportTags, sharePost, isFavBtnShow, notPartialSupportSite, settings, store };
+      return { __sfc: true, notR34Fav, isMobile: isMobile2, showImageToolbar, imgLoading, innerWidth, innerHeight, downloading, scaleOn, imageSelected, isVideo, imgSrc, imgLasySrc, imageSelectedWidth, notYKSite, imgCreateTime, touchStartX, touchStartY, touchStartedAt, onTouchStart, onTouchEnd, close, toggleToolbar, toTagsPage, toPidPage, toDetailPage, validSourceUrl, sourceName, shareSource, toSourcePage, download, addToList, onDtlContClick, postDetail, metaTags, addFavorite, isExportTagsEnable, isExportTagsShow, openExportTags, preloadImgEl, preloadImg, preloadNextImg, isVideoShow, toggleVideoShow, showPreviewThumb, showPrevPost, showNextPost, onImageLoadError, scaleImgSrc, onScaleImgError, scaleImgStyleMap, imgScaleState, imgRotateDeg, rotateImg, scaleImgStyle, clearDragEv, zoomInImg, zoomOutImg, reqFullscreen, onResize, isTriggerEvent, onWheel, onKeyup, mdiChevronLeft, mdiChevronRight, mdiClose, mdiDownload, mdiFileTree, mdiFitToScreenOutline, mdiFolderNetwork, mdiFullscreen, mdiHeart, mdiHeartPlusOutline, mdiLaunch, mdiLinkVariant, mdiLoupe, mdiMagnifyMinusOutline, mdiMagnifyPlusOutline, mdiPlaylistPlus, mdiRotateRight, mdiShareVariant, mdiTableSplitCell, mdiTagMultiple, DPlayer, PostExportTags, sharePost, isFavBtnShow, notPartialSupportSite, settings, store };
     }
   });
   var _sfc_render$5 = function render() {
     var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
     return _c("v-dialog", { attrs: { "fullscreen": "" }, model: { value: _setup.store.showImageSelected, callback: function($$v) {
       _vm.$set(_setup.store, "showImageSelected", $$v);
-    }, expression: "store.showImageSelected" } }, [_c("div", { directives: [{ name: "show", rawName: "v-show", value: _setup.store.showImageSelected, expression: "store.showImageSelected" }], staticClass: "img_detail_cont", on: { "click": _setup.onDtlContClick, "&touchstart": function($event) {
+    }, expression: "store.showImageSelected" } }, [_setup.store.showImageSelected ? _c("div", { staticClass: "img_detail_cont", on: { "click": _setup.onDtlContClick, "&touchstart": function($event) {
       return _setup.onTouchStart.apply(null, arguments);
     }, "&touchend": function($event) {
       return _setup.onTouchEnd.apply(null, arguments);
     } } }, [_setup.isVideo ? [_setup.isVideoShow ? _c(_setup.DPlayer, { style: `width: ${_setup.imageSelectedWidth > _setup.imageSelected.width ? _setup.imageSelected.width : _setup.imageSelectedWidth}px`, attrs: { "options": { theme: "#8E24AA", autoplay: true, loop: true, video: { url: _setup.imageSelected.fileUrl } } } }) : _vm._e()] : _c("div", { class: { img_scale_scroll: _setup.scaleOn, img_scale_normal: !_setup.scaleOn }, attrs: { "draggable": "false" } }, [_c("v-row", { directives: [{ name: "show", rawName: "v-show", value: _setup.imgLoading, expression: "imgLoading" }], staticClass: "img_detail_loading", on: { "click": function($event) {
       $event.stopPropagation();
       return _setup.close.apply(null, arguments);
-    } } }, [_setup.showPreviewThumb && !_setup.scaleOn ? _c("img", { attrs: { "src": _setup.imgLasySrc, "width": _setup.imageSelectedWidth, "alt": "" } }) : _vm._e(), _c("v-progress-circular", { attrs: { "size": 100, "width": 6, "indeterminate": "", "color": "deep-purple" } })], 1), !_setup.scaleOn ? _c("img", { staticClass: "img_detail_sample", attrs: { "draggable": "false", "alt": "", "src": _setup.imgSrc, "width": _setup.imageSelectedWidth }, on: { "click": function($event) {
+    } } }, [_setup.showPreviewThumb && !_setup.scaleOn ? _c("img", { attrs: { "src": _setup.imgLasySrc, "width": _setup.imageSelectedWidth, "alt": "" } }) : _vm._e(), _c("v-progress-circular", { attrs: { "size": 100, "width": 6, "indeterminate": "", "color": "deep-purple" } })], 1), !_setup.scaleOn ? _c("img", { staticClass: "img_detail_sample", attrs: { "draggable": "false", "alt": "", "src": _setup.imgSrc, "width": _setup.imgLoading ? 0 : _setup.imageSelectedWidth }, on: { "click": function($event) {
       $event.stopPropagation();
       return _setup.toggleToolbar.apply(null, arguments);
     }, "load": function($event) {
       _setup.imgLoading = false;
     }, "error": _setup.onImageLoadError } }) : _vm._e(), _setup.scaleOn ? _c("img", { staticClass: "img_detail_scale", style: _setup.scaleImgStyle, attrs: { "draggable": "false", "alt": "", "src": _setup.scaleImgSrc }, on: { "load": function($event) {
       _setup.imgLoading = false;
-    }, "error": _setup.onScaleImgError } }) : _vm._e()], 1)], 2), _c("v-toolbar", { directives: [{ name: "show", rawName: "v-show", value: _setup.showImageToolbar && _setup.scaleOn && !_setup.isVideo, expression: "showImageToolbar && scaleOn && !isVideo" }], staticClass: "img-detail-toolbar img_detail_btn_color", class: { "detail-buttons-bottom": _setup.settings.detailButtonsBottom }, attrs: { "color": "transparent", "height": "auto", "flat": "" } }, [_c("v-spacer"), _c("v-tooltip", { attrs: { "bottom": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function({ on, attrs }) {
+    }, "error": _setup.onScaleImgError } }) : _vm._e()], 1)], 2) : _vm._e(), _c("v-toolbar", { directives: [{ name: "show", rawName: "v-show", value: _setup.showImageToolbar && _setup.scaleOn && !_setup.isVideo, expression: "showImageToolbar && scaleOn && !isVideo" }], staticClass: "img-detail-toolbar img_detail_btn_color", class: { "detail-buttons-bottom": _setup.settings.detailButtonsBottom }, attrs: { "color": "transparent", "height": "auto", "flat": "" } }, [_c("v-spacer"), _c("v-tooltip", { attrs: { "bottom": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function({ on, attrs }) {
       return [_c("v-btn", _vm._g(_vm._b({ staticClass: "mr-1 hidden-sm-and-down", attrs: { "fab": "", "small": "" }, on: { "click": function($event) {
         $event.stopPropagation();
         _setup.imgScaleState = "FitToPage";
@@ -10699,13 +10682,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           fancyboxShow(store.imageList, index);
           return;
         }
-        const post = store.imageList[index];
-        const card = post ? document.getElementById(`post-card-${post.id}`) : null;
-        store.detailReturnState = {
-          postId: post?.id ? String(post.id) : "",
-          scrollY: window.scrollY,
-          cardTop: card?.getBoundingClientRect().top ?? 0
-        };
         store.imageSelectedIndex = index;
         store.showImageSelected = true;
       }
@@ -10805,7 +10781,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   var _sfc_render$4 = function render() {
     var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
     return _setup.showImageList ? _c("div", { style: _setup.settings.masonryLayout === "virtual" ? "height:93vh" : "" }, [_setup.settings.masonryLayout === "virtual" ? _c("virtual-waterfall", { staticClass: "virtual-waterfall", class: { "wf-no-fit-screen": _setup.notFitScreen }, staticStyle: { "min-height": "93vh" }, attrs: { "gap": 10, "preload-screen-count": [1, 1], "item-min-width": 300, "items": _setup.store.imageList, "max-column-count": _setup.virtualMaxCol, "calc-item-height": _setup.calcItemHeight }, scopedSlots: _vm._u([{ key: "default", fn: function({ item, index }) {
-      return [_c("div", { staticClass: "posts-image-card", attrs: { "id": `post-card-${item?.id}` }, on: { "touchstart": function($event) {
+      return [_c("div", { staticClass: "posts-image-card", on: { "touchstart": function($event) {
         return _setup.onPostTouchStart($event, item);
       }, "touchmove": _setup.onPostTouchMove, "touchend": _setup.onPostTouchEnd, "touchcancel": _setup.cancelPostLongPress, "contextmenu": function($event) {
         return _setup.onCtxMenu($event, item);
@@ -10827,8 +10803,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         $event.stopPropagation();
         return _setup.addFavorite(item?.id);
       } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiHeartPlusOutline))])], 1) : _vm._e()], 1) : _vm._e()], 2)];
-    } }], null, false, 2062662601) }) : _c("wf-layout", _vm._l(_setup.store.imageList, function(image, index) {
-      return _c("v-card", { key: image.id || index, staticClass: "posts-image-card", style: _setup.imgCardStyle(image), attrs: { "id": `post-card-${image?.id}` }, on: { "touchstart": function($event) {
+    } }], null, false, 2499632841) }) : _c("wf-layout", _vm._l(_setup.store.imageList, function(image, index) {
+      return _c("v-card", { key: index, staticClass: "posts-image-card", style: _setup.imgCardStyle(image), on: { "touchstart": function($event) {
         return _setup.onPostTouchStart($event, image);
       }, "touchmove": _setup.onPostTouchMove, "touchend": _setup.onPostTouchEnd, "touchcancel": _setup.cancelPostLongPress, "contextmenu": function($event) {
         return _setup.onCtxMenu($event, image);
