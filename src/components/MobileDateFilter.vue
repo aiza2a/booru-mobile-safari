@@ -1,5 +1,13 @@
 <template>
-  <div v-if="visible" class="mobile-date-filter">
+  <div
+    v-if="visible"
+    class="mobile-date-filter"
+    :class="{
+      'date-filter--compact': dateFilter.mode === 'all',
+      'date-filter--recent': dateFilter.mode === 'latest',
+      'date-filter--expanded': dateFilter.mode === 'date',
+    }"
+  >
     <v-btn-toggle v-if="showModeToggle" v-model="dateFilter.mode" mandatory dense class="date-mode-toggle">
       <v-btn :value="primaryMode" icon small :aria-label="primaryLabel" :title="primaryLabel"><v-icon>{{ primaryIcon }}</v-icon></v-btn>
       <v-btn value="date" icon small :aria-label="secondaryLabel" :title="secondaryLabel"><v-icon>{{ secondaryIcon }}</v-icon></v-btn>
