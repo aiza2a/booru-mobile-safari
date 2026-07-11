@@ -237,7 +237,7 @@ const notFitScreen = ref(localStorage.getItem('__fitScreen') == '0')
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const isR34Fav = ref(isRule34FavPage() || isGelbooruFavPage())
 const showImageList = ref(true)
-const imageRenderVersions = ref<Record<string, number>>({})
+
 let openedDetailIndex = -1
 let detailCloseRefreshTimer: number | undefined
 type LongPressState = 'idle' | 'pressing' | 'previewing' | 'sharing' | 'restoring'
@@ -257,13 +257,9 @@ watch(
   () => store.showImageSelected,
   shown => {
     if (shown || openedDetailIndex < 0) return
-    const index = openedDetailIndex
     openedDetailIndex = -1
     if (detailCloseRefreshTimer) window.clearTimeout(detailCloseRefreshTimer)
-    detailCloseRefreshTimer = window.setTimeout(() => {
-      nextTick(() => refreshDetailNeighbourImages(index))
-      detailCloseRefreshTimer = undefined
-    }, 80)
+    detailCloseRefreshTimer = undefined
   },
 )
 
@@ -293,22 +289,7 @@ const maxHeightStyle = computed(() => {
 })
 
 function imageRenderKey(image: Post, index: number) {
-  const id = String(image?.id || index)
-  return `${id}-${imageRenderVersions.value[id] || 0}`
-}
-
-function refreshDetailNeighbourImages(index: number) {
-  const radius = 12
-  const start = Math.max(0, index - radius)
-  const end = Math.min(store.imageList.length - 1, index + radius)
-  const versions = { ...imageRenderVersions.value }
-  for (let current = start; current <= end; current++) {
-    const image = store.imageList[current]
-    if (!image) continue
-    const id = String(image.id || current)
-    versions[id] = (versions[id] || 0) + 1
-  }
-  imageRenderVersions.value = versions
+  return String(image?.id || index)
 }
 
 function imgCardStyle(image: Post) {

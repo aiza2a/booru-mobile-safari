@@ -1,7 +1,7 @@
 <template>
   <component
     :is="isMobile ? 'div' : 'v-dialog'"
-    v-if="!isMobile || store.showImageSelected"
+    v-show="!isMobile || store.showImageSelected"
     v-model="store.showImageSelected"
     :fullscreen="!isMobile"
     :content-class="isMobile ? undefined : 'ios-detail-dialog'"
@@ -10,7 +10,14 @@
     :overlay-opacity="0"
     :class="isMobile ? ['mobile-detail-overlay', `mobile-detail-overlay--${detailVisualState}`] : undefined"
   >
-    <div v-if="isMobile" class="mobile-detail-backdrop" aria-hidden="true"></div>
+    <div v-if="isMobile" class="mobile-detail-backdrop" aria-hidden="true" @click="close"></div>
+    <div
+      v-if="isMobile"
+      class="mobile-detail-color-glass"
+      :style="detailColorStyle"
+      aria-hidden="true"
+      @click="close"
+    ></div>
     <div
       v-if="store.showImageSelected"
       class="img_detail_cont"
@@ -41,8 +48,8 @@
           alt=""
           :src="imgSrc"
           :width="imgLoading ? 0 : imageSelectedWidth"
-          @click.stop="toggleToolbar"
-          @load="imgLoading = false"
+          @click.stop="close"
+          @load="onDetailImageLoad"
           @error="onImageLoadError"
         >
         <img
@@ -502,6 +509,13 @@ const notR34Fav = ref(!(
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const showImageToolbar = ref(true)
 const detailVisualState = ref<'closed' | 'opening' | 'open' | 'closing'>('closed')
+const detailColors = ref(['38, 40, 46', '24, 27, 34', '68, 62, 76'])
+let detailLockedScrollY = 0
+const detailColorStyle = computed(() => ({
+  '--detail-color-a': detailColors.value[0],
+  '--detail-color-b': detailColors.value[1],
+  '--detail-color-c': detailColors.value[2],
+}))
 const imgLoading = ref(true)
 const innerWidth = ref(window.innerWidth)
 const innerHeight = ref(window.innerHeight)
@@ -580,6 +594,53 @@ function onTouchEnd(ev: TouchEvent) {
     return
   }
   if (dy > 96 && Math.abs(dy) > Math.abs(dx) * 1.35) close()
+}
+
+function lockDetailScroll() {
+  if (!isMobile || document.documentElement.classList.contains('mobile-detail-open')) return
+  detailLockedScrollY = window.scrollY
+  document.documentElement.classList.add('mobile-detail-open')
+  document.body.style.top = `-${detailLockedScrollY}px`
+}
+
+function unlockDetailScroll() {
+  if (!document.documentElement.classList.contains('mobile-detail-open')) return
+  document.documentElement.classList.remove('mobile-detail-open')
+  document.body.style.top = ''
+  window.scrollTo(0, detailLockedScrollY)
+}
+
+function extractDetailColors(image: HTMLImageElement) {
+  try {
+    const canvas = document.createElement('canvas')
+    canvas.width = 12
+    canvas.height = 12
+    const context = canvas.getContext('2d', { willReadFrequently: true })
+    if (!context) return
+    context.drawImage(image, 0, 0, 12, 12)
+    const data = context.getImageData(0, 0, 12, 12).data
+    const buckets = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+    for (let index = 0; index < data.length; index += 16) {
+      if (data[index + 3] < 160) continue
+      const luminance = data[index] * .299 + data[index + 1] * .587 + data[index + 2] * .114
+      const bucket = luminance < 80 ? buckets[1] : luminance > 175 ? buckets[2] : buckets[0]
+      bucket[0] += data[index]
+      bucket[1] += data[index + 1]
+      bucket[2] += data[index + 2]
+      bucket[3]++
+    }
+    detailColors.value = buckets.map((bucket, index) => {
+      if (!bucket[3]) return ['48, 50, 58', '24, 27, 34', '86, 78, 96'][index]
+      return `${Math.round(bucket[0] / bucket[3])}, ${Math.round(bucket[1] / bucket[3])}, ${Math.round(bucket[2] / bucket[3])}`
+    })
+  } catch (_error) {
+    detailColors.value = ['48, 50, 58', '24, 27, 34', '86, 78, 96']
+  }
+}
+
+function onDetailImageLoad(event: Event) {
+  imgLoading.value = false
+  extractDetailColors(event.target as HTMLImageElement)
 }
 
 async function close() {
@@ -864,6 +925,7 @@ async function reqFullscreen() {
 
 watch(() => store.showImageSelected, async val => {
   if (val) {
+    lockDetailScroll()
     detailVisualState.value = 'opening'
     imgLoading.value = true
     await nextTick()
@@ -872,6 +934,7 @@ watch(() => store.showImageSelected, async val => {
     preloadNextImg()
   } else {
     detailVisualState.value = 'closed'
+    unlockDetailScroll()
     scaleOn.value = false
     postDetail.value = {}
     await nextTick()

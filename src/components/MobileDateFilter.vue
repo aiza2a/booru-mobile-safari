@@ -95,7 +95,7 @@ const scales = computed<DateScale[]>(() => {
   if (dateFilter.mode === 'date' && (routeKind === 'home' || (site === 'danbooru' && routeKind === 'ranked'))) values.push('range')
   return values
 })
-const labels: Record<DateScale, string> = { day: '日', week: '周', month: '月', year: '年', range: '范围' }
+const labels: Record<DateScale, string> = { day: '日', week: '周', month: '月', year: '年', range: '域' }
 const scaleLabel = computed(() => labels[dateFilter.scale])
 const displayDate = computed(() => formatDateDisplay(dateFilter.date, dateFilter.scale))
 const today = formatISODate(new Date())
@@ -105,7 +105,15 @@ const rangeStep = ref<'start' | 'end'>('start')
 const pendingNativeValue = ref('')
 const rangePendingValue = ref('')
 const rangeComplete = computed(() => !!dateFilter.rangeStart && !!dateFilter.rangeEnd)
-const rangeDisplay = computed(() => dateFilter.rangeStart && dateFilter.rangeEnd ? `${dateFilter.rangeStart.slice(5).replace('-', '/')}–${dateFilter.rangeEnd.slice(5).replace('-', '/')}` : '选择范围')
+const rangeDisplay = computed(() => {
+  if (!dateFilter.rangeStart || !dateFilter.rangeEnd) return '选域'
+  const [start, end] = [dateFilter.rangeStart, dateFilter.rangeEnd].sort()
+  const startMonth = start.slice(5, 7)
+  const endMonth = end.slice(5, 7)
+  const startText = start.slice(5).replace('-', '/')
+  const endText = startMonth === endMonth ? end.slice(8) : end.slice(5).replace('-', '/')
+  return `${startText}–${endText}`
+})
 const rangeNativeValue = computed(() => rangeStep.value === 'start' ? (dateFilter.rangeStart || dateFilter.date) : (dateFilter.rangeEnd || dateFilter.rangeStart))
 const nativePickerType = computed(() => dateFilter.scale === 'month' ? 'month' : 'date')
 const nativePickerValue = computed(() => dateFilter.scale === 'month' ? dateFilter.date.slice(0, 7) : dateFilter.date)
@@ -154,6 +162,8 @@ function onRangeNativeChange(event: Event) {
 }
 function applyRange() {
   if (!rangeComplete.value) return
+  const [rangeStart, rangeEnd] = [dateFilter.rangeStart, dateFilter.rangeEnd].sort()
+  updateDateFilter({ rangeStart, rangeEnd })
   showRangePicker.value = false
   navigate()
 }
