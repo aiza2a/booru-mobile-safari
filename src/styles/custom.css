@@ -1101,6 +1101,24 @@ html.ym-immersive .posts-image-card {
   font-variant-numeric: tabular-nums;
 }
 
+.native-date-trigger {
+  position: relative;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.native-date-trigger input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: .001;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .mobile-search-fab {
   right: 16px !important;
   bottom: calc(20px + env(safe-area-inset-bottom)) !important;

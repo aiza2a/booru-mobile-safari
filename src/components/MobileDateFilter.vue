@@ -9,43 +9,25 @@
       <v-list dense><v-list-item v-for="scale in scales" :key="scale" @click="setScale(scale)"><v-list-item-title>{{ labels[scale] }}</v-list-item-title></v-list-item></v-list>
     </v-menu>
     <template v-if="dateFilter.mode === 'date'">
-      <template v-if="dateFilter.scale !== 'range'">
-        <v-btn icon small @click="move(-1)"><v-icon>{{ mdiChevronLeft }}</v-icon></v-btn>
-        <v-btn class="date-display" small text @click="openPicker">{{ displayDate }}</v-btn>
-        <v-btn v-if="canMoveNext" icon small @click="move(1)"><v-icon>{{ mdiChevronRight }}</v-icon></v-btn>
-      </template>
-      <v-btn v-else class="date-display range-display" small text @click="openPicker">{{ rangeDisplay }}</v-btn>
-      <v-dialog v-model="showPicker" content-class="ios-date-dialog">
+      <v-btn icon small @click="move(-1)"><v-icon>{{ mdiChevronLeft }}</v-icon></v-btn>
+      <div v-if="dateFilter.scale !== 'year'" class="native-date-trigger">
+        <v-btn class="date-display" small text tabindex="-1">{{ displayDate }}</v-btn>
+        <input
+          :value="nativePickerValue"
+          :type="nativePickerType"
+          :max="nativePickerMax"
+          :aria-label="pickerTitle"
+          @input="onNativeDateInput"
+          @change="onNativeDateChange"
+        >
+      </div>
+      <v-btn v-else class="date-display" small text @click="showYearPicker = true">{{ displayDate }}</v-btn>
+      <v-btn v-if="canMoveNext" icon small @click="move(1)"><v-icon>{{ mdiChevronRight }}</v-icon></v-btn>
+      <v-dialog v-model="showYearPicker" content-class="ios-date-dialog">
         <v-card class="ios-date-sheet">
-          <v-card-title>{{ pickerTitle }}</v-card-title>
-          <MobileCalendarGrid
-            v-if="dateFilter.scale === 'day' || dateFilter.scale === 'week'"
-            v-model="dateFilter.date"
-            :max="today"
-            @select="onDateSelected"
-          />
-          <MobileCalendarGrid
-            v-else-if="dateFilter.scale === 'range'"
-            v-model="rangeSelection"
-            :max="today"
-            :min="rangeStep === 'end' ? dateFilter.rangeStart : undefined"
-            @select="onRangeSelected"
-          />
-          <div v-else-if="dateFilter.scale === 'month'" class="ios-month-picker">
-            <label for="mobile-month-input">选择月份</label>
-            <input id="mobile-month-input" v-model="pickerMonth" type="month" :max="today.slice(0, 7)">
-            <v-btn text @click="onMonthSelected(pickerMonth)">查看结果</v-btn>
-          </div>
-          <div v-else class="ios-year-picker"><v-btn v-for="year in years" :key="year" text @click="onYearSelected(year)">{{ year }}</v-btn></div>
-          <div v-if="dateFilter.scale === 'range'" class="range-selection-summary">
-            <span>开始：{{ dateFilter.rangeStart || '未选择' }}</span>
-            <span>结束：{{ dateFilter.rangeEnd || '未选择' }}</span>
-          </div>
-          <v-card-actions>
-            <v-btn v-if="dateFilter.scale === 'range'" text @click="resetRange">清除</v-btn><v-spacer />
-            <v-btn text @click="showPicker = false">取消</v-btn>
-            <v-btn v-if="dateFilter.scale === 'range'" text :disabled="!rangeComplete" @click="applyRange">查看结果</v-btn>
-          </v-card-actions>
+          <v-card-title>选择年份</v-card-title>
+          <div class="ios-year-picker"><v-btn v-for="year in years" :key="year" text @click="onYearSelected(year)">{{ year }}</v-btn></div>
+          <v-card-actions><v-spacer /><v-btn text @click="showYearPicker = false">取消</v-btn></v-card-actions>
         </v-card>
       </v-dialog>
     </template>
@@ -55,7 +37,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { mdiCalendarMonthOutline, mdiCalendarStar, mdiChevronLeft, mdiChevronRight, mdiFire, mdiViewGridOutline } from '@mdi/js'
-import MobileCalendarGrid from '@/components/MobileCalendarGrid.vue'
 import { currentDateSite, currentRouteKind, siteCapabilities } from '@/config/site-capabilities'
 import { type DateFilterMode, dateFilter, updateDateFilter } from '@/store/date-filter'
 import { type DateScale, clampFutureDate, formatDateDisplay, formatISODate, shiftDate } from '@/utils/date-filter'
@@ -74,23 +55,17 @@ const primaryLabel = computed(() => hasLatestMode.value ? (routeKind === 'ranked
 const secondaryLabel = computed(() => routeKind === 'ranked' ? '历史高分' : '指定日期')
 const primaryIcon = computed(() => hasLatestMode.value ? mdiFire : mdiViewGridOutline)
 const secondaryIcon = computed(() => routeKind === 'ranked' ? mdiCalendarStar : mdiCalendarMonthOutline)
-const allowRange = computed(() => dateFilter.mode === 'date' && (routeKind === 'home' || (site === 'danbooru' && routeKind === 'ranked')))
-const scales = computed(() => {
-  const values: DateScale[] = routeKind && capability ? [...capability.scales[routeKind]] : []
-  if (allowRange.value) values.push('range')
-  return values
-})
+const scales = computed<DateScale[]>(() => routeKind && capability ? [...capability.scales[routeKind]] : [])
 const labels: Record<DateScale, string> = { day: '日', week: '周', month: '月', year: '年', range: '范围' }
 const scaleLabel = computed(() => labels[dateFilter.scale])
 const displayDate = computed(() => formatDateDisplay(dateFilter.date, dateFilter.scale))
-const rangeDisplay = computed(() => dateFilter.rangeStart && dateFilter.rangeEnd ? `${dateFilter.rangeStart.slice(5).replace('-', '/')}–${dateFilter.rangeEnd.slice(5).replace('-', '/')}` : '选择范围')
 const today = formatISODate(new Date())
-const showPicker = ref(false)
-const pickerMonth = ref(dateFilter.date.slice(0, 7))
-const rangeStep = ref<'start' | 'end'>('start')
-const rangeSelection = ref(dateFilter.rangeStart || dateFilter.date)
-const rangeComplete = computed(() => !!dateFilter.rangeStart && !!dateFilter.rangeEnd)
-const pickerTitle = computed(() => dateFilter.scale === 'range' ? (rangeStep.value === 'start' ? '选择开始日期' : '选择结束日期') : ({ day: '选择日期', week: '选择周所在日期', month: '选择月份', year: '选择年份' })[dateFilter.scale])
+const showYearPicker = ref(false)
+const pendingNativeValue = ref('')
+const nativePickerType = computed(() => dateFilter.scale === 'month' ? 'month' : 'date')
+const nativePickerValue = computed(() => dateFilter.scale === 'month' ? dateFilter.date.slice(0, 7) : dateFilter.date)
+const nativePickerMax = computed(() => dateFilter.scale === 'month' ? today.slice(0, 7) : today)
+const pickerTitle = computed(() => dateFilter.scale === 'month' ? '选择月份' : dateFilter.scale === 'week' ? '选择周所在日期' : '选择日期')
 const currentYear = Number(today.slice(0, 4))
 const years = Array.from({ length: 30 }, (_, index) => currentYear - index)
 const canMoveNext = computed(() => shiftDate(dateFilter.date, dateFilter.scale, 1) <= today)
@@ -99,47 +74,31 @@ if (routeKind) updateDateFilter({ routeKind })
 if (!showModeToggle.value) updateDateFilter({ mode: 'date' })
 if (!scales.value.includes(dateFilter.scale)) updateDateFilter({ scale: scales.value[0] || 'day' })
 
-function openPicker() {
-  if (dateFilter.scale === 'range') {
-    rangeStep.value = 'start'
-    rangeSelection.value = dateFilter.rangeStart || dateFilter.date
-  }
-  showPicker.value = true
-}
-function resetRange() {
-  updateDateFilter({ rangeStart: '', rangeEnd: '' })
-  rangeStep.value = 'start'
-  rangeSelection.value = dateFilter.date
-}
-function onRangeSelected(value: string) {
-  if (rangeStep.value === 'start') {
-    updateDateFilter({ rangeStart: value, rangeEnd: '' })
-    rangeStep.value = 'end'
-    rangeSelection.value = value
-  } else {
-    updateDateFilter({ rangeEnd: value })
-  }
-}
-function applyRange() {
-  if (!rangeComplete.value) return
-  showPicker.value = false
-  navigate()
-}
 function navigate() {
   if (!site || !routeKind) return
-  location.assign(buildDateRoute({ site, kind: routeKind, date: dateFilter.date, scale: dateFilter.scale, mode: dateFilter.mode, rangeStart: dateFilter.rangeStart, rangeEnd: dateFilter.rangeEnd }))
+  location.assign(buildDateRoute({ site, kind: routeKind, date: dateFilter.date, scale: dateFilter.scale, mode: dateFilter.mode }))
 }
 function setScale(scale: DateScale) {
   updateDateFilter({ scale })
-  if (scale === 'range') openPicker()
-  else navigate()
+  navigate()
 }
 function move(offset: number) {
   updateDateFilter({ date: clampFutureDate(shiftDate(dateFilter.date, dateFilter.scale, offset)) })
   navigate()
 }
-function onDateSelected() { showPicker.value = false; navigate() }
-function onMonthSelected(month: string) { if (!month) return; updateDateFilter({ date: `${month}-01` }); showPicker.value = false; navigate() }
-function onYearSelected(year: number) { updateDateFilter({ date: `${year}-01-01` }); showPicker.value = false; navigate() }
+function onNativeDateInput(event: Event) {
+  pendingNativeValue.value = (event.target as HTMLInputElement).value
+}
+function onNativeDateChange(event: Event) {
+  const value = (event.target as HTMLInputElement).value || pendingNativeValue.value
+  if (!value) return
+  updateDateFilter({ date: dateFilter.scale === 'month' ? `${value}-01` : value })
+  navigate()
+}
+function onYearSelected(year: number) {
+  updateDateFilter({ date: `${year}-01-01` })
+  showYearPicker.value = false
+  navigate()
+}
 watch(() => dateFilter.mode, mode => { if (mode === primaryMode.value) navigate() })
 </script>
