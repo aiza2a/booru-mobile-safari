@@ -60,7 +60,7 @@
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>{{ site.label }}</v-list-item-title>
-          <v-list-item-subtitle v-if="site.note">{{ site.note }}</v-list-item-subtitle>
+          <v-list-item-subtitle>{{ site.host }}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -70,6 +70,11 @@
 <script setup lang="ts">
 import { mdiClose, mdiEye, mdiFire, mdiHome, mdiImageMultiple, mdiShuffle, mdiStar, mdiTrendingUp } from '@mdi/js'
 import { store } from '@/store'
+import yandereIcon from '@/assets/sites/yandere.svg'
+import konachanIcon from '@/assets/sites/konachan.svg'
+import konachanSafeIcon from '@/assets/sites/konachan-safe.svg'
+import danbooruIcon from '@/assets/sites/danbooru.svg'
+import gelbooruIcon from '@/assets/sites/gelbooru.svg'
 
 const locationHost = location.hostname
 const isDanbooru = locationHost === 'danbooru.donmai.us'
@@ -87,21 +92,12 @@ const gelbooruShortcuts = [
   { label: '最近更新', url: 'https://gelbooru.com/index.php?page=post&s=list&tags=sort%3Aupdated%3Adesc&_wf=1', icon: mdiTrendingUp },
   { label: '画集', url: 'https://gelbooru.com/index.php?page=pool&s=list', icon: mdiImageMultiple },
 ]
-const iconProxy = (host: string) => `https://kwc.cocomi.eu.org/https://${host}/favicon.ico`
-const konachanIcon = 'https://upload-bbs.miyoushe.com/upload/2023/01/14/190122060/cbd0b71ead30e0777e5b023170ba415c_4819570566325089051.png'
-const rule34Icon = 'https://upload-bbs.miyoushe.com/upload/2025/03/29/190122060/76ba90d4350a1455f899d2a1500fca69_8344852329496206545.png'
-
 const sites = [
-  { label: 'Yande.re', host: 'yande.re', url: 'https://yande.re/post?_wf=1', icon: iconProxy('yande.re') },
+  { label: 'Yandere', host: 'yande.re', url: 'https://yande.re/post?_wf=1', icon: yandereIcon },
   { label: 'Konachan', host: 'konachan.com', url: 'https://konachan.com/post?_wf=1', icon: konachanIcon },
-  { label: 'Konachan Safe', host: 'konachan.net', url: 'https://konachan.net/post?_wf=1', icon: konachanIcon },
-  { label: 'Danbooru', host: 'danbooru.donmai.us', url: 'https://danbooru.donmai.us/posts?_wf=1', icon: iconProxy('danbooru.donmai.us') },
-  { label: 'Gelbooru', host: 'gelbooru.com', url: 'https://gelbooru.com/index.php?page=post&s=list&_wf=1', icon: iconProxy('gelbooru.com') },
-  { label: 'Rule34', host: 'rule34.xxx', url: 'https://rule34.xxx/index.php?page=post&s=list&_wf=1', icon: rule34Icon },
-  { label: 'Safebooru', host: 'safebooru.org', url: 'https://safebooru.org/index.php?page=post&s=list&_wf=1', icon: iconProxy('safebooru.org') },
-  { label: 'Zerochan', host: 'www.zerochan.net', url: 'https://www.zerochan.net/', icon: iconProxy('www.zerochan.net') },
-  { label: 'Pixiv Viewer', host: 'pixiv.pictures', url: 'https://pixiv.pictures/', icon: 'https://pixiv.pictures/favicon.ico', note: 'Pixiv 浏览器' },
-  { label: 'Moeview', host: 'moeview.app', url: 'https://moeview.app/', icon: 'https://moeview.app/favicon.ico', note: '图片聚合浏览' },
+  { label: 'Konachan Safe', host: 'konachan.net', url: 'https://konachan.net/post?_wf=1', icon: konachanSafeIcon },
+  { label: 'Danbooru', host: 'danbooru.donmai.us', url: 'https://danbooru.donmai.us/posts?_wf=1', icon: danbooruIcon },
+  { label: 'Gelbooru', host: 'gelbooru.com', url: 'https://gelbooru.com/index.php?page=post&s=list&_wf=1', icon: gelbooruIcon },
 ]
 
 function openSite(url: string) {
