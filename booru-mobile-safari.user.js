@@ -9846,7 +9846,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       return false;
     try {
       if (navigator.share) {
-        await navigator.share({ title, url });
+        await navigator.share({ title, text: url });
         return true;
       }
       await navigator.clipboard.writeText(url);
@@ -10494,6 +10494,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       let longPressStartX = 0;
       let longPressStartY = 0;
       let longPressTriggered = false;
+      let suppressContextMenuUntil = 0;
+      let shareInFlight = false;
       let pendingDirectSharePost;
       Vue2.watch(
         () => settings.selectedColumn,
@@ -10582,15 +10584,27 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           cancelPostLongPress();
         }
       }
+      async function sharePostOnce(post) {
+        if (shareInFlight)
+          return;
+        shareInFlight = true;
+        try {
+          await sharePost(post);
+        } finally {
+          shareInFlight = false;
+        }
+      }
       function onPostTouchEnd(ev) {
-        if (longPressTriggered)
+        if (longPressTriggered) {
           ev.preventDefault();
+          suppressContextMenuUntil = Date.now() + 1e3;
+        }
         const post = pendingDirectSharePost;
         pendingDirectSharePost = void 0;
         longPressPreview.value = void 0;
         cancelPostLongPress();
         if (post)
-          sharePost(post);
+          void sharePostOnce(post);
       }
       function onImageClick(index) {
         if (longPressTriggered) {
@@ -10603,8 +10617,10 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         if (isR34Fav.value)
           return;
         ev.preventDefault();
+        if (Date.now() < suppressContextMenuUntil)
+          return;
         if (isMobile2 && settings.longPressDirectShare) {
-          sharePost(img);
+          void sharePostOnce(img);
           return;
         }
         openPostMenu(img, ev.clientX, ev.clientY);
@@ -10699,7 +10715,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       Vue2.onUnmounted(() => {
         window.removeEventListener("scroll", scrollFn);
       });
-      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, longPressTimer, longPressStartX, longPressStartY, longPressTriggered, pendingDirectSharePost, showNoMore, showLoadMore, longPressPreview, ctxActPost, showMenu, x, y, maxHeightStyle, imgCardStyle, getImgSrc, openPostMenu, cancelPostLongPress, onPostTouchStart, onPostTouchMove, onPostTouchEnd, onImageClick, onCtxMenu, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, downloadCtxPost, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
+      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, longPressTimer, longPressStartX, longPressStartY, longPressTriggered, suppressContextMenuUntil, shareInFlight, pendingDirectSharePost, showNoMore, showLoadMore, longPressPreview, ctxActPost, showMenu, x, y, maxHeightStyle, imgCardStyle, getImgSrc, openPostMenu, cancelPostLongPress, onPostTouchStart, onPostTouchMove, sharePostOnce, onPostTouchEnd, onImageClick, onCtxMenu, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, downloadCtxPost, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
     }
   });
   var _sfc_render$4 = function render() {
