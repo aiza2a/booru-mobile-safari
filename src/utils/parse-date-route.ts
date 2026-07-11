@@ -10,7 +10,7 @@ export interface ParsedDateRoute {
 
 const periodScale: Record<string, DateScale> = { '1d': 'day', '1w': 'week', '1m': 'month', '1y': 'year' }
 const pathScale: Record<string, DateScale> = { day: 'day', week: 'week', month: 'month', year: 'year' }
-const dScale: Record<string, DateScale> = { '1': 'day', '7': 'week', '30': 'month', '365': 'year' }
+const dScale: Record<string, DateScale> = { 1: 'day', 7: 'week', 30: 'month', 365: 'year' }
 
 function parseTagDate(tags: string) {
   const exact = tags.match(/(?:^|\s)date:(\d{4}-\d{2}-\d{2})(?:\s|$)/)?.[1]

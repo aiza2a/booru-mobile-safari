@@ -32,7 +32,7 @@
 import { computed, ref, watch } from 'vue'
 import { mdiCheck, mdiChevronLeft, mdiChevronRight } from '@mdi/js'
 import { currentDateSite, currentRouteKind, siteCapabilities } from '@/config/site-capabilities'
-import { dateFilter, updateDateFilter, type DateFilterMode } from '@/store/date-filter'
+import { type DateFilterMode, dateFilter, updateDateFilter } from '@/store/date-filter'
 import { type DateScale, clampFutureDate, formatDateDisplay, formatISODate, shiftDate } from '@/utils/date-filter'
 import { buildDateRoute } from '@/utils/site-date-routes'
 
