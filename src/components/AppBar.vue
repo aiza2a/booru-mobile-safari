@@ -293,6 +293,7 @@
       </v-card>
     </v-dialog>
     <v-progress-linear
+      v-if="!isMobile"
       :active="store.requestLoading"
       :height="6"
       indeterminate
