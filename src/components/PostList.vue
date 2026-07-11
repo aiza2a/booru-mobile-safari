@@ -239,6 +239,7 @@ const isR34Fav = ref(isRule34FavPage() || isGelbooruFavPage())
 const showImageList = ref(true)
 const imageRenderVersions = ref<Record<string, number>>({})
 let openedDetailIndex = -1
+let detailCloseRefreshTimer: number | undefined
 type LongPressState = 'idle' | 'pressing' | 'previewing' | 'sharing' | 'restoring'
 
 let longPressState: LongPressState = 'idle'
@@ -258,7 +259,11 @@ watch(
     if (shown || openedDetailIndex < 0) return
     const index = openedDetailIndex
     openedDetailIndex = -1
-    nextTick(() => refreshDetailNeighbourImages(index))
+    if (detailCloseRefreshTimer) window.clearTimeout(detailCloseRefreshTimer)
+    detailCloseRefreshTimer = window.setTimeout(() => {
+      nextTick(() => refreshDetailNeighbourImages(index))
+      detailCloseRefreshTimer = undefined
+    }, 80)
   },
 )
 
@@ -553,6 +558,7 @@ function onVisibilityChange() {
 onUnmounted(() => {
   window.removeEventListener('scroll', scrollFn)
   document.removeEventListener('visibilitychange', onVisibilityChange)
+  if (detailCloseRefreshTimer) window.clearTimeout(detailCloseRefreshTimer)
   unlockLongPressScroll()
   resetLongPressState()
 })
