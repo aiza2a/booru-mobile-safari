@@ -235,6 +235,8 @@ let longPressTimer: number | undefined
 let longPressStartX = 0
 let longPressStartY = 0
 let longPressTriggered = false
+let suppressContextMenuUntil = 0
+let shareInFlight = false
 let pendingDirectSharePost: Post | undefined
 
 watch(
@@ -325,13 +327,26 @@ function onPostTouchMove(ev: TouchEvent) {
   }
 }
 
+async function sharePostOnce(post: Post) {
+  if (shareInFlight) return
+  shareInFlight = true
+  try {
+    await sharePost(post)
+  } finally {
+    shareInFlight = false
+  }
+}
+
 function onPostTouchEnd(ev: TouchEvent) {
-  if (longPressTriggered) ev.preventDefault()
+  if (longPressTriggered) {
+    ev.preventDefault()
+    suppressContextMenuUntil = Date.now() + 1000
+  }
   const post = pendingDirectSharePost
   pendingDirectSharePost = undefined
   longPressPreview.value = undefined
   cancelPostLongPress()
-  if (post) sharePost(post)
+  if (post) void sharePostOnce(post)
 }
 
 function onImageClick(index: number) {
@@ -345,8 +360,9 @@ function onImageClick(index: number) {
 function onCtxMenu(ev: MouseEvent, img: Post) {
   if (isR34Fav.value) return
   ev.preventDefault()
+  if (Date.now() < suppressContextMenuUntil) return
   if (isMobile && settings.longPressDirectShare) {
-    sharePost(img)
+    void sharePostOnce(img)
     return
   }
   openPostMenu(img, ev.clientX, ev.clientY)

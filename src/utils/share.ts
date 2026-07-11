@@ -16,7 +16,7 @@ export async function shareUrl(url: string, title: string): Promise<boolean> {
   if (!url) return false
   try {
     if (navigator.share) {
-      await navigator.share({ title, url })
+      await navigator.share({ title, text: url })
       return true
     }
     await navigator.clipboard.writeText(url)
