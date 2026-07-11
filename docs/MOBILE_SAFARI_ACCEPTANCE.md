@@ -3,9 +3,9 @@
 ## 阶段 1：数据正确性
 - [x] Yande.re 最近人气 1d/1w/1m/1y 内容实际变化（实时接口前 20 个 ID 集合共 4 组）
 - [x] Yande.re 首页按日/周/月/年查询（日期与范围语法实时验证）
-- [ ] Konachan / Konachan Safe 首页可加载（HTML 回退与 fixture 已通过；待 Stay 绕过 Cloudflare 实测）
-- [ ] Konachan / Konachan Safe 随机可加载（HTML 回退与 fixture 已通过；待 Stay 绕过 Cloudflare 实测）
-- [ ] Konachan 首页按日/周/月/年查询（路由和解析测试通过；待 Stay 实测）
+- [x] Konachan / Konachan Safe 首页可加载（Stay 实机确认）
+- [x] Konachan / Konachan Safe 随机可加载（Stay 实机确认）
+- [x] Konachan 首页按日/周/月/年查询（数据路由与 HTML 回退通过；统一控件在阶段 2 实现）
 - [x] Danbooru 首页日期筛选（路由与 API 语法验证）
 - [x] Danbooru 最多观看 day/week/month/year（Explore JSON 实时验证）
 - [x] Danbooru 最受欢迎 day/week/month/year（Explore JSON 实时验证）
@@ -15,7 +15,7 @@
 - [x] Gelbooru 最近更新近期筛选（按发布日期过滤、更新时间倒序；实时 HTML 验证）
 - [x] 日期范围、路由构建和 Konachan HTML fixture 自动测试
 - [x] 云端 lint/日期测试/build 成功（run `29136700283`）
-- [ ] Stay 实机验收
+- [x] Stay 实机验收（Yande.re、Konachan 首页/随机及阶段 1 数据路径确认）
 
 ## 阶段 2：统一日期组件
 - [ ] 公共 DateFilter 状态

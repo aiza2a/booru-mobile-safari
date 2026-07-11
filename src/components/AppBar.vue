@@ -1,7 +1,8 @@
 <template>
   <v-app-bar app dense flat :elevation="2">
     <v-app-bar-nav-icon @click="toggleDrawer()" />
-    <div v-if="store.isYKSite && showPopAction" style="display:flex" class="align-center">
+    <MobileDateFilter v-if="isMobile" />
+    <div v-if="!isMobile && store.isYKSite && showPopAction" style="display:flex" class="align-center">
       <v-toolbar-title class="mr-4 hidden-md-and-down" v-text="popTitle" />
       <v-switch v-model="isPopSearchByDate" class="hidden-sm-and-down" hide-details :label="isPopSearchByDate ? $t('nd4UjZy2ILsc-iW9iu7xR') : $t('elkBQ9moOZ-KMcy5bt_Ts')" />
       <v-btn v-if="isMobile" class="mobile-pop-mode" small icon @click="isPopSearchByDate = !isPopSearchByDate">
@@ -60,7 +61,7 @@
         <v-icon>{{ mdiHome }}</v-icon>
       </v-btn>
     </div>
-    <div v-else-if="store.showPostList" style="display:flex" class="align-center">
+    <div v-else-if="!isMobile && store.showPostList" style="display:flex" class="align-center">
       <v-toolbar-title class="hidden-md-and-down" v-text="title" />
       <input
         v-if="!isSankakuSite"
@@ -328,6 +329,7 @@ import {
   mdiTranslate,
 } from '@mdi/js'
 import { computed, onMounted, reactive, ref, set, watch } from 'vue'
+import MobileDateFilter from './MobileDateFilter.vue'
 import { useVuetify } from '@/plugins/vuetify'
 import { addDate, debounce, downloadFile, downloadText, eventBus, formatDate, showMsg, subDate } from '@/utils'
 import { settings, store, toggleDrawer } from '@/store'

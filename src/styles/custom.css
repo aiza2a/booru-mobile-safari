@@ -1081,3 +1081,36 @@ html.ym-immersive .posts-image-card {
 .theme--dark .v-list-item:before {
   opacity: 0 !important;
 }
+
+.mobile-date-filter {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin-left: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.mobile-date-filter .v-btn {
+  min-width: 34px !important;
+  padding: 0 6px !important;
+  text-transform: none !important;
+}
+
+.mobile-date-filter .date-mode-toggle {
+  flex: 0 0 auto;
+  margin-right: 2px;
+  border-radius: 9px;
+  background: rgba(118, 118, 128, .24) !important;
+  box-shadow: none !important;
+}
+
+.mobile-date-filter .date-mode-toggle .v-btn--active {
+  color: var(--ios-label) !important;
+  background: rgba(118, 118, 128, .46) !important;
+}
+
+.mobile-date-filter .date-display {
+  min-width: 58px !important;
+  font-variant-numeric: tabular-nums;
+}
