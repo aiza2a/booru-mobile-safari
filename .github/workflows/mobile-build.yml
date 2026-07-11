@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - mobile-safari
+      - mobile-safari-slim
   workflow_dispatch:
 
 permissions:
