@@ -293,9 +293,11 @@ function imageRenderKey(image: Post, index: number) {
 }
 
 function refreshDetailNeighbourImages(index: number) {
-  const start = Math.max(0, index - 8)
+  const radius = 12
+  const start = Math.max(0, index - radius)
+  const end = Math.min(store.imageList.length - 1, index + radius)
   const versions = { ...imageRenderVersions.value }
-  for (let current = start; current <= index; current++) {
+  for (let current = start; current <= end; current++) {
     const image = store.imageList[current]
     if (!image) continue
     const id = String(image.id || current)
