@@ -48,7 +48,7 @@
 
 ## 阶段 4：iOS UI 重构（进行中）
 - [x] 左侧仅保留 Yandere、Konachan、Konachan Safe、Danbooru、Gelbooru
-- [x] Konachan Safe 保持独立站点、独立名称和独立入口
+- [x] Konachan Safe 保持独立域名和独立绿色入口，显示名统一为 Konachan
 - [x] 五站使用清晰、统一风格的本地 SVG Icon
 - [x] 建立深浅主题 iOS 语义色变量（未改顶栏结构和空间分配）
 - [ ] 深色 iOS 语义色完整覆盖

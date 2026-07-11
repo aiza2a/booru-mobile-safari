@@ -2,10 +2,10 @@
   <v-navigation-drawer v-model="store.showDrawer" class="nav_drawer mobile-site-drawer" app temporary>
     <v-list-item class="drawer-title-row">
       <v-list-item-avatar class="drawer-brand-avatar">
-        <img :src="booruAvatar" alt="Booru·薄 柳">
+        <img :src="booruAvatar" alt="薄 柳">
       </v-list-item-avatar>
       <v-list-item-content>
-        <v-list-item-title class="drawer-brand-title">Booru·薄 柳</v-list-item-title>
+        <v-list-item-title class="drawer-brand-title">薄 柳</v-list-item-title>
         <v-list-item-subtitle class="drawer-brand-subtitle">图站瀑布流</v-list-item-subtitle>
       </v-list-item-content>
       <v-list-item-action>
@@ -98,7 +98,7 @@ const gelbooruShortcuts = [
 const sites = [
   { label: 'Yandere', host: 'yande.re', url: 'https://yande.re/post?_wf=1', icon: yandereIcon },
   { label: 'Konachan', host: 'konachan.com', url: 'https://konachan.com/post?_wf=1', icon: konachanIcon },
-  { label: 'Konachan Safe', host: 'konachan.net', url: 'https://konachan.net/post?_wf=1', icon: konachanSafeIcon },
+  { label: 'Konachan', host: 'konachan.net', url: 'https://konachan.net/post?_wf=1', icon: konachanSafeIcon },
   { label: 'Danbooru', host: 'danbooru.donmai.us', url: 'https://danbooru.donmai.us/posts?_wf=1', icon: danbooruIcon },
   { label: 'Gelbooru', host: 'gelbooru.com', url: 'https://gelbooru.com/index.php?page=post&s=list&_wf=1', icon: gelbooruIcon },
 ]
