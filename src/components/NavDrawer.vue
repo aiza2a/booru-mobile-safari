@@ -1,9 +1,12 @@
 <template>
   <v-navigation-drawer v-model="store.showDrawer" class="nav_drawer mobile-site-drawer" app temporary>
     <v-list-item class="drawer-title-row">
+      <v-list-item-avatar class="drawer-brand-avatar">
+        <img :src="booruAvatar" alt="Booru·薄 柳">
+      </v-list-item-avatar>
       <v-list-item-content>
-        <v-list-item-title class="title">选择站点</v-list-item-title>
-        <v-list-item-subtitle>常用图站与浏览器</v-list-item-subtitle>
+        <v-list-item-title class="drawer-brand-title">Booru·薄 柳</v-list-item-title>
+        <v-list-item-subtitle class="drawer-brand-subtitle">图站瀑布流</v-list-item-subtitle>
       </v-list-item-content>
       <v-list-item-action>
         <v-btn icon aria-label="关闭" @click="store.showDrawer = false">
@@ -60,7 +63,6 @@
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>{{ site.label }}</v-list-item-title>
-          <v-list-item-subtitle>{{ site.host }}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -70,6 +72,7 @@
 <script setup lang="ts">
 import { mdiClose, mdiEye, mdiFire, mdiHome, mdiImageMultiple, mdiShuffle, mdiStar, mdiTrendingUp } from '@mdi/js'
 import { store } from '@/store'
+import booruAvatar from '@/assets/sites/booru-avatar.png'
 import yandereIcon from '@/assets/sites/yandere.svg'
 import konachanIcon from '@/assets/sites/konachan.svg'
 import konachanSafeIcon from '@/assets/sites/konachan-safe.svg'
