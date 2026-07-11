@@ -622,7 +622,7 @@ function extractDetailColors(image: HTMLImageElement) {
     const buckets = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
     for (let index = 0; index < data.length; index += 16) {
       if (data[index + 3] < 160) continue
-      const luminance = data[index] * .299 + data[index + 1] * .587 + data[index + 2] * .114
+      const luminance = data[index] * 0.299 + data[index + 1] * 0.587 + data[index + 2] * 0.114
       const bucket = luminance < 80 ? buckets[1] : luminance > 175 ? buckets[2] : buckets[0]
       bucket[0] += data[index]
       bucket[1] += data[index + 1]
