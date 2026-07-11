@@ -442,23 +442,23 @@ var __publicField = (obj, key, value) => {
   "use strict";
   GM_addStyle(`
 
-.mobile-calendar-grid[data-v-57281db6] { padding: 0 12px 12px; color: var(--ios-label);
+.mobile-calendar-grid[data-v-7b54b917] { padding: 0 12px 12px; color: var(--ios-label);
 }
-.calendar-toolbar[data-v-57281db6] { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; min-height: 48px; text-align: center;
+.calendar-toolbar[data-v-7b54b917] { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; min-height: 48px; text-align: center;
 }
-.calendar-nav-spacer[data-v-57281db6] { width: 44px; height: 44px;
+.calendar-nav-spacer[data-v-7b54b917] { width: 44px; height: 44px;
 }
-.calendar-weekdays[data-v-57281db6], .calendar-days[data-v-57281db6] { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+.calendar-weekdays[data-v-7b54b917], .calendar-days[data-v-7b54b917] { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
 }
-.calendar-weekdays span[data-v-57281db6] { padding: 4px 0 8px; color: var(--ios-secondary-label); font-size: 12px; text-align: center;
+.calendar-weekdays span[data-v-7b54b917] { padding: 4px 0 8px; color: var(--ios-secondary-label); font-size: 12px; text-align: center;
 }
-.calendar-day[data-v-57281db6] { appearance: none; min-width: 0; height: 40px; padding: 0; border: 0; border-radius: 20px; color: inherit; background: transparent; font: inherit;
+.calendar-day[data-v-7b54b917] { appearance: none; min-width: 0; height: 40px; padding: 0; border: 0; border-radius: 20px; color: inherit; background: transparent; font: inherit;
 }
-.calendar-day.is-outside[data-v-57281db6] { color: var(--ios-secondary-label); opacity: .52;
+.calendar-day.is-outside[data-v-7b54b917] { color: var(--ios-secondary-label); opacity: .52;
 }
-.calendar-day.is-selected[data-v-57281db6] { color: #fff; background: #8e5bc7;
+.calendar-day.is-selected[data-v-7b54b917] { color: #fff; background: #8e5bc7;
 }
-.calendar-day.is-disabled[data-v-57281db6] { opacity: .22;
+.calendar-day.is-disabled[data-v-7b54b917] { opacity: .22;
 }
   `);
   function _interopDefaultLegacy(e) {
@@ -2669,7 +2669,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     _sfc_staticRenderFns$e,
     false,
     null,
-    "57281db6",
+    "7b54b917",
     null,
     null
   );
