@@ -51,7 +51,7 @@ export const siteCapabilities: Record<SupportedDateSite, SiteDateCapability> = {
   },
   'gelbooru': {
     site: 'gelbooru',
-    routes: ['home', 'ranked', 'updated'],
+    routes: [],
     latestRoutes: [],
     scales: {
       home: [...allScales],

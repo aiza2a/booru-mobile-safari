@@ -1,17 +1,17 @@
 import { reactive } from 'vue'
-import { type DateScale, clampFutureDate, formatISODate, parseDateFilterParams } from '@/utils/date-filter'
+import { clampFutureDate } from '@/utils/date-filter'
+import { parseDateRoute } from '@/utils/parse-date-route'
 
-export type DateFilterMode = 'latest' | 'date'
+export type DateFilterMode = 'all' | 'latest' | 'date'
 export type DateRouteKind = 'home' | 'random' | 'popular' | 'viewed' | 'ranked' | 'updated'
 
-const params = new URLSearchParams(location.search)
-const parsed = parseDateFilterParams(params)
+const parsed = parseDateRoute()
 
 export const dateFilter = reactive({
-  mode: (params.get('date_mode') === 'latest' ? 'latest' : 'date') as DateFilterMode,
-  scale: parsed.scale as DateScale,
-  date: parsed.date || formatISODate(new Date()),
-  routeKind: 'home' as DateRouteKind,
+  mode: parsed.mode,
+  scale: parsed.scale,
+  date: parsed.date,
+  routeKind: parsed.routeKind,
 })
 
 export function updateDateFilter(values: Partial<typeof dateFilter>) {

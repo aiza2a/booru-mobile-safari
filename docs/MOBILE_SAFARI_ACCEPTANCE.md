@@ -37,6 +37,9 @@
 - [ ] Stay 实机验收
 
 ## 阶段 4：iOS UI 重构
+- [ ] 左侧站点仅保留 Yande.re、Konachan、Danbooru、Gelbooru、Rule34
+- [ ] Konachan Safe 从站点主列表移除或统一命名后并入 Konachan 入口
+- [ ] 五站使用清晰、统一风格的本地 Icon 资产
 - [ ] 深色 iOS 语义色完整覆盖
 - [ ] 浅色 iOS 语义色完整覆盖
 - [ ] 设置/菜单/搜索/日期控件统一

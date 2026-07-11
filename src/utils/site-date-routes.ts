@@ -8,7 +8,7 @@ export interface DateRouteInput {
   kind: DateRouteKind
   date: string
   scale: DateScale
-  mode?: 'latest' | 'date'
+  mode?: 'all' | 'latest' | 'date'
 }
 
 export const siteDateCapabilities: Record<SupportedDateSite, DateRouteKind[]> = {
@@ -34,6 +34,13 @@ export function buildDateRoute(input: DateRouteInput) {
     throw new Error(`${site} does not support ${kind} date routes`)
   }
 
+  if (input.mode === 'all') {
+    if (site === 'yandere') return 'https://yande.re/post?_wf=1'
+    if (site === 'konachan-com') return 'https://konachan.com/post?_wf=1'
+    if (site === 'konachan-net') return 'https://konachan.net/post?_wf=1'
+    if (site === 'danbooru') return 'https://danbooru.donmai.us/posts?_wf=1'
+  }
+
   if (site === 'yandere' || site.startsWith('konachan')) {
     const origin = moeOrigin(site)
     if (kind === 'popular') {
@@ -50,6 +57,10 @@ export function buildDateRoute(input: DateRouteInput) {
   }
 
   if (site === 'danbooru') {
+    if (kind === 'ranked' && input.mode === 'latest') {
+      const days = { day: 1, week: 7, month: 30, year: 365 }[scale]
+      return `https://danbooru.donmai.us/posts?tags=order%3Arank&d=${days}&date_mode=latest&date_scale=${scale}&_wf=1`
+    }
     if (kind === 'popular' || kind === 'viewed') {
       const explore = kind === 'viewed' ? 'viewed' : 'popular'
       return `https://danbooru.donmai.us/explore/posts/${explore}?date=${range.date}&scale=${scale}&_wf=1`

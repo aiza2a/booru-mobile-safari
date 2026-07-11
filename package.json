@@ -12,7 +12,7 @@
     "build": "vite build",
     "postbuild": "node scripts/postbuild.mjs",
     "lint": "eslint src --ext .ts,.vue",
-    "verify:dates": "node scripts/verify-site-date-routes.mjs && node scripts/verify-moebooru-html.mjs",
+    "verify:dates": "node scripts/verify-site-date-routes.mjs && node scripts/verify-date-route-parser.mjs && node scripts/verify-moebooru-html.mjs",
     "preinstall": "npx -y only-allow pnpm"
   },
   "dependencies": {
