@@ -761,9 +761,14 @@ html:has(#app.theme--dark) {
     position: relative;
     overflow: hidden;
     isolation: isolate;
-    background: rgba(8, 9, 12, .42) !important;
-    backdrop-filter: blur(24px) saturate(135%);
-    -webkit-backdrop-filter: blur(24px) saturate(135%);
+    background: transparent !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .v-dialog__content:has(.ios-detail-dialog),
+  .v-dialog__content:has(.ios-detail-dialog) .v-dialog {
+    background: transparent !important;
   }
 
   .ios-detail-dialog .detail-glass-panel {
@@ -774,10 +779,10 @@ html:has(#app.theme--dark) {
     bottom: calc(8px + env(safe-area-inset-bottom));
     left: 8px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, .12);
+    border: 0;
     border-radius: 26px;
-    background: rgba(20, 20, 22, .24);
-    box-shadow: inset 0 1px rgba(255,255,255,.08), 0 18px 56px rgba(0,0,0,.24);
+    background: transparent;
+    box-shadow: none;
     opacity: 1;
     transform: scale(1);
     transform-origin: center;
@@ -785,13 +790,13 @@ html:has(#app.theme--dark) {
   }
 
   .ios-detail-dialog .detail-glass-panel--opening {
-    opacity: 0;
-    transform: scale(.975);
+    opacity: 1;
+    transform: scale(1);
   }
 
   .ios-detail-dialog .detail-glass-panel--closing {
-    opacity: 0;
-    transform: scale(.985);
+    opacity: 1;
+    transform: scale(1);
   }
 
   .ios-detail-dialog .detail-ambient-bg,
@@ -812,6 +817,18 @@ html:has(#app.theme--dark) {
   .ios-detail-dialog .detail-ambient-shade {
     inset: 0;
     background: linear-gradient(180deg, rgba(5, 6, 9, .36), rgba(10, 10, 13, .12) 45%, rgba(5, 6, 9, .42));
+  }
+
+  .ios-detail-dialog:has(.detail-glass-panel--opening) .img_detail_cont,
+  .ios-detail-dialog:has(.detail-glass-panel--opening) .mobile-detail-nav {
+    opacity: 0;
+    transform: scale(.975);
+  }
+
+  .ios-detail-dialog:has(.detail-glass-panel--closing) .img_detail_cont,
+  .ios-detail-dialog:has(.detail-glass-panel--closing) .mobile-detail-nav {
+    opacity: 0;
+    transform: scale(.985);
   }
 
   .ios-detail-dialog .img_detail_cont {
@@ -855,9 +872,9 @@ html:has(#app.theme--dark) {
 
   .ios-detail-dialog .mobile-detail-nav {
     z-index: 4;
-    right: max(14px, env(safe-area-inset-right));
+    right: 16px;
     bottom: calc(12px + env(safe-area-inset-bottom));
-    left: max(14px, env(safe-area-inset-left));
+    left: 16px;
     width: auto;
     max-width: 560px;
     min-height: 60px;
@@ -900,7 +917,7 @@ html:has(#app.theme--dark) {
   .v-application .v-app-bar .v-toolbar__content {
     gap: 4px;
     height: 52px !important;
-    padding: 0 10px;
+    padding: 0 12px 0 16px;
     background: transparent !important;
   }
 
@@ -920,13 +937,24 @@ html:has(#app.theme--dark) {
 
   .v-application .mobile-date-filter {
     min-height: 44px;
-    padding: 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent !important;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .v-application .mobile-date-filter .date-mode-toggle,
+  .v-application .mobile-date-filter > .v-btn,
+  .v-application .mobile-date-filter > .v-menu {
     border: 1px solid rgba(255, 255, 255, .13);
-    border-radius: 15px;
-    background: rgba(28, 28, 30, .52);
-    box-shadow: inset 0 1px rgba(255, 255, 255, .09), 0 6px 18px rgba(0, 0, 0, .14);
-    backdrop-filter: blur(24px) saturate(175%);
-    -webkit-backdrop-filter: blur(24px) saturate(175%);
+    border-radius: 14px;
+    background: rgba(28, 28, 30, .56) !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.08), 0 5px 14px rgba(0,0,0,.12);
+    backdrop-filter: blur(22px) saturate(170%);
+    -webkit-backdrop-filter: blur(22px) saturate(170%);
   }
 
   .v-application .mobile-date-filter.date-filter--compact,
@@ -945,7 +973,9 @@ html:has(#app.theme--dark) {
 
   .theme--light .v-app-bar .v-app-bar__nav-icon,
   .theme--light .v-app-bar > .v-toolbar__content > .v-btn,
-  .theme--light .mobile-date-filter {
+  .theme--light .mobile-date-filter .date-mode-toggle,
+  .theme--light .mobile-date-filter > .v-btn,
+  .theme--light .mobile-date-filter > .v-menu {
     border-color: rgba(60, 60, 67, .18);
     background: rgba(255, 255, 255, .62) !important;
   }
