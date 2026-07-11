@@ -75,9 +75,6 @@
             <v-btn v-if="notPartialSupportSite" icon color="#fff" :title="$t('hVmfDxXoj8vkgVQabEOSr')" @click.stop="addToSelectedList(item)">
               <v-icon>{{ mdiPlaylistPlus }}</v-icon>
             </v-btn>
-            <v-btn v-if="notPartialSupportSite" icon color="#fff" :title="$t('VpuyxZtIoDF9-YyOm0tK_')" @click.stop="downloadCtxPost(item)">
-              <v-icon>{{ mdiDownload }}</v-icon>
-            </v-btn>
             <v-btn v-if="isFavBtnShow" icon color="#fff" :title="$t('Dnnio9m9RZA6bkTLytc99')" @click.stop="addFavorite(item?.id)">
               <v-icon>{{ mdiHeartPlusOutline }}</v-icon>
             </v-btn>
@@ -171,9 +168,6 @@
           <v-btn v-if="notPartialSupportSite" class="hidden-md-and-down" icon color="#fff" :title="$t('hVmfDxXoj8vkgVQabEOSr')" @click.stop="addToSelectedList(image)">
             <v-icon>{{ mdiPlaylistPlus }}</v-icon>
           </v-btn>
-          <v-btn v-if="notPartialSupportSite" icon color="#fff" :title="$t('VpuyxZtIoDF9-YyOm0tK_')" @click.stop="downloadCtxPost(image)">
-            <v-icon>{{ mdiDownload }}</v-icon>
-          </v-btn>
           <v-btn v-if="isFavBtnShow" icon color="#fff" :title="$t('Dnnio9m9RZA6bkTLytc99')" @click.stop="addFavorite(image?.id)">
             <v-icon>{{ mdiHeartPlusOutline }}</v-icon>
           </v-btn>
@@ -202,9 +196,6 @@
         <v-list-item v-if="isFavBtnShow" @click="addFavorite()">
           <v-list-item-title>{{ $t('Dnnio9m9RZA6bkTLytc99') }}</v-list-item-title>
         </v-list-item>
-        <v-list-item v-if="notPartialSupportSite" @click="downloadCtxPost()">
-          <v-list-item-title>{{ $t('VpuyxZtIoDF9-YyOm0tK_') }}</v-list-item-title>
-        </v-list-item>
         <v-list-item @click="openDetail()">
           <v-list-item-title>{{ $t('EsiorRgoeHI8h7IHMLDA4') }}</v-list-item-title>
         </v-list-item>
@@ -218,17 +209,16 @@
 </template>
 
 <script setup lang="ts">
-import { mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo } from '@mdi/js'
+import { mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo } from '@mdi/js'
 import { computed, nextTick, onMounted, onUnmounted, ref, set, watch } from 'vue'
 import type { Post } from '@himeka/booru'
 import PostDetail from './PostDetail.vue'
-import { downloadFile, fancyboxShow, notReachBottom, showMsg, throttleScroll } from '@/utils'
+import { fancyboxShow, notReachBottom, throttleScroll } from '@/utils'
 import { sharePost } from '@/utils/share'
 import { notPartialSupportSite } from '@/api/booru'
 import { addPostToFavorites, isFavBtnShow } from '@/api/fav'
 import { isRule34FavPage } from '@/api/rule34'
 import { isGelbooruFavPage } from '@/api/gelbooru'
-import { isR34PahealHome } from '@/api/r34-paheal'
 import { initPosts, searchPosts } from '@/store/actions/post'
 import { removeFromSelectedList, settings, store, addToSelectedList as storeAddToSelectedList } from '@/store'
 import i18n from '@/utils/i18n'
@@ -480,25 +470,6 @@ function addFavorite(id?: string) {
   if (!isFavBtnShow) return
   const imgId = id || ctxActPost.value?.id
   imgId && addPostToFavorites(imgId)
-}
-
-async function downloadCtxPost(post?: Post) {
-  const img = post || ctxActPost.value
-  if (!img) return
-  let { fileDownloadName } = img
-  if (!img.fileUrl) return
-  if (store.isYKSite) {
-    fileDownloadName = `${location.hostname} ${img.id} ${img.tags.join(' ')}`
-  }
-  if (isR34PahealHome()) {
-    // @ts-expect-error protected prop
-    fileDownloadName = `${fileDownloadName}.${img.data.file_name.split('.').pop()}`
-  }
-  try {
-    await downloadFile(img.fileUrl, fileDownloadName)
-  } catch (error) {
-    showMsg({ msg: `${i18n.t('FAqj5ONm50QMfIt9Vq2p1')}: ${error}`, type: 'error' })
-  }
 }
 
 function isPostChecked(id?: string) {

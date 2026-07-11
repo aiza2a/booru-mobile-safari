@@ -63,8 +63,7 @@
       </div>
 
       <v-subheader>下载与预加载</v-subheader>
-      <div class="mobile-settings-section">
-        <v-list-item v-if="notPartialSupportSite"><v-list-item-content><v-list-item-title>下载方式</v-list-item-title><v-list-item-subtitle>手机端推荐新标签页或 Tampermonkey</v-list-item-subtitle></v-list-item-content><v-list-item-action><v-menu offset-y><template #activator="{ on, attrs }"><v-btn small class="sel_menu_btn" v-bind="attrs" v-on="on">{{ actDownloadMethod }}<v-icon :size="16">{{ mdiChevronDown }}</v-icon></v-btn></template><v-list dense><v-list-item v-for="it in mobileDownloadMethods" :key="it.value" @click="settings.downloadBy = it.value"><v-list-item-title>{{ it.text }}</v-list-item-title></v-list-item></v-list></v-menu></v-list-item-action></v-list-item>
+      <div class="mobile-settings-section"></v-list></v-menu></v-list-item-action></v-list-item>
         <v-list-item v-if="notPartialSupportSite"><v-list-item-content><v-list-item-title>完整图片预加载</v-list-item-title><v-list-item-subtitle>提前加载详情中的后续图片</v-list-item-subtitle></v-list-item-content><v-list-item-action><v-switch v-model="settings.isFullImgPreload" inset hide-details /></v-list-item-action></v-list-item>
         <v-list-item v-if="notPartialSupportSite && settings.isFullImgPreload"><v-list-item-content><v-list-item-title>预加载数量</v-list-item-title><v-list-item-subtitle>最多预加载 5 张</v-list-item-subtitle></v-list-item-content><v-list-item-action><input :value="settings.imgPreloadNum" class="text-center rounded preload_num" type="number" min="0" max="5" @blur="onPreloadNumBlur"></v-list-item-action></v-list-item>
       </div>
@@ -301,48 +300,7 @@
           <v-switch v-model="settings.isThumbSampleUrl" inset />
         </v-list-item-action>
       </v-list-item>
-      <v-list-item v-if="notPartialSupportSite">
-        <v-list-item-content>
-          <v-list-item-title>{{ $t('Ah2uP1cGRBQ6jff-SIc-Q') }}</v-list-item-title>
-          <v-list-item-subtitle>{{ $t('rcpw-hgymDP2bsJPPUb_F') }}</v-list-item-subtitle>
-        </v-list-item-content>
-        <v-list-item-action>
-          <v-menu transition="slide-y-transition" offset-y>
-            <template #activator="{ on, attrs }">
-              <v-btn small v-bind="attrs" class="sel_menu_btn" v-on="on">
-                {{ actDownloadMethod }}
-                <v-icon :size="16">{{ mdiChevronDown }}</v-icon>
-              </v-btn>
-            </template>
-            <v-list dense>
-              <v-list-item-group :value="settings.downloadBy" color="primary">
-                <v-list-item v-for="it in downloadMethods" :key="it.value" :value="it.value" dense @click="settings.downloadBy = it.value">
-                  <v-list-item-title>{{ it.text }}</v-list-item-title>
-                </v-list-item>
-              </v-list-item-group>
-            </v-list>
-          </v-menu>
-        </v-list-item-action>
-      </v-list-item>
-      <v-list-item v-if="notPartialSupportSite && isFsaSupported && settings.downloadBy === 'fsa'">
-        <v-list-item-content>
-          <v-list-item-title>{{ $t('1sUsdpwBzU4gBf7Mrcihq') }}</v-list-item-title>
-          <v-list-item-subtitle>{{ $t('jx2FWrN3O_8T7U5aSbvXj') }}</v-list-item-subtitle>
-        </v-list-item-content>
-        <v-list-item-action>
-          <v-btn small class="sel_menu_btn" @click="setFsaDirName">{{ fsaDirName || $t('UOaS5wud2xGLzx9NGJxYQ') }}</v-btn>
-        </v-list-item-action>
-      </v-list-item>
-      <v-list-item v-if="notPartialSupportSite && settings.downloadBy !== 'newtab'">
-        <v-list-item-content>
-          <v-list-item-title>{{ $t('PBjdNKuj02doUvOf2zZqP') }}</v-list-item-title>
-          <v-list-item-subtitle v-if="settings.downloadBy === 'tm'">{{ $t('z_oL9s5fS164W4_gITOGZ') }}</v-list-item-subtitle>
-          <v-list-item-subtitle v-if="settings.downloadBy === 'fsa'">是否将图片保存到以站点为名的文件夹</v-list-item-subtitle>
-        </v-list-item-content>
-        <v-list-item-action>
-          <v-switch v-model="settings.isDLSubpath" inset :loading="dlSubLoading" @change="onDLSubpathChange" />
-        </v-list-item-action>
-      </v-list-item>
+
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>{{ $t('fbIpwMw2yVoSxP66OJ32z') }}</v-list-item-title>
@@ -453,7 +411,6 @@ import { langList } from '@/store/settings'
 import { isBooruSite, notPartialSupportSite } from '@/api/booru'
 import { showMsg } from '@/utils'
 import i18n from '@/utils/i18n'
-import { getMainDirHandle, isFsaSupported, setMainDirHandle } from '@/utils/fsa'
 
 const vuetify = useVuetify()
 const isDarkMode = ref(settings.darkMode === 'dark')
@@ -514,64 +471,6 @@ function importBlacklist() {
     .catch(() => showMsg({ msg: i18n.t('si-zDDRFrEwDTCkp53Q44') as string, type: 'error' }))
 }
 
-const downloadMethods = ref([
-  { text: 'Tampermonkey', value: 'tm' } as const,
-  { text: 'FileSystemAccess', value: 'fsa' } as const,
-  { text: i18n.t('EsiorRgoeHI8h7IHMLDA4'), value: 'newtab' } as const,
-])
-const actDownloadMethod = computed(() => {
-  return downloadMethods.value.find(e => e.value === settings.downloadBy)?.text
-})
-
-const fsaDirName = ref('')
-getFsaDirName()
-async function getFsaDirName() {
-  if (!isFsaSupported) {
-    downloadMethods.value = downloadMethods.value.filter(e => e.value !== 'fsa')
-    return
-  }
-  const dirHandle = await getMainDirHandle()
-  if (dirHandle) {
-    fsaDirName.value = dirHandle.name
-  }
-}
-async function setFsaDirName() {
-  try {
-    const dirHandle = await setMainDirHandle()
-    fsaDirName.value = dirHandle.name
-  } catch (err) {
-    console.log('setFsaDirName err: ', err)
-  }
-}
-
-const dlSubLoading = ref(false)
-const showDLConfirm = ref(false)
-function setDLSubpathOn(val: boolean) {
-  settings.isDLSubpath = val
-  showDLConfirm.value = false
-  dlSubLoading.value = false
-}
-function onDLSubpathChange(val: boolean) {
-  if (settings.downloadBy != 'tm') return
-  dlSubLoading.value = true
-  if (val) {
-    showDLConfirm.value = true
-  } else {
-    setDLSubpathOn(false)
-  }
-}
-
-const { width: windowWidth } = useWindowSize()
-const allColList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20]
-const colList = computed(() => settings.masonryLayout == 'virtual' ? allColList.filter(e => e < (windowWidth.value - 32) / 300) : allColList)
-const cols = computed(() => colList.value.map(e => [`${e}`, e === 0 ? i18n.t('uxIs3XkeVzkrEX985zHk3').toString() : `${e} ${i18n.t('dU7ou5kVM0s9DMju5e2tS')}`]))
-const actCol = computed(() => {
-  return colList.value.findIndex(e => e.toString() === settings.selectedColumn)
-})
-
-const mobileCols = computed(() => [0, 1, 2, 3, 4].map(e => [`${e}`, e === 0 ? '自动' : `${e} 列`]))
-const mobileColumnLabel = computed(() => settings.selectedColumn === '0' ? '自动' : `${settings.selectedColumn} 列`)
-const mobileDownloadMethods = computed(() => downloadMethods.value.filter(item => item.value !== 'fsa'))
 
 const layoutTypes = ref([
   ['masonry', `Masonry/${i18n.t('6jPGehET9TViankl5-SRu')}`],
