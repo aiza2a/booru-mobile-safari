@@ -262,7 +262,14 @@
     <v-btn class="hidden-md-and-down" :title="$t('ClZdL9hGweOokP7Mn_Ptq')" icon @click="exitMasonry">
       <v-icon>{{ mdiLocationExit }}</v-icon>
     </v-btn>
-    <v-dialog v-model="store.showMobileSearch" fullscreen transition="dialog-bottom-transition">
+    <v-dialog
+      v-model="store.showMobileSearch"
+      fullscreen
+      content-class="mobile-search-dialog"
+      :transition="false"
+      overlay-color="transparent"
+      :overlay-opacity="0"
+    >
       <v-card class="mobile-search-sheet">
         <v-toolbar flat>
           <v-btn icon @click="store.showMobileSearch = false">

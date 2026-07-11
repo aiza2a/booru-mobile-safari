@@ -1732,3 +1732,97 @@ html.long-press-sharing body {
     box-shadow: inset 0 1px rgba(255, 255, 255, .45);
   }
 }
+
+/* Rounded date segments and a drawer-like glass search surface. */
+@media screen and (max-width: 959px), (pointer: coarse) {
+  .mobile-date-filter .date-mode-toggle {
+    gap: 2px;
+    overflow: hidden;
+    border-radius: 18px !important;
+  }
+
+  .mobile-date-filter .date-mode-toggle .v-btn {
+    overflow: hidden;
+    border: 0 !important;
+    border-radius: 15px !important;
+  }
+
+  .mobile-date-filter .date-mode-toggle .v-btn::before,
+  .mobile-date-filter .date-mode-toggle .v-btn::after {
+    border-radius: inherit !important;
+  }
+
+  .mobile-search-dialog,
+  .mobile-search-dialog.v-card {
+    overflow: hidden;
+    color: var(--ios-label) !important;
+    background: rgba(8, 9, 12, .34) !important;
+    backdrop-filter: blur(32px) saturate(155%);
+    -webkit-backdrop-filter: blur(32px) saturate(155%);
+  }
+
+  .mobile-search-dialog .mobile-search-sheet {
+    min-height: 100dvh;
+    color: var(--ios-label) !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .035), rgba(255, 255, 255, .01)) !important;
+  }
+
+  .mobile-search-dialog .v-toolbar {
+    padding-top: env(safe-area-inset-top);
+    border-bottom: 1px solid rgba(255, 255, 255, .10);
+    background: rgba(18, 18, 20, .62) !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(28px) saturate(150%);
+    -webkit-backdrop-filter: blur(28px) saturate(150%);
+  }
+
+  .mobile-search-dialog .mobile-search-input .v-input__slot {
+    min-height: 46px !important;
+    padding: 0 12px !important;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .08) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, .05);
+  }
+
+  .mobile-search-dialog .mobile-search-input .v-input__slot::before,
+  .mobile-search-dialog .mobile-search-input .v-input__slot::after {
+    display: none !important;
+  }
+
+  .mobile-search-dialog .mobile-search-suggestions {
+    padding: 10px 12px calc(20px + env(safe-area-inset-bottom));
+    background: transparent !important;
+  }
+
+  .mobile-search-dialog .mobile-search-suggestions .v-list-item {
+    min-height: 54px;
+    margin-bottom: 2px;
+    padding: 0 14px !important;
+    border-radius: 14px;
+    background: transparent !important;
+  }
+
+  .mobile-search-dialog .mobile-search-suggestions .v-list-item:active {
+    background: rgba(255, 255, 255, .10) !important;
+  }
+
+  .theme--light .mobile-search-dialog,
+  .theme--light .mobile-search-dialog.v-card {
+    background: rgba(242, 242, 247, .52) !important;
+  }
+
+  .theme--light .mobile-search-dialog .v-toolbar {
+    border-bottom-color: rgba(60, 60, 67, .14);
+    background: rgba(248, 248, 250, .68) !important;
+  }
+
+  .theme--light .mobile-search-dialog .mobile-search-input .v-input__slot {
+    border-color: rgba(60, 60, 67, .14);
+    background: rgba(255, 255, 255, .60) !important;
+  }
+
+  .theme--light .mobile-search-dialog .mobile-search-suggestions .v-list-item:active {
+    background: rgba(120, 120, 128, .12) !important;
+  }
+}
