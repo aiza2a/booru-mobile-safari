@@ -38,6 +38,37 @@ export function getDateRange(dateText: string, scale: DateScale): DateRange {
   }
 }
 
+export function shiftDate(dateText: string, scale: DateScale, offset: number) {
+  const date = new Date(`${dateText}T12:00:00`)
+  if (scale === 'day') date.setDate(date.getDate() + offset)
+  if (scale === 'week') date.setDate(date.getDate() + offset * 7)
+  if (scale === 'month') date.setMonth(date.getMonth() + offset)
+  if (scale === 'year') date.setFullYear(date.getFullYear() + offset)
+  return formatISODate(date)
+}
+
+export function clampFutureDate(dateText: string, today = new Date()) {
+  const value = new Date(`${dateText}T12:00:00`)
+  const max = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12)
+  return formatISODate(value > max ? max : value)
+}
+
+export function formatDateDisplay(dateText: string, scale: DateScale) {
+  const range = getDateRange(dateText, scale)
+  if (scale === 'day') return range.date.slice(5)
+  if (scale === 'week') return `${range.start.slice(5)} ~ ${range.end.slice(5)}`
+  if (scale === 'month') return range.date.slice(0, 7)
+  return range.date.slice(0, 4)
+}
+
+export function parseDateFilterParams(params: URLSearchParams, fallbackDate = formatISODate(new Date())) {
+  const scale = params.get('date_scale') as DateScale
+  return {
+    date: clampFutureDate(params.get('date') || fallbackDate),
+    scale: ['day', 'week', 'month', 'year'].includes(scale) ? scale : 'day' as DateScale,
+  }
+}
+
 export function buildDateTags(dateText: string, scale: DateScale) {
   const range = getDateRange(dateText, scale)
   return scale === 'day' ? `date:${range.date}` : `date:>=${range.start} date:<=${range.end}`

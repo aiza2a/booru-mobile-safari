@@ -23,6 +23,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run lint
+      - run: pnpm run verify:dates
       - run: pnpm run build
       - name: Publish userscript to branch
         run: |

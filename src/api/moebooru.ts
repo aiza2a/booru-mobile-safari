@@ -1,5 +1,6 @@
 import { Post, SearchResults, forSite } from '@himeka/booru'
 import { formatDate, showMsg } from '../utils'
+import { extractRegisteredPosts } from '@/utils/moebooru-html'
 import i18n from '@/utils/i18n'
 import { settings, store } from '@/store'
 
@@ -212,20 +213,10 @@ export async function fetchPostsByHtml(page: number, tags: string | null) {
   url.searchParams.set('page', `${page}`)
   tags && url.searchParams.set('tags', tags)
   const htmlResp = await fetch(url.href)
-  const doc = new DOMParser().parseFromString(await htmlResp.text(), 'text/html')
-  const selectors = [
-    'form:has(select[name=locale]) + script',
-    'script:not([src])',
-  ]
-  const scriptTexts = selectors.flatMap(selector => [...doc.querySelectorAll<HTMLScriptElement>(selector)].map(e => e.innerText))
-  const scriptText = scriptTexts.find(text => text.includes('Post.register(')) || ''
+  const html = await htmlResp.text()
   let results: any[] = []
   try {
-    results = scriptText.split('\n').flatMap(line => {
-      const match = line.match(/Post\.register\((.*)\);?\s*$/)
-      if (!match) return []
-      return [JSON.parse(match[1])]
-    })
+    results = extractRegisteredPosts(html)
   } catch (err) {
     console.log('err: ', err)
   }
