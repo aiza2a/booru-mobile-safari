@@ -849,11 +849,49 @@ html:has(#app.theme--dark) {
   .v-application .v-app-bar {
     padding-top: env(safe-area-inset-top);
     height: calc(52px + env(safe-area-inset-top)) !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    pointer-events: none;
   }
 
   .v-application .v-app-bar .v-toolbar__content {
+    gap: 4px;
     height: 52px !important;
-    padding: 0 4px;
+    padding: 0 6px;
+    background: transparent !important;
+  }
+
+  .v-application .v-app-bar .v-toolbar__content > * {
+    pointer-events: auto;
+  }
+
+  .v-application .v-app-bar .v-app-bar__nav-icon,
+  .v-application .v-app-bar > .v-toolbar__content > .v-btn {
+    border: 1px solid rgba(255, 255, 255, .13);
+    border-radius: 15px;
+    background: rgba(28, 28, 30, .56) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, .1), 0 6px 18px rgba(0, 0, 0, .16) !important;
+    backdrop-filter: blur(24px) saturate(175%);
+    -webkit-backdrop-filter: blur(24px) saturate(175%);
+  }
+
+  .v-application .mobile-date-filter {
+    min-height: 44px;
+    padding: 4px;
+    border: 1px solid rgba(255, 255, 255, .13);
+    border-radius: 15px;
+    background: rgba(28, 28, 30, .52);
+    box-shadow: inset 0 1px rgba(255, 255, 255, .09), 0 6px 18px rgba(0, 0, 0, .14);
+    backdrop-filter: blur(24px) saturate(175%);
+    -webkit-backdrop-filter: blur(24px) saturate(175%);
+  }
+
+  .theme--light .v-app-bar .v-app-bar__nav-icon,
+  .theme--light .v-app-bar > .v-toolbar__content > .v-btn,
+  .theme--light .mobile-date-filter {
+    border-color: rgba(60, 60, 67, .18);
+    background: rgba(255, 255, 255, .62) !important;
   }
 
   .v-main {
