@@ -31,7 +31,7 @@
         <v-card class="ios-date-sheet">
           <v-card-title>{{ pickerTitle }}</v-card-title>
           <v-date-picker
-            v-if="pickerMounted && (dateFilter.scale === 'day' || dateFilter.scale === 'week')"
+            v-if="dateFilter.scale === 'day' || dateFilter.scale === 'week'"
             v-model="dateFilter.date"
             :max="today"
             full-width
@@ -39,7 +39,7 @@
             @input="onDateSelected"
           />
           <v-date-picker
-            v-else-if="pickerMounted && dateFilter.scale === 'month'"
+            v-else-if="dateFilter.scale === 'month'"
             v-model="pickerMonth"
             :max="today.slice(0, 7)"
             type="month"
@@ -49,8 +49,8 @@
           />
           <template v-else-if="dateFilter.scale === 'range'">
             <div class="ios-range-picker">
-              <div><div class="range-label">开始日期</div><v-date-picker v-if="pickerMounted" v-model="dateFilter.rangeStart" :max="dateFilter.rangeEnd || today" no-title /></div>
-              <div><div class="range-label">结束日期</div><v-date-picker v-if="pickerMounted" v-model="dateFilter.rangeEnd" :min="dateFilter.rangeStart" :max="today" no-title /></div>
+              <div><div class="range-label">开始日期</div><v-date-picker v-model="dateFilter.rangeStart" :max="dateFilter.rangeEnd || today" no-title /></div>
+              <div><div class="range-label">结束日期</div><v-date-picker v-model="dateFilter.rangeEnd" :min="dateFilter.rangeStart" :max="today" no-title /></div>
             </div>
             <v-card-actions>
               <v-btn text @click="resetRange">清除</v-btn><v-spacer />
@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { mdiCalendarMonthOutline, mdiCalendarStar, mdiChevronLeft, mdiChevronRight, mdiFire, mdiViewGridOutline } from '@mdi/js'
 import { currentDateSite, currentRouteKind, siteCapabilities } from '@/config/site-capabilities'
 import { type DateFilterMode, dateFilter, updateDateFilter } from '@/store/date-filter'
@@ -104,7 +104,6 @@ const rangeDisplay = computed(() => {
 })
 const today = formatISODate(new Date())
 const showPicker = ref(false)
-const pickerMounted = ref(false)
 const pickerMonth = ref(dateFilter.date.slice(0, 7))
 const pickerTitle = computed(() => ({ day: '选择日期', week: '选择周所在日期', month: '选择月份', year: '选择年份', range: '自定义日期范围' })[dateFilter.scale])
 const currentYear = Number(today.slice(0, 4))
@@ -116,11 +115,7 @@ if (!showModeToggle.value) updateDateFilter({ mode: 'date' })
 if (!scales.value.includes(dateFilter.scale)) updateDateFilter({ scale: scales.value[0] || 'day' })
 
 function openPicker() {
-  pickerMounted.value = false
   showPicker.value = true
-  nextTick(() => {
-    pickerMounted.value = true
-  })
 }
 function resetRange() {
   updateDateFilter({ rangeStart: dateFilter.date, rangeEnd: dateFilter.date })

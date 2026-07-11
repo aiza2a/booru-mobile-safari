@@ -1156,15 +1156,14 @@ html.ym-immersive .posts-image-card {
 }
 
 .ios-date-sheet {
-  overflow: visible;
+  width: min(92vw, 390px);
+  overflow: hidden;
   border-radius: 22px 22px 0 0 !important;
   background: var(--ios-surface) !important;
 }
 
-.ios-date-sheet .v-picker,
-.ios-date-sheet .v-date-picker-table {
+.ios-date-sheet .v-picker {
   width: 100% !important;
-  min-height: 360px;
 }
 
 .ios-date-sheet .v-card__title {
@@ -1199,7 +1198,7 @@ html.ym-immersive .posts-image-card {
 }
 
 .ios-range-picker .v-picker {
-  min-height: 340px;
+  width: 100% !important;
 }
 
 .range-label {
