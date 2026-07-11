@@ -30,7 +30,6 @@
           alt=""
           :src="imgSrc"
           :width="imageSelectedWidth"
-          :style="{ opacity: imgLoading ? 0 : 1 }"
           @click.stop="toggleToolbar"
           @load="imgLoading = false"
           @error="onImageLoadError"
@@ -519,7 +518,10 @@ const imgSrc = computed(() => {
 })
 const imgLasySrc = computed(() => {
   if (isVideo.value) return void 0
-  return imageSelected.value.previewUrl ?? void 0
+  return imageSelected.value.previewUrl
+    ?? imageSelected.value.sampleUrl
+    ?? imageSelected.value.fileUrl
+    ?? void 0
 })
 
 const imageSelectedWidth = computed(() => {
