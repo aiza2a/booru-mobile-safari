@@ -1,4 +1,4 @@
-import { buildDateTags, type DateScale, getDateRange } from './date-filter'
+import { buildDateTags, getDateRange, type DateScale } from './date-filter'
 
 export type SupportedDateSite = 'yandere' | 'konachan-com' | 'konachan-net' | 'danbooru' | 'gelbooru'
 export type DateRouteKind = 'home' | 'random' | 'popular' | 'viewed' | 'ranked' | 'updated'
@@ -12,11 +12,11 @@ export interface DateRouteInput {
 }
 
 export const siteDateCapabilities: Record<SupportedDateSite, DateRouteKind[]> = {
-  yandere: ['home', 'random', 'popular'],
+  'yandere': ['home', 'random', 'popular'],
   'konachan-com': ['home', 'random', 'popular'],
   'konachan-net': ['home', 'random', 'popular'],
-  danbooru: ['home', 'popular', 'viewed', 'ranked'],
-  gelbooru: ['home', 'ranked', 'updated'],
+  'danbooru': ['home', 'popular', 'viewed', 'ranked'],
+  'gelbooru': ['home', 'ranked', 'updated'],
 }
 
 const moeOrigin = (site: SupportedDateSite) => {

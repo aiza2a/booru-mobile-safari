@@ -26,7 +26,7 @@ export function extractRegisteredPosts(html: string): any[] {
           if (char === quote) quote = ''
           continue
         }
-        if (char === '"' || char === "'") {
+        if (char === '\"' || char === '\'') {
           quote = char
           continue
         }

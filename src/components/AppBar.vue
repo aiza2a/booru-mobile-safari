@@ -11,7 +11,7 @@
         <template #activator="{ on, attrs }">
           <v-btn small class="ml-4" v-bind="attrs" v-on="on">
             <v-icon left>{{ mdiCalendarSearch }}</v-icon>
-              <span style="margin-bottom:2px">{{ isMobile && isPopSearchByDate ? periodComputedMap[recentPeriod][0].slice(-1) : periodComputedMap[recentPeriod][0] }}</span>
+            <span style="margin-bottom:2px">{{ isMobile && isPopSearchByDate ? periodComputedMap[recentPeriod][0].slice(-1) : periodComputedMap[recentPeriod][0] }}</span>
           </v-btn>
         </template>
         <v-list dense>
