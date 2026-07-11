@@ -10490,12 +10490,14 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       const isMobile2 = window.matchMedia("(max-width: 959px), (pointer: coarse)").matches;
       const isR34Fav = Vue2.ref(isRule34FavPage() || isGelbooruFavPage());
       const showImageList = Vue2.ref(true);
+      let longPressState = "idle";
       let longPressTimer;
       let longPressStartX = 0;
       let longPressStartY = 0;
-      let longPressTriggered = false;
+      let suppressNextClick = false;
       let suppressContextMenuUntil = 0;
       let shareInFlight = false;
+      let activeLongPressPost;
       let pendingDirectSharePost;
       Vue2.watch(
         () => settings.selectedColumn,
@@ -10549,25 +10551,39 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           showMenu.value = true;
         });
       }
-      function cancelPostLongPress() {
+      function clearLongPressTimer() {
         if (longPressTimer)
           window.clearTimeout(longPressTimer);
         longPressTimer = void 0;
-        if (!longPressTriggered)
-          longPressPreview.value = void 0;
+      }
+      function resetLongPressState(clearPreview = true) {
+        clearLongPressTimer();
+        longPressState = "idle";
+        activeLongPressPost = void 0;
         pendingDirectSharePost = void 0;
+        if (clearPreview)
+          longPressPreview.value = void 0;
+      }
+      function cancelPostLongPress() {
+        if (longPressState === "sharing" || longPressState === "restoring")
+          return;
+        resetLongPressState();
       }
       function onPostTouchStart(ev, img) {
-        if (!isMobile2 || ev.touches.length !== 1)
+        if (!isMobile2 || ev.touches.length !== 1 || longPressState === "sharing")
           return;
+        resetLongPressState();
         const touch = ev.touches[0];
         longPressStartX = touch.clientX;
         longPressStartY = touch.clientY;
-        pendingDirectSharePost = void 0;
-        longPressTriggered = false;
-        cancelPostLongPress();
+        activeLongPressPost = img;
+        longPressState = "pressing";
+        suppressNextClick = false;
         longPressTimer = window.setTimeout(() => {
-          longPressTriggered = true;
+          if (longPressState !== "pressing" || activeLongPressPost !== img)
+            return;
+          longPressState = "previewing";
+          suppressNextClick = true;
           longPressPreview.value = img;
           navigator.vibrate?.(18);
           if (settings.longPressDirectShare)
@@ -10577,38 +10593,51 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         }, 360);
       }
       function onPostTouchMove(ev) {
-        const touch = ev.touches[0];
-        if (!touch)
+        if (longPressState !== "pressing")
           return;
-        if (Math.abs(touch.clientX - longPressStartX) > 12 || Math.abs(touch.clientY - longPressStartY) > 12) {
+        if (ev.touches.length !== 1) {
           cancelPostLongPress();
+          return;
         }
+        const touch = ev.touches[0];
+        if (Math.abs(touch.clientX - longPressStartX) > 12 || Math.abs(touch.clientY - longPressStartY) > 12)
+          cancelPostLongPress();
       }
       async function sharePostOnce(post) {
         if (shareInFlight)
           return;
         shareInFlight = true;
+        longPressState = "sharing";
         try {
           await sharePost(post);
         } finally {
           shareInFlight = false;
+          longPressState = "restoring";
+          resetLongPressState();
         }
       }
       function onPostTouchEnd(ev) {
-        if (longPressTriggered) {
+        clearLongPressTimer();
+        const wasTriggered = longPressState === "previewing";
+        if (wasTriggered) {
           ev.preventDefault();
           suppressContextMenuUntil = Date.now() + 1e3;
         }
         const post = pendingDirectSharePost;
         pendingDirectSharePost = void 0;
-        longPressPreview.value = void 0;
-        cancelPostLongPress();
-        if (post)
+        if (post) {
           void sharePostOnce(post);
+          return;
+        }
+        if (wasTriggered) {
+          longPressState = "restoring";
+          longPressPreview.value = void 0;
+        }
+        resetLongPressState();
       }
       function onImageClick(index) {
-        if (longPressTriggered) {
-          longPressTriggered = false;
+        if (suppressNextClick || longPressState !== "idle") {
+          suppressNextClick = false;
           return;
         }
         showImgModal(index);
@@ -10711,11 +10740,18 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       Vue2.onMounted(async () => {
         await initPosts();
         window.addEventListener("scroll", scrollFn);
+        document.addEventListener("visibilitychange", onVisibilityChange);
       });
+      function onVisibilityChange() {
+        if (document.hidden && longPressState !== "sharing")
+          resetLongPressState();
+      }
       Vue2.onUnmounted(() => {
         window.removeEventListener("scroll", scrollFn);
+        document.removeEventListener("visibilitychange", onVisibilityChange);
+        resetLongPressState();
       });
-      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, longPressTimer, longPressStartX, longPressStartY, longPressTriggered, suppressContextMenuUntil, shareInFlight, pendingDirectSharePost, showNoMore, showLoadMore, longPressPreview, ctxActPost, showMenu, x, y, maxHeightStyle, imgCardStyle, getImgSrc, openPostMenu, cancelPostLongPress, onPostTouchStart, onPostTouchMove, sharePostOnce, onPostTouchEnd, onImageClick, onCtxMenu, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, downloadCtxPost, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
+      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, longPressState, longPressTimer, longPressStartX, longPressStartY, suppressNextClick, suppressContextMenuUntil, shareInFlight, activeLongPressPost, pendingDirectSharePost, showNoMore, showLoadMore, longPressPreview, ctxActPost, showMenu, x, y, maxHeightStyle, imgCardStyle, getImgSrc, openPostMenu, clearLongPressTimer, resetLongPressState, cancelPostLongPress, onPostTouchStart, onPostTouchMove, sharePostOnce, onPostTouchEnd, onImageClick, onCtxMenu, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, downloadCtxPost, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, onVisibilityChange, mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
     }
   });
   var _sfc_render$4 = function render() {
