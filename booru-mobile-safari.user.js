@@ -2548,7 +2548,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     },
     "gelbooru": {
       site: "gelbooru",
-      routes: ["home", "ranked", "updated"],
+      routes: [],
       latestRoutes: [],
       scales: {
         home: [...allScales],
@@ -2647,24 +2647,84 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       return range.date.slice(0, 7);
     return range.date.slice(0, 4);
   }
-  function parseDateFilterParams(params2, fallbackDate = formatISODate(new Date())) {
-    const scale = params2.get("date_scale");
-    return {
-      date: clampFutureDate(params2.get("date") || fallbackDate),
-      scale: ["day", "week", "month", "year"].includes(scale) ? scale : "day"
-    };
-  }
   function buildDateTags(dateText, scale) {
     const range = getDateRange(dateText, scale);
     return scale === "day" ? `date:${range.date}` : `date:>=${range.start} date:<=${range.end}`;
   }
-  const params$1 = new URLSearchParams(location.search);
-  const parsed = parseDateFilterParams(params$1);
+  const periodScale = { "1d": "day", "1w": "week", "1m": "month", "1y": "year" };
+  const pathScale = { day: "day", week: "week", month: "month", year: "year" };
+  const dScale = { 1: "day", 7: "week", 30: "month", 365: "year" };
+  function parseTagDate(tags) {
+    const exact = tags.match(/(?:^|\s)date:(\d{4}-\d{2}-\d{2})(?:\s|$)/)?.[1];
+    const start = tags.match(/date:>=(\d{4}-\d{2}-\d{2})/)?.[1];
+    const end = tags.match(/date:<=(\d{4}-\d{2}-\d{2})/)?.[1];
+    if (exact)
+      return { date: exact, scale: "day" };
+    if (!start || !end)
+      return null;
+    const startDate = new Date(`${start}T12:00:00`);
+    const endDate = new Date(`${end}T12:00:00`);
+    const days = Math.round((endDate.valueOf() - startDate.valueOf()) / 864e5) + 1;
+    const scale = days <= 7 ? "week" : days <= 31 ? "month" : "year";
+    return { date: start, scale };
+  }
+  function parseDateRoute(url = new URL(location.href)) {
+    const params2 = url.searchParams;
+    const tags = params2.get("tags") || "";
+    const today = formatISODate(new Date());
+    let routeKind = "home";
+    let mode = "all";
+    let scale = "day";
+    let date = params2.get("date") || params2.get("date_filter") || today;
+    if (/\/post\/popular_recent/.test(url.pathname)) {
+      routeKind = "popular";
+      mode = "latest";
+      scale = periodScale[params2.get("period") || "1d"] || "day";
+    } else if (/\/post\/popular_by_/.test(url.pathname)) {
+      routeKind = "popular";
+      mode = "date";
+      scale = pathScale[url.pathname.match(/popular_by_(\w+)/)?.[1] || "day"] || "day";
+      const year = params2.get("year") || today.slice(0, 4);
+      const month = (params2.get("month") || "1").padStart(2, "0");
+      const day = (params2.get("day") || "1").padStart(2, "0");
+      date = `${year}-${month}-${day}`;
+    } else if (url.pathname === "/explore/posts/viewed" || url.pathname === "/explore/posts/popular") {
+      routeKind = url.pathname.endsWith("viewed") ? "viewed" : "popular";
+      mode = "date";
+      scale = pathScale[params2.get("scale") || "day"] || "day";
+    } else {
+      if (/order:random/.test(tags))
+        routeKind = "random";
+      if (/order:(rank|score)/.test(tags) || /sort:score/.test(tags))
+        routeKind = "ranked";
+      if (/sort:updated/.test(tags))
+        routeKind = "updated";
+      const parsedTags = parseTagDate(tags);
+      if (parsedTags) {
+        mode = "date";
+        date = parsedTags.date;
+        scale = parsedTags.scale;
+      }
+      if (/order:rank/.test(tags) && params2.get("d")) {
+        mode = "latest";
+        scale = dScale[params2.get("d") || "1"] || "day";
+      }
+    }
+    const explicitScale = params2.get("date_scale");
+    if (["day", "week", "month", "year"].includes(explicitScale))
+      scale = explicitScale;
+    const explicitMode = params2.get("date_mode");
+    if (["all", "latest", "date"].includes(explicitMode))
+      mode = explicitMode;
+    date = clampFutureDate(date);
+    return { mode, scale, date, routeKind };
+  }
+  const parsed = parseDateRoute();
   const dateFilter = Vue2.reactive({
-    mode: params$1.get("date_mode") === "latest" ? "latest" : "date",
+    mode: parsed.mode,
     scale: parsed.scale,
-    date: parsed.date || formatISODate(new Date()),
-    routeKind: "home"
+    date: parsed.date,
+    routeKind: parsed.routeKind
   });
   function updateDateFilter(values) {
     Object.assign(dateFilter, values);
@@ -2691,6 +2751,16 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     if (!siteDateCapabilities[site].includes(kind)) {
       throw new Error(`${site} does not support ${kind} date routes`);
     }
+    if (input.mode === "all") {
+      if (site === "yandere")
+        return "https://yande.re/post?_wf=1";
+      if (site === "konachan-com")
+        return "https://konachan.com/post?_wf=1";
+      if (site === "konachan-net")
+        return "https://konachan.net/post?_wf=1";
+      if (site === "danbooru")
+        return "https://danbooru.donmai.us/posts?_wf=1";
+    }
     if (site === "yandere" || site.startsWith("konachan")) {
       const origin = moeOrigin(site);
       if (kind === "popular") {
@@ -2698,14 +2768,18 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           const period = { day: "1d", week: "1w", month: "1m", year: "1y" }[scale];
           return `${origin}/post/popular_recent?period=${period}&_wf=1`;
         }
-        const pathScale = scale === "year" ? "month" : scale;
+        const pathScale2 = scale === "year" ? "month" : scale;
         const [year, month, day] = range.date.split("-");
-        return `${origin}/post/popular_by_${pathScale}?day=${Number(day)}&month=${Number(month)}&year=${year}&_wf=1`;
+        return `${origin}/post/popular_by_${pathScale2}?day=${Number(day)}&month=${Number(month)}&year=${year}&_wf=1`;
       }
       const terms = [kind === "random" ? "order:random" : "", buildDateTags(date, scale)].filter(Boolean).join(" ");
       return `${origin}/post?tags=${encodedTags(terms)}&_wf=1`;
     }
     if (site === "danbooru") {
+      if (kind === "ranked" && input.mode === "latest") {
+        const days = { day: 1, week: 7, month: 30, year: 365 }[scale];
+        return `https://danbooru.donmai.us/posts?tags=order%3Arank&d=${days}&date_mode=latest&date_scale=${scale}&_wf=1`;
+      }
       if (kind === "popular" || kind === "viewed") {
         const explore = kind === "viewed" ? "viewed" : "popular";
         return `https://danbooru.donmai.us/explore/posts/${explore}?date=${range.date}&scale=${scale}&_wf=1`;
@@ -2724,6 +2798,11 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       const capability = site ? siteCapabilities[site] : null;
       const visible = !!(site && routeKind && capability?.routes.includes(routeKind));
       const hasLatestMode = Vue2.computed(() => !!(routeKind && capability?.latestRoutes.includes(routeKind)));
+      const isHomeLike = Vue2.computed(() => routeKind === "home" || routeKind === "random");
+      const showModeToggle = Vue2.computed(() => hasLatestMode.value || isHomeLike.value);
+      const primaryMode = Vue2.computed(() => hasLatestMode.value ? "latest" : "all");
+      const primaryLabel = Vue2.computed(() => hasLatestMode.value ? routeKind === "ranked" ? "\u8FD1\u671F" : "\u6700\u8FD1" : "\u5168\u90E8");
+      const secondaryLabel = Vue2.computed(() => routeKind === "ranked" ? "\u5386\u53F2\u9AD8\u5206" : "\u65E5\u671F");
       const scales = Vue2.computed(() => routeKind && capability ? capability.scales[routeKind] : []);
       const labels = { day: "\u65E5", week: "\u5468", month: "\u6708", year: "\u5E74" };
       const scaleLabel = Vue2.computed(() => labels[dateFilter.scale]);
@@ -2733,12 +2812,14 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       const canMoveNext = Vue2.computed(() => shiftDate(dateFilter.date, dateFilter.scale, 1) <= today);
       if (routeKind)
         updateDateFilter({ routeKind });
-      if (!hasLatestMode.value)
+      if (!showModeToggle.value)
         updateDateFilter({ mode: "date" });
       if (!scales.value.includes(dateFilter.scale))
         updateDateFilter({ scale: scales.value[0] || "day" });
       function setScale(scale) {
         updateDateFilter({ scale });
+        if (dateFilter.mode !== "date")
+          apply();
       }
       function move(offset) {
         updateDateFilter({ date: clampFutureDate(shiftDate(dateFilter.date, dateFilter.scale, offset)) });
@@ -2749,23 +2830,23 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         location.assign(buildDateRoute({ site, kind: routeKind, date: dateFilter.date, scale: dateFilter.scale, mode: dateFilter.mode }));
       }
       Vue2.watch(() => dateFilter.mode, (mode) => {
-        if (mode === "latest")
+        if (mode === primaryMode.value)
           apply();
       });
-      return { __sfc: true, site, routeKind, capability, visible, hasLatestMode, scales, labels, scaleLabel, displayDate, today, showPicker, canMoveNext, setScale, move, apply, mdiCheck, mdiChevronLeft, mdiChevronRight, dateFilter };
+      return { __sfc: true, site, routeKind, capability, visible, hasLatestMode, isHomeLike, showModeToggle, primaryMode, primaryLabel, secondaryLabel, scales, labels, scaleLabel, displayDate, today, showPicker, canMoveNext, setScale, move, apply, mdiCheck, mdiChevronLeft, mdiChevronRight, dateFilter };
     }
   });
   var _sfc_render$c = function render() {
     var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
-    return _setup.visible ? _c("div", { staticClass: "mobile-date-filter" }, [_setup.hasLatestMode ? _c("v-btn-toggle", { staticClass: "date-mode-toggle", attrs: { "mandatory": "", "dense": "" }, model: { value: _setup.dateFilter.mode, callback: function($$v) {
+    return _setup.visible ? _c("div", { staticClass: "mobile-date-filter" }, [_setup.showModeToggle ? _c("v-btn-toggle", { staticClass: "date-mode-toggle", attrs: { "mandatory": "", "dense": "" }, model: { value: _setup.dateFilter.mode, callback: function($$v) {
       _vm.$set(_setup.dateFilter, "mode", $$v);
-    }, expression: "dateFilter.mode" } }, [_c("v-btn", { attrs: { "value": "latest", "small": "" } }, [_vm._v("\u6700\u8FD1")]), _c("v-btn", { attrs: { "value": "date", "small": "" } }, [_vm._v("\u65E5\u671F")])], 1) : _vm._e(), _c("v-menu", { attrs: { "offset-y": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function({ on, attrs }) {
+    }, expression: "dateFilter.mode" } }, [_c("v-btn", { attrs: { "value": _setup.primaryMode, "small": "" } }, [_vm._v(_vm._s(_setup.primaryLabel))]), _c("v-btn", { attrs: { "value": "date", "small": "" } }, [_vm._v(_vm._s(_setup.secondaryLabel))])], 1) : _vm._e(), _c("v-menu", { attrs: { "offset-y": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function({ on, attrs }) {
       return [_c("v-btn", _vm._g(_vm._b({ attrs: { "small": "", "text": "" } }, "v-btn", attrs, false), on), [_vm._v(_vm._s(_setup.scaleLabel))])];
     } }], null, false, 3230893886) }, [_c("v-list", { attrs: { "dense": "" } }, _vm._l(_setup.scales, function(scale) {
       return _c("v-list-item", { key: scale, on: { "click": function($event) {
         return _setup.setScale(scale);
       } } }, [_c("v-list-item-title", [_vm._v(_vm._s(_setup.labels[scale]))])], 1);
-    }), 1)], 1), _setup.dateFilter.mode === "date" || !_setup.hasLatestMode ? [_c("v-btn", { attrs: { "icon": "", "small": "" }, on: { "click": function($event) {
+    }), 1)], 1), _setup.dateFilter.mode === "date" ? [_c("v-btn", { attrs: { "icon": "", "small": "" }, on: { "click": function($event) {
       return _setup.move(-1);
     } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiChevronLeft))])], 1), _c("v-menu", { attrs: { "close-on-content-click": false, "offset-y": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function({ on, attrs }) {
       return [_c("v-btn", _vm._g(_vm._b({ staticClass: "date-display", attrs: { "small": "", "text": "" } }, "v-btn", attrs, false), on), [_vm._v(_vm._s(_setup.displayDate))])];
@@ -2777,7 +2858,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       _vm.$set(_setup.dateFilter, "date", $$v);
     }, expression: "dateFilter.date" } })], 1), _c("v-btn", { attrs: { "icon": "", "small": "", "disabled": !_setup.canMoveNext }, on: { "click": function($event) {
       return _setup.move(1);
-    } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiChevronRight))])], 1)] : _vm._e(), _c("v-btn", { attrs: { "icon": "", "small": "", "aria-label": "\u5E94\u7528\u65E5\u671F\u7B5B\u9009" }, on: { "click": _setup.apply } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiCheck))])], 1)], 2) : _vm._e();
+    } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiChevronRight))])], 1)] : _vm._e(), _setup.dateFilter.mode === "date" ? _c("v-btn", { attrs: { "icon": "", "small": "", "aria-label": "\u5E94\u7528\u65E5\u671F\u7B5B\u9009" }, on: { "click": _setup.apply } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiCheck))])], 1) : _vm._e()], 2) : _vm._e();
   };
   var _sfc_staticRenderFns$c = [];
   var __component__$c = /* @__PURE__ */ normalizeComponent(
