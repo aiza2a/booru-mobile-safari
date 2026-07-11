@@ -5,6 +5,8 @@ export interface ParsedDateRoute {
   mode: DateFilterMode
   scale: DateScale
   date: string
+  rangeStart: string
+  rangeEnd: string
   routeKind: DateRouteKind
 }
 
@@ -22,7 +24,7 @@ function parseTagDate(tags: string) {
   const endDate = new Date(`${end}T12:00:00`)
   const days = Math.round((endDate.valueOf() - startDate.valueOf()) / 86400000) + 1
   const scale: DateScale = days <= 7 ? 'week' : days <= 31 ? 'month' : 'year'
-  return { date: start, scale }
+  return { exact, start, end, date: start, scale }
 }
 
 export function parseDateRoute(url = new URL(location.href)): ParsedDateRoute {
@@ -33,6 +35,8 @@ export function parseDateRoute(url = new URL(location.href)): ParsedDateRoute {
   let mode: DateFilterMode = 'all'
   let scale: DateScale = 'day'
   let date = params.get('date') || params.get('date_filter') || today
+  let rangeStart = ''
+  let rangeEnd = ''
 
   if (/\/post\/popular_recent/.test(url.pathname)) {
     routeKind = 'popular'
@@ -59,6 +63,11 @@ export function parseDateRoute(url = new URL(location.href)): ParsedDateRoute {
       mode = 'date'
       date = parsedTags.date
       scale = parsedTags.scale
+      if (parsedTags.start && parsedTags.end) {
+        rangeStart = parsedTags.start
+        rangeEnd = parsedTags.end
+        if (params.get('date_scale') === 'range') scale = 'range'
+      }
     }
     if (/order:rank/.test(tags) && params.get('d')) {
       mode = 'latest'
@@ -67,11 +76,11 @@ export function parseDateRoute(url = new URL(location.href)): ParsedDateRoute {
   }
 
   const explicitScale = params.get('date_scale') as DateScale
-  if (['day', 'week', 'month', 'year'].includes(explicitScale)) scale = explicitScale
+  if (['day', 'week', 'month', 'year', 'range'].includes(explicitScale)) scale = explicitScale
   const explicitMode = params.get('date_mode') as DateFilterMode
   if (['all', 'latest', 'date'].includes(explicitMode)) mode = explicitMode
   date = clampFutureDate(date)
-  return { mode, scale, date, routeKind }
+  return { mode, scale, date, rangeStart, rangeEnd, routeKind }
 }
 
 export function rangeAnchor(date: string, scale: DateScale) {

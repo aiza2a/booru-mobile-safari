@@ -40,10 +40,10 @@ export function buildDateRoute(input: DateRouteInput) {
     const start = input.rangeStart || date
     const end = input.rangeEnd || date
     const tags = `date:>=${start} date:<=${end}`
-    if (site === 'yandere' || site.startsWith('konachan')) return `${moeOrigin(site)}/post?tags=${encodedTags(tags)}&_wf=1`
+    if (site === 'yandere' || site.startsWith('konachan')) return `${moeOrigin(site)}/post?tags=${encodedTags(tags)}&date_scale=range&_wf=1`
     if (site === 'danbooru') {
       const order = kind === 'ranked' ? 'order:score ' : ''
-      return `https://danbooru.donmai.us/posts?tags=${encodedTags(`${order}${tags}`)}&_wf=1`
+      return `https://danbooru.donmai.us/posts?tags=${encodedTags(`${order}${tags}`)}&date_scale=range&_wf=1`
     }
   }
 
