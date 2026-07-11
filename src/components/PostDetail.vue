@@ -19,7 +19,7 @@
         :class="{ img_scale_scroll: scaleOn, img_scale_normal: !scaleOn }"
         draggable="false"
       >
-        <v-row v-show="imgLoading" class="img_detail_loading">
+        <v-row v-show="imgLoading" class="img_detail_loading" @click.stop="close">
           <img v-if="(showPreviewThumb && !scaleOn)" :src="imgLasySrc" :width="imageSelectedWidth" alt="">
           <v-progress-circular :size="100" :width="6" indeterminate color="deep-purple" />
         </v-row>
