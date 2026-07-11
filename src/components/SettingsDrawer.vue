@@ -19,7 +19,60 @@
       </v-list-item-icon>
     </v-list-item>
     <v-divider />
-    <v-list dense nav>
+    <v-list v-if="isMobile" class="mobile-settings-groups" nav>
+      <v-subheader>外观</v-subheader>
+      <div class="mobile-settings-section">
+        <v-list-item>
+          <v-list-item-content><v-list-item-title>界面主题</v-list-item-title><v-list-item-subtitle>切换浅色或深色显示（默认深色开启）</v-list-item-subtitle></v-list-item-content>
+          <v-list-item-action><v-switch v-model="isDarkMode" inset hide-details @change="onDarkModeChange" /></v-list-item-action>
+        </v-list-item>
+        <v-list-item>
+          <v-list-item-content><v-list-item-title>布局方式</v-list-item-title><v-list-item-subtitle>选择瀑布流、网格或其他布局</v-list-item-subtitle></v-list-item-content>
+          <v-list-item-action>
+            <v-menu offset-y><template #activator="{ on, attrs }"><v-btn small class="sel_menu_btn" v-bind="attrs" v-on="on">{{ actLayout }}<v-icon :size="16">{{ mdiChevronDown }}</v-icon></v-btn></template>
+              <v-list dense><v-list-item v-for="item in layoutTypes" :key="item[0]" @click="onMasonryLayoutChange(item[0])"><v-list-item-title>{{ item[1] }}</v-list-item-title></v-list-item></v-list>
+            </v-menu>
+          </v-list-item-action>
+        </v-list-item>
+        <v-list-item v-if="['masonry', 'grid', 'virtual', 'masonry2'].includes(settings.masonryLayout)">
+          <v-list-item-content><v-list-item-title>列数</v-list-item-title><v-list-item-subtitle>自动或手动指定图片列数</v-list-item-subtitle></v-list-item-content>
+          <v-list-item-action>
+            <v-menu offset-y><template #activator="{ on, attrs }"><v-btn small class="sel_menu_btn" v-bind="attrs" v-on="on">{{ mobileColumnLabel }}<v-icon :size="16">{{ mdiChevronDown }}</v-icon></v-btn></template>
+              <v-list dense><v-list-item v-for="col in mobileCols" :key="col[0]" @click="settings.selectedColumn = col[0]"><v-list-item-title>{{ col[1] }}</v-list-item-title></v-list-item></v-list>
+            </v-menu>
+          </v-list-item-action>
+        </v-list-item>
+      </div>
+
+      <v-subheader>浏览</v-subheader>
+      <div class="mobile-settings-section">
+        <v-list-item><v-list-item-content><v-list-item-title>自动加载更多</v-list-item-title><v-list-item-subtitle>接近页面底部时继续加载帖子</v-list-item-subtitle></v-list-item-content><v-list-item-action><v-switch v-model="settings.autoWaterfall" inset hide-details /></v-list-item-action></v-list-item>
+        <v-list-item><v-list-item-content><v-list-item-title>清晰缩略图</v-list-item-title><v-list-item-subtitle>列表优先使用较清晰的预览图片</v-list-item-subtitle></v-list-item-content><v-list-item-action><v-switch v-model="settings.isThumbSampleUrl" inset hide-details /></v-list-item-action></v-list-item>
+        <v-list-item><v-list-item-content><v-list-item-title>显示图片分辨率</v-list-item-title><v-list-item-subtitle>在图片卡片上显示宽度和高度</v-list-item-subtitle></v-list-item-content><v-list-item-action><v-switch v-model="settings.showListPostReso" inset hide-details /></v-list-item-action></v-list-item>
+        <v-list-item><v-list-item-content><v-list-item-title>点击图片关闭详情</v-list-item-title><v-list-item-subtitle>点击详情图片时直接返回列表</v-list-item-subtitle></v-list-item-content><v-list-item-action><v-switch v-model="settings.closePopupOnImgClick" inset hide-details /></v-list-item-action></v-list-item>
+        <v-list-item><v-list-item-content><v-list-item-title>详情按钮置底</v-list-item-title><v-list-item-subtitle>将详情操作栏显示在屏幕底部</v-list-item-subtitle></v-list-item-content><v-list-item-action><v-switch v-model="settings.detailButtonsBottom" inset hide-details /></v-list-item-action></v-list-item>
+      </div>
+
+      <v-subheader>触摸与分享</v-subheader>
+      <div class="mobile-settings-section">
+        <v-list-item><v-list-item-content><v-list-item-title>长按立即分享帖子</v-list-item-title><v-list-item-subtitle>关闭时显示操作菜单；开启时打开 iOS 分享面板</v-list-item-subtitle></v-list-item-content><v-list-item-action><v-switch v-model="settings.longPressDirectShare" inset hide-details /></v-list-item-action></v-list-item>
+      </div>
+
+      <v-subheader>下载与预加载</v-subheader>
+      <div class="mobile-settings-section">
+        <v-list-item v-if="notPartialSupportSite"><v-list-item-content><v-list-item-title>下载方式</v-list-item-title><v-list-item-subtitle>手机端推荐新标签页或 Tampermonkey</v-list-item-subtitle></v-list-item-content><v-list-item-action><v-menu offset-y><template #activator="{ on, attrs }"><v-btn small class="sel_menu_btn" v-bind="attrs" v-on="on">{{ actDownloadMethod }}<v-icon :size="16">{{ mdiChevronDown }}</v-icon></v-btn></template><v-list dense><v-list-item v-for="it in mobileDownloadMethods" :key="it.value" @click="settings.downloadBy = it.value"><v-list-item-title>{{ it.text }}</v-list-item-title></v-list-item></v-list></v-menu></v-list-item-action></v-list-item>
+        <v-list-item v-if="notPartialSupportSite"><v-list-item-content><v-list-item-title>完整图片预加载</v-list-item-title><v-list-item-subtitle>提前加载详情中的后续图片</v-list-item-subtitle></v-list-item-content><v-list-item-action><v-switch v-model="settings.isFullImgPreload" inset hide-details /></v-list-item-action></v-list-item>
+        <v-list-item v-if="notPartialSupportSite && settings.isFullImgPreload"><v-list-item-content><v-list-item-title>预加载数量</v-list-item-title><v-list-item-subtitle>最多预加载 5 张</v-list-item-subtitle></v-list-item-content><v-list-item-action><input :value="settings.imgPreloadNum" class="text-center rounded preload_num" type="number" min="0" max="5" @blur="onPreloadNumBlur"></v-list-item-action></v-list-item>
+      </div>
+
+      <v-subheader>高级</v-subheader>
+      <div class="mobile-settings-section">
+        <v-list-item><v-list-item-content><v-list-item-title>语言</v-list-item-title></v-list-item-content><v-list-item-action><v-menu offset-y><template #activator="{ on, attrs }"><v-btn small class="sel_menu_btn" v-bind="attrs" v-on="on">{{ currentLanglabel }}<v-icon :size="16">{{ mdiChevronDown }}</v-icon></v-btn></template><v-list dense><v-list-item v-for="lang in langList" :key="lang.value" @click="selectLang(lang.value)"><v-list-item-title>{{ lang.label }}</v-list-item-title></v-list-item></v-list></v-menu></v-list-item-action></v-list-item>
+        <v-list-item><v-list-item-content><v-list-item-title>黑名单</v-list-item-title><v-list-item-subtitle>隐藏包含指定标签的帖子</v-list-item-subtitle></v-list-item-content></v-list-item>
+        <v-list-item class="mobile-blacklist-input"><v-list-item-content><v-combobox v-model="settings.blacklist" :append-icon="null" :items="[]" hide-details hide-no-data multiple outlined dense chips><template #selection="{ item }"><v-chip label small outlined close @click:close="removeTagFromBlacklist(item)">{{ item }}</v-chip></template></v-combobox></v-list-item-content></v-list-item>
+      </div>
+    </v-list>
+    <v-list v-else dense nav>
       <v-list-item class="hidden-lg-and-up">
         <v-list-item-content>
           <v-list-item-title>{{ $t('e4_fgvntwNlfxgJUc2dXK') }}</v-list-item-title>
@@ -496,6 +549,10 @@ const cols = computed(() => colList.value.map(e => [`${e}`, e === 0 ? i18n.t('ux
 const actCol = computed(() => {
   return colList.value.findIndex(e => e.toString() === settings.selectedColumn)
 })
+
+const mobileCols = computed(() => [0, 1, 2, 3, 4].map(e => [`${e}`, e === 0 ? '自动' : `${e} 列`]))
+const mobileColumnLabel = computed(() => settings.selectedColumn === '0' ? '自动' : `${settings.selectedColumn} 列`)
+const mobileDownloadMethods = computed(() => downloadMethods.value.filter(item => item.value !== 'fsa'))
 
 const layoutTypes = ref([
   ['masonry', `Masonry/${i18n.t('6jPGehET9TViankl5-SRu')}`],
