@@ -442,23 +442,23 @@ var __publicField = (obj, key, value) => {
   "use strict";
   GM_addStyle(`
 
-.mobile-calendar-grid[data-v-7b54b917] { padding: 0 12px 12px; color: var(--ios-label);
+.mobile-calendar-grid[data-v-92ca7c0b] { display: block; width: 100%; padding: 0 12px 12px; color: var(--ios-label);
 }
-.calendar-toolbar[data-v-7b54b917] { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; min-height: 48px; text-align: center;
+.calendar-toolbar[data-v-92ca7c0b] { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; min-height: 48px; text-align: center;
 }
-.calendar-nav-spacer[data-v-7b54b917] { width: 44px; height: 44px;
+.calendar-nav-spacer[data-v-92ca7c0b] { width: 44px; height: 44px;
 }
-.calendar-weekdays[data-v-7b54b917], .calendar-days[data-v-7b54b917] { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+.calendar-weekdays[data-v-92ca7c0b], .calendar-days[data-v-92ca7c0b] { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); width: 100%;
 }
-.calendar-weekdays span[data-v-7b54b917] { padding: 4px 0 8px; color: var(--ios-secondary-label); font-size: 12px; text-align: center;
+.calendar-weekdays span[data-v-92ca7c0b] { padding: 4px 0 8px; color: var(--ios-secondary-label); font-size: 12px; text-align: center;
 }
-.calendar-day[data-v-7b54b917] { appearance: none; min-width: 0; height: 40px; padding: 0; border: 0; border-radius: 20px; color: inherit; background: transparent; font: inherit;
+.calendar-day[data-v-92ca7c0b] { appearance: none; min-width: 0; height: 40px; padding: 0; border: 0; border-radius: 20px; color: inherit; background: transparent; font: inherit;
 }
-.calendar-day.is-outside[data-v-7b54b917] { color: var(--ios-secondary-label); opacity: .52;
+.calendar-day.is-outside[data-v-92ca7c0b] { color: var(--ios-secondary-label); opacity: .52;
 }
-.calendar-day.is-selected[data-v-7b54b917] { color: #fff; background: #8e5bc7;
+.calendar-day.is-selected[data-v-92ca7c0b] { color: #fff; background: #8e5bc7;
 }
-.calendar-day.is-disabled[data-v-7b54b917] { opacity: .22;
+.calendar-day.is-disabled[data-v-92ca7c0b] { opacity: .22;
 }
   `);
   function _interopDefaultLegacy(e) {
@@ -2597,29 +2597,33 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     const range = getDateRange(dateText, scale);
     return scale === "day" ? `date:${range.date}` : `date:>=${range.start} date:<=${range.end}`;
   }
-  var _sfc_main$e = /* @__PURE__ */ Vue2.defineComponent({
-    __name: "MobileCalendarGrid",
+  var _sfc_main$e = Vue__default["default"].extend({
+    name: "MobileCalendarGrid",
     props: {
-      value: null,
-      max: null,
-      min: null
+      value: { type: String, required: true },
+      max: { type: String, required: true },
+      min: { type: String, default: "" }
     },
-    emits: ["input", "select"],
-    setup(__props, { emit }) {
-      const props = __props;
-      const weekdays = ["\u65E5", "\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D"];
-      const visibleMonth = Vue2.ref((props.value || props.max).slice(0, 7));
-      Vue2.watch(() => props.value, (value) => {
-        if (value)
-          visibleMonth.value = value.slice(0, 7);
-      });
-      const monthTitle = Vue2.computed(() => {
-        const [year, month] = visibleMonth.value.split("-").map(Number);
-        return `${year}\u5E74${month}\u6708`;
-      });
-      const canMoveNextMonth = Vue2.computed(() => visibleMonth.value < props.max.slice(0, 7));
-      const cells = Vue2.computed(() => {
-        const [year, month] = visibleMonth.value.split("-").map(Number);
+    data() {
+      return {
+        weekdays: ["\u65E5", "\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D"],
+        visibleMonth: (this.value || this.max).slice(0, 7),
+        mdiChevronLeft,
+        mdiChevronRight
+      };
+    },
+    computed: {
+      monthTitle() {
+        const parts = this.visibleMonth.split("-").map(Number);
+        return `${parts[0]}\u5E74${parts[1]}\u6708`;
+      },
+      canMoveNextMonth() {
+        return this.visibleMonth < this.max.slice(0, 7);
+      },
+      cells() {
+        const parts = this.visibleMonth.split("-").map(Number);
+        const year = parts[0];
+        const month = parts[1];
         const first = new Date(year, month - 1, 1, 12);
         const gridStart = new Date(first);
         gridStart.setDate(first.getDate() - first.getDay());
@@ -2628,37 +2632,44 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           date.setDate(gridStart.getDate() + index);
           const iso = formatISODate(date);
           return {
-            key: iso,
             date: iso,
             day: date.getDate(),
             currentMonth: date.getMonth() === month - 1,
-            disabled: iso > props.max || !!props.min && iso < props.min
+            disabled: iso > this.max || !!this.min && iso < this.min
           };
         });
-      });
-      function shiftMonth(offset) {
-        const [year, month] = visibleMonth.value.split("-").map(Number);
-        visibleMonth.value = formatISODate(new Date(year, month - 1 + offset, 1, 12)).slice(0, 7);
       }
-      function selectDate(value) {
-        emit("input", value);
-        emit("select", value);
+    },
+    watch: {
+      value(value) {
+        if (value)
+          this.visibleMonth = value.slice(0, 7);
       }
-      return { __sfc: true, props, emit, weekdays, visibleMonth, monthTitle, canMoveNextMonth, cells, shiftMonth, selectDate, mdiChevronLeft, mdiChevronRight };
+    },
+    methods: {
+      shiftMonth(offset) {
+        const parts = this.visibleMonth.split("-").map(Number);
+        this.visibleMonth = formatISODate(new Date(parts[0], parts[1] - 1 + offset, 1, 12)).slice(0, 7);
+      },
+      selectDate(value) {
+        this.$emit("input", value);
+        this.$emit("select", value);
+      }
     }
   });
 
   var _sfc_render$e = function render() {
-    var _vm = this, _c = _vm._self._c, _setup = _vm._self._setupProxy;
+    var _vm = this, _c = _vm._self._c;
+    _vm._self._setupProxy;
     return _c("div", { staticClass: "mobile-calendar-grid" }, [_c("div", { staticClass: "calendar-toolbar" }, [_c("v-btn", { attrs: { "icon": "", "small": "", "aria-label": "\u4E0A\u4E2A\u6708" }, on: { "click": function($event) {
-      return _setup.shiftMonth(-1);
-    } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiChevronLeft))])], 1), _c("strong", [_vm._v(_vm._s(_setup.monthTitle))]), _setup.canMoveNextMonth ? _c("v-btn", { attrs: { "icon": "", "small": "", "aria-label": "\u4E0B\u4E2A\u6708" }, on: { "click": function($event) {
-      return _setup.shiftMonth(1);
-    } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiChevronRight))])], 1) : _c("span", { staticClass: "calendar-nav-spacer" })], 1), _c("div", { staticClass: "calendar-weekdays", attrs: { "aria-hidden": "true" } }, _vm._l(_setup.weekdays, function(weekday) {
+      return _vm.shiftMonth(-1);
+    } } }, [_c("v-icon", [_vm._v(_vm._s(_vm.mdiChevronLeft))])], 1), _c("strong", [_vm._v(_vm._s(_vm.monthTitle))]), _vm.canMoveNextMonth ? _c("v-btn", { attrs: { "icon": "", "small": "", "aria-label": "\u4E0B\u4E2A\u6708" }, on: { "click": function($event) {
+      return _vm.shiftMonth(1);
+    } } }, [_c("v-icon", [_vm._v(_vm._s(_vm.mdiChevronRight))])], 1) : _c("span", { staticClass: "calendar-nav-spacer" })], 1), _c("div", { staticClass: "calendar-weekdays", attrs: { "aria-hidden": "true" } }, _vm._l(_vm.weekdays, function(weekday) {
       return _c("span", { key: weekday }, [_vm._v(_vm._s(weekday))]);
-    }), 0), _c("div", { staticClass: "calendar-days", attrs: { "role": "grid", "aria-label": _setup.monthTitle } }, _vm._l(_setup.cells, function(cell) {
-      return _c("button", { key: cell.key, staticClass: "calendar-day", class: { "is-outside": !cell.currentMonth, "is-selected": cell.date === _vm.value, "is-disabled": cell.disabled }, attrs: { "type": "button", "role": "gridcell", "disabled": cell.disabled, "aria-label": cell.date, "aria-selected": cell.date === _vm.value }, on: { "click": function($event) {
-        return _setup.selectDate(cell.date);
+    }), 0), _c("div", { staticClass: "calendar-days", attrs: { "role": "grid", "aria-label": _vm.monthTitle } }, _vm._l(_vm.cells, function(cell) {
+      return _c("button", { key: cell.date, staticClass: "calendar-day", class: { "is-outside": !cell.currentMonth, "is-selected": cell.date === _vm.value, "is-disabled": cell.disabled }, attrs: { "type": "button", "role": "gridcell", "disabled": cell.disabled, "aria-label": cell.date, "aria-selected": cell.date === _vm.value }, on: { "click": function($event) {
+        return _vm.selectDate(cell.date);
       } } }, [_vm._v(" " + _vm._s(cell.day) + " ")]);
     }), 0)]);
   };
@@ -2669,7 +2680,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     _sfc_staticRenderFns$e,
     false,
     null,
-    "7b54b917",
+    "92ca7c0b",
     null,
     null
   );
