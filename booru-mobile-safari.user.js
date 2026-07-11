@@ -7085,8 +7085,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   }
   async function fetchDanbooruExplorePosts() {
     const url = new URL(location.href);
-    url.pathname += ".json";
     url.searchParams.delete("_wf");
+    url.pathname += ".json";
     const response = await fetch(url);
     if (!response.ok)
       throw new Error(`Danbooru explore ${response.status}`);
@@ -8224,13 +8224,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       await searchPosts(true);
     }
   };
-  const refreshPosts = () => {
-    setPage(1);
-    store.imageList = [];
-    store.selectedImageList = [];
-    store.requestStop = false;
-    initPosts();
-  };
   const loadPostsByPage = (toPage) => {
     setPage(Number(toPage) || 1);
     store.imageList = [];
@@ -8448,14 +8441,12 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         return subDate(1, "days");
       })());
       function fetchPopularPosts(type) {
-        let url = `/post/popular_recent?period=${type}`;
+        let url = `/post/popular_recent?period=${type}&_wf=1`;
         if (isPopSearchByDate.value) {
           const [year, month, day] = popSearchDate.value.split("-");
-          url = `/post/popular_by_${periodMap[type][2]}?day=${day}&month=${month}&year=${year}`;
+          url = `/post/popular_by_${periodMap[type][2]}?day=${day}&month=${month}&year=${year}&_wf=1`;
         }
-        history.pushState("", "", url);
-        popTitle.value = getPopTitle();
-        refreshPosts();
+        location.assign(url);
       }
       function selPeriod(key) {
         recentPeriod.value = key;
