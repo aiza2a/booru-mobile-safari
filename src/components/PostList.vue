@@ -231,12 +231,16 @@ const notFitScreen = ref(localStorage.getItem('__fitScreen') == '0')
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const isR34Fav = ref(isRule34FavPage() || isGelbooruFavPage())
 const showImageList = ref(true)
+type LongPressState = 'idle' | 'pressing' | 'previewing' | 'sharing' | 'restoring'
+
+let longPressState: LongPressState = 'idle'
 let longPressTimer: number | undefined
 let longPressStartX = 0
 let longPressStartY = 0
-let longPressTriggered = false
+let suppressNextClick = false
 let suppressContextMenuUntil = 0
 let shareInFlight = false
+let activeLongPressPost: Post | undefined
 let pendingDirectSharePost: Post | undefined
 
 watch(
@@ -295,23 +299,37 @@ function openPostMenu(img: Post, xPos: number, yPos: number) {
   })
 }
 
-function cancelPostLongPress() {
+function clearLongPressTimer() {
   if (longPressTimer) window.clearTimeout(longPressTimer)
   longPressTimer = undefined
-  if (!longPressTriggered) longPressPreview.value = undefined
+}
+
+function resetLongPressState(clearPreview = true) {
+  clearLongPressTimer()
+  longPressState = 'idle'
+  activeLongPressPost = undefined
   pendingDirectSharePost = undefined
+  if (clearPreview) longPressPreview.value = undefined
+}
+
+function cancelPostLongPress() {
+  if (longPressState === 'sharing' || longPressState === 'restoring') return
+  resetLongPressState()
 }
 
 function onPostTouchStart(ev: TouchEvent, img: Post) {
-  if (!isMobile || ev.touches.length !== 1) return
+  if (!isMobile || ev.touches.length !== 1 || longPressState === 'sharing') return
+  resetLongPressState()
   const touch = ev.touches[0]
   longPressStartX = touch.clientX
   longPressStartY = touch.clientY
-  pendingDirectSharePost = undefined
-  longPressTriggered = false
-  cancelPostLongPress()
+  activeLongPressPost = img
+  longPressState = 'pressing'
+  suppressNextClick = false
   longPressTimer = window.setTimeout(() => {
-    longPressTriggered = true
+    if (longPressState !== 'pressing' || activeLongPressPost !== img) return
+    longPressState = 'previewing'
+    suppressNextClick = true
     longPressPreview.value = img
     navigator.vibrate?.(18)
     if (settings.longPressDirectShare) pendingDirectSharePost = img
@@ -320,38 +338,51 @@ function onPostTouchStart(ev: TouchEvent, img: Post) {
 }
 
 function onPostTouchMove(ev: TouchEvent) {
-  const touch = ev.touches[0]
-  if (!touch) return
-  if (Math.abs(touch.clientX - longPressStartX) > 12 || Math.abs(touch.clientY - longPressStartY) > 12) {
+  if (longPressState !== 'pressing') return
+  if (ev.touches.length !== 1) {
     cancelPostLongPress()
+    return
   }
+  const touch = ev.touches[0]
+  if (Math.abs(touch.clientX - longPressStartX) > 12 || Math.abs(touch.clientY - longPressStartY) > 12) cancelPostLongPress()
 }
 
 async function sharePostOnce(post: Post) {
   if (shareInFlight) return
   shareInFlight = true
+  longPressState = 'sharing'
   try {
     await sharePost(post)
   } finally {
     shareInFlight = false
+    longPressState = 'restoring'
+    resetLongPressState()
   }
 }
 
 function onPostTouchEnd(ev: TouchEvent) {
-  if (longPressTriggered) {
+  clearLongPressTimer()
+  const wasTriggered = longPressState === 'previewing'
+  if (wasTriggered) {
     ev.preventDefault()
     suppressContextMenuUntil = Date.now() + 1000
   }
   const post = pendingDirectSharePost
   pendingDirectSharePost = undefined
-  longPressPreview.value = undefined
-  cancelPostLongPress()
-  if (post) void sharePostOnce(post)
+  if (post) {
+    void sharePostOnce(post)
+    return
+  }
+  if (wasTriggered) {
+    longPressState = 'restoring'
+    longPressPreview.value = undefined
+  }
+  resetLongPressState()
 }
 
 function onImageClick(index: number) {
-  if (longPressTriggered) {
-    longPressTriggered = false
+  if (suppressNextClick || longPressState !== 'idle') {
+    suppressNextClick = false
     return
   }
   showImgModal(index)
@@ -456,9 +487,16 @@ const scrollFn = throttleScroll(_scroll => {
 onMounted(async () => {
   await initPosts()
   window.addEventListener('scroll', scrollFn)
+  document.addEventListener('visibilitychange', onVisibilityChange)
 })
+
+function onVisibilityChange() {
+  if (document.hidden && longPressState !== 'sharing') resetLongPressState()
+}
 
 onUnmounted(() => {
   window.removeEventListener('scroll', scrollFn)
+  document.removeEventListener('visibilitychange', onVisibilityChange)
+  resetLongPressState()
 })
 </script>
