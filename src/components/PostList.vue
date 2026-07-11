@@ -21,6 +21,8 @@
             :src="getImgSrc(item)"
             role="button"
             tabindex="0"
+            draggable="false"
+            @dragstart.prevent
             @click="onImageClick(index)"
             @touchstart="onPostTouchStart($event, item)"
             @touchmove="onPostTouchMove"
@@ -95,6 +97,8 @@
             :src="getImgSrc(image)"
             role="button"
             tabindex="0"
+            draggable="false"
+            @dragstart.prevent
             @click="onImageClick(index)"
             @touchstart="onPostTouchStart($event, image)"
             @touchmove="onPostTouchMove"
@@ -109,6 +113,8 @@
           transition="scroll-y-transition"
           :src="getImgSrc(image)"
           :aspect-ratio="image?.aspectRatio"
+          draggable="false"
+          @dragstart.prevent
           @click="onImageClick(index)"
           @touchstart="onPostTouchStart($event, image)"
           @touchmove="onPostTouchMove"

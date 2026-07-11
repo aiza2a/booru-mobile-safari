@@ -843,6 +843,7 @@ html:has(#app.theme--dark) {
 .img_detail_sample,
 .img_detail_scale {
   -webkit-touch-callout: none !important;
+  -webkit-user-drag: none !important;
   -webkit-user-select: none !important;
   user-select: none !important;
 }
