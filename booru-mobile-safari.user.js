@@ -7422,6 +7422,57 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     posts: fetchKusowankaPosts,
     detail: getKusowankaDetail
   };
+  function extractRegisteredPosts(html) {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const scripts = [...doc.querySelectorAll("script:not([src])")];
+    const results = [];
+    for (const script of scripts) {
+      const text = script.textContent || "";
+      for (const line of text.split("\n")) {
+        const marker = "Post.register(";
+        const start = line.indexOf(marker);
+        if (start < 0)
+          continue;
+        let depth = 0;
+        let quote = "";
+        let escaped = false;
+        const jsonStart = start + marker.length;
+        for (let index = jsonStart; index < line.length; index++) {
+          const char = line[index];
+          if (escaped) {
+            escaped = false;
+            continue;
+          }
+          if (char === "\\") {
+            escaped = true;
+            continue;
+          }
+          if (quote) {
+            if (char === quote)
+              quote = "";
+            continue;
+          }
+          if (char === '"' || char === "'") {
+            quote = char;
+            continue;
+          }
+          if (char === "{" || char === "[")
+            depth++;
+          if (char === "}" || char === "]")
+            depth--;
+          if (char === ")" && depth === 0) {
+            const raw = line.slice(jsonStart, index);
+            try {
+              results.push(JSON.parse(raw));
+            } catch (_error) {
+            }
+            break;
+          }
+        }
+      }
+    }
+    return results;
+  }
   function getYandereUserId() {
     const match2 = document.cookie.match(/user_id=(\d+)/);
     return match2?.[1];
@@ -7588,21 +7639,10 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     url.searchParams.set("page", `${page}`);
     tags && url.searchParams.set("tags", tags);
     const htmlResp = await fetch(url.href);
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const selectors = [
-      "form:has(select[name=locale]) + script",
-      "script:not([src])"
-    ];
-    const scriptTexts = selectors.flatMap((selector) => [...doc.querySelectorAll(selector)].map((e) => e.innerText));
-    const scriptText = scriptTexts.find((text) => text.includes("Post.register(")) || "";
+    const html = await htmlResp.text();
     let results = [];
     try {
-      results = scriptText.split("\n").flatMap((line) => {
-        const match2 = line.match(/Post\.register\((.*)\);?\s*$/);
-        if (!match2)
-          return [];
-        return [JSON.parse(match2[1])];
-      });
+      results = extractRegisteredPosts(html);
     } catch (err) {
       console.log("err: ", err);
     }
