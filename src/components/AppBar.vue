@@ -663,8 +663,6 @@ function exitMasonry() {
   location.assign(url)
 }
 
-
-
 async function toggleFullscreen() {
   try {
     if (document.fullscreenElement) {

@@ -27,7 +27,7 @@
       </template>
       <div
         v-else
-        :class="{ img_scale_scroll: scaleOn, img_scale_normal: !scaleOn, 'detail-media-stage': !scaleOn }"
+        :class="{ 'img_scale_scroll': scaleOn, 'img_scale_normal': !scaleOn, 'detail-media-stage': !scaleOn }"
         :style="!scaleOn ? detailColorStyle : undefined"
         draggable="false"
       >
