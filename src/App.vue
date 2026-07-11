@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <MobileStatusBackdrop />
     <AppBar />
     <NavDrawer />
     <ImmersiveExit />
@@ -17,6 +18,7 @@
 
 import { onMounted, watch } from 'vue'
 import AppBar from './components/AppBar.vue'
+import MobileStatusBackdrop from './components/MobileStatusBackdrop.vue'
 import NavDrawer from './components/NavDrawer.vue'
 // Mobile page shortcuts live in the settings drawer.
 import ImmersiveExit from './components/ImmersiveExit.vue'
