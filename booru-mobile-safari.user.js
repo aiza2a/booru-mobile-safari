@@ -9842,36 +9842,38 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       return `https://gelbooru.com/index.php?page=post&s=view&id=${id}`;
     return post.postView || location.href;
   }
-  async function shareUrl(url, title) {
-    if (!url)
-      return false;
+  async function copyUrl(url) {
     try {
-      if (navigator.share) {
-        await navigator.share({ title, text: url });
-        return true;
-      }
       await navigator.clipboard.writeText(url);
       showMsg({ msg: "\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
       return true;
-    } catch (error) {
-      if (error?.name === "AbortError")
-        return false;
-      try {
-        await navigator.clipboard.writeText(url);
+    } catch (_error) {
+      const textarea = document.createElement("textarea");
+      textarea.value = url;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      const copied = document.execCommand("copy");
+      textarea.remove();
+      if (copied)
         showMsg({ msg: "\u94FE\u63A5\u5DF2\u590D\u5236", type: "success" });
-        return true;
-      } catch (_copyError) {
-        const textarea = document.createElement("textarea");
-        textarea.value = url;
-        textarea.style.position = "fixed";
-        textarea.style.opacity = "0";
-        document.body.appendChild(textarea);
-        textarea.select();
-        const copied = document.execCommand("copy");
-        textarea.remove();
-        showMsg({ msg: copied ? "\u94FE\u63A5\u5DF2\u590D\u5236" : `\u65E0\u6CD5\u6253\u5F00\u5206\u4EAB\uFF1A${url}`, type: copied ? "success" : "error" });
-        return copied;
-      }
+      return copied;
+    }
+  }
+  async function shareUrl(url, title) {
+    if (!url)
+      return false;
+    if (!navigator.share)
+      return copyUrl(url);
+    const shareData = { title, url };
+    if (navigator.canShare && !navigator.canShare(shareData))
+      return false;
+    try {
+      await navigator.share(shareData);
+      return true;
+    } catch (_error) {
+      return false;
     }
   }
   async function sharePost(post) {
