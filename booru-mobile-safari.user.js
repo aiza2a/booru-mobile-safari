@@ -14,30 +14,6 @@
 // @match                https://konachan.net/*
 // @match                https://danbooru.donmai.us/*
 // @match                https://gelbooru.com/*
-// @match                https://rule34.xxx/*
-// @match                https://lolibooru.moe/*
-// @match                https://www.sakugabooru.com/*
-// @match                https://safebooru.org/*
-// @match                https://tbib.org/*
-// @match                https://xbooru.com/*
-// @match                http://behoimi.org/*
-// @match                https://rule34.paheal.net/*
-// @match                https://realbooru.com/*
-// @match                https://booru.allthefallen.moe/*
-// @match                https://aibooru.online/*
-// @match                https://e-shuushuu.net/*
-// @match                https://www.zerochan.net/*
-// @match                https://sankaku.app/*
-// @match                https://chan.sankakucomplex.com/*
-// @match                https://www.sankakucomplex.com/*
-// @match                https://www.idolcomplex.com/*
-// @match                https://anime-pictures.net/*
-// @match                https://allgirl.booru.org/*
-// @match                https://booru.eu/*
-// @match                https://kusowanka.com/*
-// @match                https://anihonetwallpaper.com/*
-// @match                https://nozomi.la/*
-// @match                https://rule34hentai.net/*
 // @homepage             https://github.com/aiza2a/yandere-masonry
 // @source               https://github.com/aiza2a/yandere-masonry
 // @icon                 https://upload-bbs.mihoyo.com/upload/2022/05/23/260511332/f1f6267537a5aff959ee63ec2c9e4e52_4821140735490026106.jpg
@@ -3105,47 +3081,11 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     const finalDate = constructFrom(date, dateWithDays.getTime() + msToAdd);
     return finalDate;
   }
-  const millisecondsInWeek = 6048e5;
-  const millisecondsInMinute = 6e4;
-  const millisecondsInHour = 36e5;
-  const millisecondsInSecond = 1e3;
   const minutesInMonth = 43200;
   const minutesInDay = 1440;
   let defaultOptions$1 = {};
-  function getDefaultOptions$1() {
+  function getDefaultOptions() {
     return defaultOptions$1;
-  }
-  function startOfWeek(date, options) {
-    const defaultOptions2 = getDefaultOptions$1();
-    const weekStartsOn = options?.weekStartsOn ?? options?.locale?.options?.weekStartsOn ?? defaultOptions2.weekStartsOn ?? defaultOptions2.locale?.options?.weekStartsOn ?? 0;
-    const _date = toDate(date);
-    const day = _date.getDay();
-    const diff = (day < weekStartsOn ? 7 : 0) + day - weekStartsOn;
-    _date.setDate(_date.getDate() - diff);
-    _date.setHours(0, 0, 0, 0);
-    return _date;
-  }
-  function startOfISOWeek(date) {
-    return startOfWeek(date, { weekStartsOn: 1 });
-  }
-  function getISOWeekYear(date) {
-    const _date = toDate(date);
-    const year = _date.getFullYear();
-    const fourthOfJanuaryOfNextYear = constructFrom(date, 0);
-    fourthOfJanuaryOfNextYear.setFullYear(year + 1, 0, 4);
-    fourthOfJanuaryOfNextYear.setHours(0, 0, 0, 0);
-    const startOfNextYear = startOfISOWeek(fourthOfJanuaryOfNextYear);
-    const fourthOfJanuaryOfThisYear = constructFrom(date, 0);
-    fourthOfJanuaryOfThisYear.setFullYear(year, 0, 4);
-    fourthOfJanuaryOfThisYear.setHours(0, 0, 0, 0);
-    const startOfThisYear = startOfISOWeek(fourthOfJanuaryOfThisYear);
-    if (_date.getTime() >= startOfNextYear.getTime()) {
-      return year + 1;
-    } else if (_date.getTime() >= startOfThisYear.getTime()) {
-      return year;
-    } else {
-      return year - 1;
-    }
   }
   function getTimezoneOffsetInMilliseconds(date) {
     const _date = toDate(date);
@@ -3162,13 +3102,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     );
     utcDate.setUTCFullYear(_date.getFullYear());
     return +date - +utcDate;
-  }
-  function startOfISOWeekYear(date) {
-    const year = getISOWeekYear(date);
-    const fourthOfJanuary = constructFrom(date, 0);
-    fourthOfJanuary.setFullYear(year, 0, 4);
-    fourthOfJanuary.setHours(0, 0, 0, 0);
-    return startOfISOWeek(fourthOfJanuary);
   }
   function compareAsc(dateLeft, dateRight) {
     const _dateLeft = toDate(dateLeft);
@@ -3740,123 +3673,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       firstWeekContainsDate: 1
     }
   };
-  function getISOWeek(date) {
-    const _date = toDate(date);
-    const diff = +startOfISOWeek(_date) - +startOfISOWeekYear(_date);
-    return Math.round(diff / millisecondsInWeek) + 1;
-  }
-  function getWeekYear(date, options) {
-    const _date = toDate(date);
-    const year = _date.getFullYear();
-    const defaultOptions2 = getDefaultOptions$1();
-    const firstWeekContainsDate = options?.firstWeekContainsDate ?? options?.locale?.options?.firstWeekContainsDate ?? defaultOptions2.firstWeekContainsDate ?? defaultOptions2.locale?.options?.firstWeekContainsDate ?? 1;
-    const firstWeekOfNextYear = constructFrom(date, 0);
-    firstWeekOfNextYear.setFullYear(year + 1, 0, firstWeekContainsDate);
-    firstWeekOfNextYear.setHours(0, 0, 0, 0);
-    const startOfNextYear = startOfWeek(firstWeekOfNextYear, options);
-    const firstWeekOfThisYear = constructFrom(date, 0);
-    firstWeekOfThisYear.setFullYear(year, 0, firstWeekContainsDate);
-    firstWeekOfThisYear.setHours(0, 0, 0, 0);
-    const startOfThisYear = startOfWeek(firstWeekOfThisYear, options);
-    if (_date.getTime() >= startOfNextYear.getTime()) {
-      return year + 1;
-    } else if (_date.getTime() >= startOfThisYear.getTime()) {
-      return year;
-    } else {
-      return year - 1;
-    }
-  }
-  function startOfWeekYear(date, options) {
-    const defaultOptions2 = getDefaultOptions$1();
-    const firstWeekContainsDate = options?.firstWeekContainsDate ?? options?.locale?.options?.firstWeekContainsDate ?? defaultOptions2.firstWeekContainsDate ?? defaultOptions2.locale?.options?.firstWeekContainsDate ?? 1;
-    const year = getWeekYear(date, options);
-    const firstWeek = constructFrom(date, 0);
-    firstWeek.setFullYear(year, 0, firstWeekContainsDate);
-    firstWeek.setHours(0, 0, 0, 0);
-    const _date = startOfWeek(firstWeek, options);
-    return _date;
-  }
-  function getWeek(date, options) {
-    const _date = toDate(date);
-    const diff = +startOfWeek(_date, options) - +startOfWeekYear(_date, options);
-    return Math.round(diff / millisecondsInWeek) + 1;
-  }
-  const dateLongFormatter = (pattern, formatLong2) => {
-    switch (pattern) {
-      case "P":
-        return formatLong2.date({ width: "short" });
-      case "PP":
-        return formatLong2.date({ width: "medium" });
-      case "PPP":
-        return formatLong2.date({ width: "long" });
-      case "PPPP":
-      default:
-        return formatLong2.date({ width: "full" });
-    }
-  };
-  const timeLongFormatter = (pattern, formatLong2) => {
-    switch (pattern) {
-      case "p":
-        return formatLong2.time({ width: "short" });
-      case "pp":
-        return formatLong2.time({ width: "medium" });
-      case "ppp":
-        return formatLong2.time({ width: "long" });
-      case "pppp":
-      default:
-        return formatLong2.time({ width: "full" });
-    }
-  };
-  const dateTimeLongFormatter = (pattern, formatLong2) => {
-    const matchResult = pattern.match(/(P+)(p+)?/) || [];
-    const datePattern = matchResult[1];
-    const timePattern = matchResult[2];
-    if (!timePattern) {
-      return dateLongFormatter(pattern, formatLong2);
-    }
-    let dateTimeFormat;
-    switch (datePattern) {
-      case "P":
-        dateTimeFormat = formatLong2.dateTime({ width: "short" });
-        break;
-      case "PP":
-        dateTimeFormat = formatLong2.dateTime({ width: "medium" });
-        break;
-      case "PPP":
-        dateTimeFormat = formatLong2.dateTime({ width: "long" });
-        break;
-      case "PPPP":
-      default:
-        dateTimeFormat = formatLong2.dateTime({ width: "full" });
-        break;
-    }
-    return dateTimeFormat.replace("{{date}}", dateLongFormatter(datePattern, formatLong2)).replace("{{time}}", timeLongFormatter(timePattern, formatLong2));
-  };
-  const longFormatters = {
-    p: timeLongFormatter,
-    P: dateTimeLongFormatter
-  };
-  const dayOfYearTokenRE = /^D+$/;
-  const weekYearTokenRE = /^Y+$/;
-  const throwTokens = ["D", "DD", "YY", "YYYY"];
-  function isProtectedDayOfYearToken(token) {
-    return dayOfYearTokenRE.test(token);
-  }
-  function isProtectedWeekYearToken(token) {
-    return weekYearTokenRE.test(token);
-  }
-  function warnOrThrowProtectedError(token, format, input) {
-    const _message = message(token, format, input);
-    console.warn(_message);
-    if (throwTokens.includes(token))
-      throw new RangeError(_message);
-  }
-  function message(token, format, input) {
-    const subject = token[0] === "Y" ? "years" : "days of the month";
-    return `Use \`${token.toLowerCase()}\` instead of \`${token}\` (in \`${format}\`) for formatting ${subject} to the input \`${input}\`; see: https://github.com/date-fns/date-fns/blob/master/docs/unicodeTokens.md`;
-  }
   function formatDistance(date, baseDate, options) {
-    const defaultOptions2 = getDefaultOptions$1();
+    const defaultOptions2 = getDefaultOptions();
     const locale = options?.locale ?? defaultOptions2.locale ?? enUS;
     const minutesInAlmostTwoDays = 2520;
     const comparison = compareAsc(date, baseDate);
@@ -3936,1702 +3754,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   }
   function formatDistanceToNow(date, options) {
     return formatDistance(date, constructNow(date), options);
-  }
-  function getDefaultOptions() {
-    return Object.assign({}, getDefaultOptions$1());
-  }
-  function getISODay(date) {
-    const _date = toDate(date);
-    let day = _date.getDay();
-    if (day === 0) {
-      day = 7;
-    }
-    return day;
-  }
-  function transpose(fromDate, constructor) {
-    const date = constructor instanceof Date ? constructFrom(constructor, 0) : new constructor(0);
-    date.setFullYear(
-      fromDate.getFullYear(),
-      fromDate.getMonth(),
-      fromDate.getDate()
-    );
-    date.setHours(
-      fromDate.getHours(),
-      fromDate.getMinutes(),
-      fromDate.getSeconds(),
-      fromDate.getMilliseconds()
-    );
-    return date;
-  }
-  const TIMEZONE_UNIT_PRIORITY = 10;
-  class Setter {
-    constructor() {
-      __publicField(this, "subPriority", 0);
-    }
-    validate(_utcDate, _options) {
-      return true;
-    }
-  }
-  class ValueSetter extends Setter {
-    constructor(value, validateValue, setValue, priority, subPriority) {
-      super();
-      this.value = value;
-      this.validateValue = validateValue;
-      this.setValue = setValue;
-      this.priority = priority;
-      if (subPriority) {
-        this.subPriority = subPriority;
-      }
-    }
-    validate(date, options) {
-      return this.validateValue(date, this.value, options);
-    }
-    set(date, flags, options) {
-      return this.setValue(date, flags, this.value, options);
-    }
-  }
-  class DateToSystemTimezoneSetter extends Setter {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", TIMEZONE_UNIT_PRIORITY);
-      __publicField(this, "subPriority", -1);
-    }
-    set(date, flags) {
-      if (flags.timestampIsSet)
-        return date;
-      return constructFrom(date, transpose(date, Date));
-    }
-  }
-  class Parser {
-    run(dateString, token, match2, options) {
-      const result = this.parse(dateString, token, match2, options);
-      if (!result) {
-        return null;
-      }
-      return {
-        setter: new ValueSetter(
-          result.value,
-          this.validate,
-          this.set,
-          this.priority,
-          this.subPriority
-        ),
-        rest: result.rest
-      };
-    }
-    validate(_utcDate, _value, _options) {
-      return true;
-    }
-  }
-  class EraParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 140);
-      __publicField(this, "incompatibleTokens", ["R", "u", "t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "G":
-        case "GG":
-        case "GGG":
-          return match2.era(dateString, { width: "abbreviated" }) || match2.era(dateString, { width: "narrow" });
-        case "GGGGG":
-          return match2.era(dateString, { width: "narrow" });
-        case "GGGG":
-        default:
-          return match2.era(dateString, { width: "wide" }) || match2.era(dateString, { width: "abbreviated" }) || match2.era(dateString, { width: "narrow" });
-      }
-    }
-    set(date, flags, value) {
-      flags.era = value;
-      date.setFullYear(value, 0, 1);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  const numericPatterns = {
-    month: /^(1[0-2]|0?\d)/,
-    date: /^(3[0-1]|[0-2]?\d)/,
-    dayOfYear: /^(36[0-6]|3[0-5]\d|[0-2]?\d?\d)/,
-    week: /^(5[0-3]|[0-4]?\d)/,
-    hour23h: /^(2[0-3]|[0-1]?\d)/,
-    hour24h: /^(2[0-4]|[0-1]?\d)/,
-    hour11h: /^(1[0-1]|0?\d)/,
-    hour12h: /^(1[0-2]|0?\d)/,
-    minute: /^[0-5]?\d/,
-    second: /^[0-5]?\d/,
-    singleDigit: /^\d/,
-    twoDigits: /^\d{1,2}/,
-    threeDigits: /^\d{1,3}/,
-    fourDigits: /^\d{1,4}/,
-    anyDigitsSigned: /^-?\d+/,
-    singleDigitSigned: /^-?\d/,
-    twoDigitsSigned: /^-?\d{1,2}/,
-    threeDigitsSigned: /^-?\d{1,3}/,
-    fourDigitsSigned: /^-?\d{1,4}/
-  };
-  const timezonePatterns = {
-    basicOptionalMinutes: /^([+-])(\d{2})(\d{2})?|Z/,
-    basic: /^([+-])(\d{2})(\d{2})|Z/,
-    basicOptionalSeconds: /^([+-])(\d{2})(\d{2})((\d{2}))?|Z/,
-    extended: /^([+-])(\d{2}):(\d{2})|Z/,
-    extendedOptionalSeconds: /^([+-])(\d{2}):(\d{2})(:(\d{2}))?|Z/
-  };
-  function mapValue(parseFnResult, mapFn) {
-    if (!parseFnResult) {
-      return parseFnResult;
-    }
-    return {
-      value: mapFn(parseFnResult.value),
-      rest: parseFnResult.rest
-    };
-  }
-  function parseNumericPattern(pattern, dateString) {
-    const matchResult = dateString.match(pattern);
-    if (!matchResult) {
-      return null;
-    }
-    return {
-      value: parseInt(matchResult[0], 10),
-      rest: dateString.slice(matchResult[0].length)
-    };
-  }
-  function parseTimezonePattern(pattern, dateString) {
-    const matchResult = dateString.match(pattern);
-    if (!matchResult) {
-      return null;
-    }
-    if (matchResult[0] === "Z") {
-      return {
-        value: 0,
-        rest: dateString.slice(1)
-      };
-    }
-    const sign = matchResult[1] === "+" ? 1 : -1;
-    const hours = matchResult[2] ? parseInt(matchResult[2], 10) : 0;
-    const minutes = matchResult[3] ? parseInt(matchResult[3], 10) : 0;
-    const seconds = matchResult[5] ? parseInt(matchResult[5], 10) : 0;
-    return {
-      value: sign * (hours * millisecondsInHour + minutes * millisecondsInMinute + seconds * millisecondsInSecond),
-      rest: dateString.slice(matchResult[0].length)
-    };
-  }
-  function parseAnyDigitsSigned(dateString) {
-    return parseNumericPattern(numericPatterns.anyDigitsSigned, dateString);
-  }
-  function parseNDigits(n, dateString) {
-    switch (n) {
-      case 1:
-        return parseNumericPattern(numericPatterns.singleDigit, dateString);
-      case 2:
-        return parseNumericPattern(numericPatterns.twoDigits, dateString);
-      case 3:
-        return parseNumericPattern(numericPatterns.threeDigits, dateString);
-      case 4:
-        return parseNumericPattern(numericPatterns.fourDigits, dateString);
-      default:
-        return parseNumericPattern(new RegExp("^\\d{1," + n + "}"), dateString);
-    }
-  }
-  function parseNDigitsSigned(n, dateString) {
-    switch (n) {
-      case 1:
-        return parseNumericPattern(numericPatterns.singleDigitSigned, dateString);
-      case 2:
-        return parseNumericPattern(numericPatterns.twoDigitsSigned, dateString);
-      case 3:
-        return parseNumericPattern(numericPatterns.threeDigitsSigned, dateString);
-      case 4:
-        return parseNumericPattern(numericPatterns.fourDigitsSigned, dateString);
-      default:
-        return parseNumericPattern(new RegExp("^-?\\d{1," + n + "}"), dateString);
-    }
-  }
-  function dayPeriodEnumToHours(dayPeriod) {
-    switch (dayPeriod) {
-      case "morning":
-        return 4;
-      case "evening":
-        return 17;
-      case "pm":
-      case "noon":
-      case "afternoon":
-        return 12;
-      case "am":
-      case "midnight":
-      case "night":
-      default:
-        return 0;
-    }
-  }
-  function normalizeTwoDigitYear(twoDigitYear, currentYear) {
-    const isCommonEra = currentYear > 0;
-    const absCurrentYear = isCommonEra ? currentYear : 1 - currentYear;
-    let result;
-    if (absCurrentYear <= 50) {
-      result = twoDigitYear || 100;
-    } else {
-      const rangeEnd = absCurrentYear + 50;
-      const rangeEndCentury = Math.trunc(rangeEnd / 100) * 100;
-      const isPreviousCentury = twoDigitYear >= rangeEnd % 100;
-      result = twoDigitYear + rangeEndCentury - (isPreviousCentury ? 100 : 0);
-    }
-    return isCommonEra ? result : 1 - result;
-  }
-  function isLeapYearIndex(year) {
-    return year % 400 === 0 || year % 4 === 0 && year % 100 !== 0;
-  }
-  class YearParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 130);
-      __publicField(this, "incompatibleTokens", ["Y", "R", "u", "w", "I", "i", "e", "c", "t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      const valueCallback = (year) => ({
-        year,
-        isTwoDigitYear: token === "yy"
-      });
-      switch (token) {
-        case "y":
-          return mapValue(parseNDigits(4, dateString), valueCallback);
-        case "yo":
-          return mapValue(
-            match2.ordinalNumber(dateString, {
-              unit: "year"
-            }),
-            valueCallback
-          );
-        default:
-          return mapValue(parseNDigits(token.length, dateString), valueCallback);
-      }
-    }
-    validate(_date, value) {
-      return value.isTwoDigitYear || value.year > 0;
-    }
-    set(date, flags, value) {
-      const currentYear = date.getFullYear();
-      if (value.isTwoDigitYear) {
-        const normalizedTwoDigitYear = normalizeTwoDigitYear(
-          value.year,
-          currentYear
-        );
-        date.setFullYear(normalizedTwoDigitYear, 0, 1);
-        date.setHours(0, 0, 0, 0);
-        return date;
-      }
-      const year = !("era" in flags) || flags.era === 1 ? value.year : 1 - value.year;
-      date.setFullYear(year, 0, 1);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  class LocalWeekYearParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 130);
-      __publicField(this, "incompatibleTokens", [
-        "y",
-        "R",
-        "u",
-        "Q",
-        "q",
-        "M",
-        "L",
-        "I",
-        "d",
-        "D",
-        "i",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token, match2) {
-      const valueCallback = (year) => ({
-        year,
-        isTwoDigitYear: token === "YY"
-      });
-      switch (token) {
-        case "Y":
-          return mapValue(parseNDigits(4, dateString), valueCallback);
-        case "Yo":
-          return mapValue(
-            match2.ordinalNumber(dateString, {
-              unit: "year"
-            }),
-            valueCallback
-          );
-        default:
-          return mapValue(parseNDigits(token.length, dateString), valueCallback);
-      }
-    }
-    validate(_date, value) {
-      return value.isTwoDigitYear || value.year > 0;
-    }
-    set(date, flags, value, options) {
-      const currentYear = getWeekYear(date, options);
-      if (value.isTwoDigitYear) {
-        const normalizedTwoDigitYear = normalizeTwoDigitYear(
-          value.year,
-          currentYear
-        );
-        date.setFullYear(
-          normalizedTwoDigitYear,
-          0,
-          options.firstWeekContainsDate
-        );
-        date.setHours(0, 0, 0, 0);
-        return startOfWeek(date, options);
-      }
-      const year = !("era" in flags) || flags.era === 1 ? value.year : 1 - value.year;
-      date.setFullYear(year, 0, options.firstWeekContainsDate);
-      date.setHours(0, 0, 0, 0);
-      return startOfWeek(date, options);
-    }
-  }
-  class ISOWeekYearParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 130);
-      __publicField(this, "incompatibleTokens", [
-        "G",
-        "y",
-        "Y",
-        "u",
-        "Q",
-        "q",
-        "M",
-        "L",
-        "w",
-        "d",
-        "D",
-        "e",
-        "c",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token) {
-      if (token === "R") {
-        return parseNDigitsSigned(4, dateString);
-      }
-      return parseNDigitsSigned(token.length, dateString);
-    }
-    set(date, _flags, value) {
-      const firstWeekOfYear = constructFrom(date, 0);
-      firstWeekOfYear.setFullYear(value, 0, 4);
-      firstWeekOfYear.setHours(0, 0, 0, 0);
-      return startOfISOWeek(firstWeekOfYear);
-    }
-  }
-  class ExtendedYearParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 130);
-      __publicField(this, "incompatibleTokens", ["G", "y", "Y", "R", "w", "I", "i", "e", "c", "t", "T"]);
-    }
-    parse(dateString, token) {
-      if (token === "u") {
-        return parseNDigitsSigned(4, dateString);
-      }
-      return parseNDigitsSigned(token.length, dateString);
-    }
-    set(date, _flags, value) {
-      date.setFullYear(value, 0, 1);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  class QuarterParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 120);
-      __publicField(this, "incompatibleTokens", [
-        "Y",
-        "R",
-        "q",
-        "M",
-        "L",
-        "w",
-        "I",
-        "d",
-        "D",
-        "i",
-        "e",
-        "c",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "Q":
-        case "QQ":
-          return parseNDigits(token.length, dateString);
-        case "Qo":
-          return match2.ordinalNumber(dateString, { unit: "quarter" });
-        case "QQQ":
-          return match2.quarter(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.quarter(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-        case "QQQQQ":
-          return match2.quarter(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-        case "QQQQ":
-        default:
-          return match2.quarter(dateString, {
-            width: "wide",
-            context: "formatting"
-          }) || match2.quarter(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.quarter(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-      }
-    }
-    validate(_date, value) {
-      return value >= 1 && value <= 4;
-    }
-    set(date, _flags, value) {
-      date.setMonth((value - 1) * 3, 1);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  class StandAloneQuarterParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 120);
-      __publicField(this, "incompatibleTokens", [
-        "Y",
-        "R",
-        "Q",
-        "M",
-        "L",
-        "w",
-        "I",
-        "d",
-        "D",
-        "i",
-        "e",
-        "c",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "q":
-        case "qq":
-          return parseNDigits(token.length, dateString);
-        case "qo":
-          return match2.ordinalNumber(dateString, { unit: "quarter" });
-        case "qqq":
-          return match2.quarter(dateString, {
-            width: "abbreviated",
-            context: "standalone"
-          }) || match2.quarter(dateString, {
-            width: "narrow",
-            context: "standalone"
-          });
-        case "qqqqq":
-          return match2.quarter(dateString, {
-            width: "narrow",
-            context: "standalone"
-          });
-        case "qqqq":
-        default:
-          return match2.quarter(dateString, {
-            width: "wide",
-            context: "standalone"
-          }) || match2.quarter(dateString, {
-            width: "abbreviated",
-            context: "standalone"
-          }) || match2.quarter(dateString, {
-            width: "narrow",
-            context: "standalone"
-          });
-      }
-    }
-    validate(_date, value) {
-      return value >= 1 && value <= 4;
-    }
-    set(date, _flags, value) {
-      date.setMonth((value - 1) * 3, 1);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  class MonthParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "incompatibleTokens", [
-        "Y",
-        "R",
-        "q",
-        "Q",
-        "L",
-        "w",
-        "I",
-        "D",
-        "i",
-        "e",
-        "c",
-        "t",
-        "T"
-      ]);
-      __publicField(this, "priority", 110);
-    }
-    parse(dateString, token, match2) {
-      const valueCallback = (value) => value - 1;
-      switch (token) {
-        case "M":
-          return mapValue(
-            parseNumericPattern(numericPatterns.month, dateString),
-            valueCallback
-          );
-        case "MM":
-          return mapValue(parseNDigits(2, dateString), valueCallback);
-        case "Mo":
-          return mapValue(
-            match2.ordinalNumber(dateString, {
-              unit: "month"
-            }),
-            valueCallback
-          );
-        case "MMM":
-          return match2.month(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.month(dateString, { width: "narrow", context: "formatting" });
-        case "MMMMM":
-          return match2.month(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-        case "MMMM":
-        default:
-          return match2.month(dateString, { width: "wide", context: "formatting" }) || match2.month(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.month(dateString, { width: "narrow", context: "formatting" });
-      }
-    }
-    validate(_date, value) {
-      return value >= 0 && value <= 11;
-    }
-    set(date, _flags, value) {
-      date.setMonth(value, 1);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  class StandAloneMonthParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 110);
-      __publicField(this, "incompatibleTokens", [
-        "Y",
-        "R",
-        "q",
-        "Q",
-        "M",
-        "w",
-        "I",
-        "D",
-        "i",
-        "e",
-        "c",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token, match2) {
-      const valueCallback = (value) => value - 1;
-      switch (token) {
-        case "L":
-          return mapValue(
-            parseNumericPattern(numericPatterns.month, dateString),
-            valueCallback
-          );
-        case "LL":
-          return mapValue(parseNDigits(2, dateString), valueCallback);
-        case "Lo":
-          return mapValue(
-            match2.ordinalNumber(dateString, {
-              unit: "month"
-            }),
-            valueCallback
-          );
-        case "LLL":
-          return match2.month(dateString, {
-            width: "abbreviated",
-            context: "standalone"
-          }) || match2.month(dateString, { width: "narrow", context: "standalone" });
-        case "LLLLL":
-          return match2.month(dateString, {
-            width: "narrow",
-            context: "standalone"
-          });
-        case "LLLL":
-        default:
-          return match2.month(dateString, { width: "wide", context: "standalone" }) || match2.month(dateString, {
-            width: "abbreviated",
-            context: "standalone"
-          }) || match2.month(dateString, { width: "narrow", context: "standalone" });
-      }
-    }
-    validate(_date, value) {
-      return value >= 0 && value <= 11;
-    }
-    set(date, _flags, value) {
-      date.setMonth(value, 1);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  function setWeek(date, week, options) {
-    const _date = toDate(date);
-    const diff = getWeek(_date, options) - week;
-    _date.setDate(_date.getDate() - diff * 7);
-    return _date;
-  }
-  class LocalWeekParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 100);
-      __publicField(this, "incompatibleTokens", [
-        "y",
-        "R",
-        "u",
-        "q",
-        "Q",
-        "M",
-        "L",
-        "I",
-        "d",
-        "D",
-        "i",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "w":
-          return parseNumericPattern(numericPatterns.week, dateString);
-        case "wo":
-          return match2.ordinalNumber(dateString, { unit: "week" });
-        default:
-          return parseNDigits(token.length, dateString);
-      }
-    }
-    validate(_date, value) {
-      return value >= 1 && value <= 53;
-    }
-    set(date, _flags, value, options) {
-      return startOfWeek(setWeek(date, value, options), options);
-    }
-  }
-  function setISOWeek(date, week) {
-    const _date = toDate(date);
-    const diff = getISOWeek(_date) - week;
-    _date.setDate(_date.getDate() - diff * 7);
-    return _date;
-  }
-  class ISOWeekParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 100);
-      __publicField(this, "incompatibleTokens", [
-        "y",
-        "Y",
-        "u",
-        "q",
-        "Q",
-        "M",
-        "L",
-        "w",
-        "d",
-        "D",
-        "e",
-        "c",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "I":
-          return parseNumericPattern(numericPatterns.week, dateString);
-        case "Io":
-          return match2.ordinalNumber(dateString, { unit: "week" });
-        default:
-          return parseNDigits(token.length, dateString);
-      }
-    }
-    validate(_date, value) {
-      return value >= 1 && value <= 53;
-    }
-    set(date, _flags, value) {
-      return startOfISOWeek(setISOWeek(date, value));
-    }
-  }
-  const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  const DAYS_IN_MONTH_LEAP_YEAR = [
-    31,
-    29,
-    31,
-    30,
-    31,
-    30,
-    31,
-    31,
-    30,
-    31,
-    30,
-    31
-  ];
-  class DateParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 90);
-      __publicField(this, "subPriority", 1);
-      __publicField(this, "incompatibleTokens", [
-        "Y",
-        "R",
-        "q",
-        "Q",
-        "w",
-        "I",
-        "D",
-        "i",
-        "e",
-        "c",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "d":
-          return parseNumericPattern(numericPatterns.date, dateString);
-        case "do":
-          return match2.ordinalNumber(dateString, { unit: "date" });
-        default:
-          return parseNDigits(token.length, dateString);
-      }
-    }
-    validate(date, value) {
-      const year = date.getFullYear();
-      const isLeapYear = isLeapYearIndex(year);
-      const month = date.getMonth();
-      if (isLeapYear) {
-        return value >= 1 && value <= DAYS_IN_MONTH_LEAP_YEAR[month];
-      } else {
-        return value >= 1 && value <= DAYS_IN_MONTH[month];
-      }
-    }
-    set(date, _flags, value) {
-      date.setDate(value);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  class DayOfYearParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 90);
-      __publicField(this, "subpriority", 1);
-      __publicField(this, "incompatibleTokens", [
-        "Y",
-        "R",
-        "q",
-        "Q",
-        "M",
-        "L",
-        "w",
-        "I",
-        "d",
-        "E",
-        "i",
-        "e",
-        "c",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "D":
-        case "DD":
-          return parseNumericPattern(numericPatterns.dayOfYear, dateString);
-        case "Do":
-          return match2.ordinalNumber(dateString, { unit: "date" });
-        default:
-          return parseNDigits(token.length, dateString);
-      }
-    }
-    validate(date, value) {
-      const year = date.getFullYear();
-      const isLeapYear = isLeapYearIndex(year);
-      if (isLeapYear) {
-        return value >= 1 && value <= 366;
-      } else {
-        return value >= 1 && value <= 365;
-      }
-    }
-    set(date, _flags, value) {
-      date.setMonth(0, value);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  function setDay(date, day, options) {
-    const defaultOptions2 = getDefaultOptions$1();
-    const weekStartsOn = options?.weekStartsOn ?? options?.locale?.options?.weekStartsOn ?? defaultOptions2.weekStartsOn ?? defaultOptions2.locale?.options?.weekStartsOn ?? 0;
-    const _date = toDate(date);
-    const currentDay = _date.getDay();
-    const remainder = day % 7;
-    const dayIndex = (remainder + 7) % 7;
-    const delta = 7 - weekStartsOn;
-    const diff = day < 0 || day > 6 ? day - (currentDay + delta) % 7 : (dayIndex + delta) % 7 - (currentDay + delta) % 7;
-    return addDays(_date, diff);
-  }
-  class DayParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 90);
-      __publicField(this, "incompatibleTokens", ["D", "i", "e", "c", "t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "E":
-        case "EE":
-        case "EEE":
-          return match2.day(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.day(dateString, { width: "short", context: "formatting" }) || match2.day(dateString, { width: "narrow", context: "formatting" });
-        case "EEEEE":
-          return match2.day(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-        case "EEEEEE":
-          return match2.day(dateString, { width: "short", context: "formatting" }) || match2.day(dateString, { width: "narrow", context: "formatting" });
-        case "EEEE":
-        default:
-          return match2.day(dateString, { width: "wide", context: "formatting" }) || match2.day(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.day(dateString, { width: "short", context: "formatting" }) || match2.day(dateString, { width: "narrow", context: "formatting" });
-      }
-    }
-    validate(_date, value) {
-      return value >= 0 && value <= 6;
-    }
-    set(date, _flags, value, options) {
-      date = setDay(date, value, options);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  class LocalDayParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 90);
-      __publicField(this, "incompatibleTokens", [
-        "y",
-        "R",
-        "u",
-        "q",
-        "Q",
-        "M",
-        "L",
-        "I",
-        "d",
-        "D",
-        "E",
-        "i",
-        "c",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token, match2, options) {
-      const valueCallback = (value) => {
-        const wholeWeekDays = Math.floor((value - 1) / 7) * 7;
-        return (value + options.weekStartsOn + 6) % 7 + wholeWeekDays;
-      };
-      switch (token) {
-        case "e":
-        case "ee":
-          return mapValue(parseNDigits(token.length, dateString), valueCallback);
-        case "eo":
-          return mapValue(
-            match2.ordinalNumber(dateString, {
-              unit: "day"
-            }),
-            valueCallback
-          );
-        case "eee":
-          return match2.day(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.day(dateString, { width: "short", context: "formatting" }) || match2.day(dateString, { width: "narrow", context: "formatting" });
-        case "eeeee":
-          return match2.day(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-        case "eeeeee":
-          return match2.day(dateString, { width: "short", context: "formatting" }) || match2.day(dateString, { width: "narrow", context: "formatting" });
-        case "eeee":
-        default:
-          return match2.day(dateString, { width: "wide", context: "formatting" }) || match2.day(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.day(dateString, { width: "short", context: "formatting" }) || match2.day(dateString, { width: "narrow", context: "formatting" });
-      }
-    }
-    validate(_date, value) {
-      return value >= 0 && value <= 6;
-    }
-    set(date, _flags, value, options) {
-      date = setDay(date, value, options);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  class StandAloneLocalDayParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 90);
-      __publicField(this, "incompatibleTokens", [
-        "y",
-        "R",
-        "u",
-        "q",
-        "Q",
-        "M",
-        "L",
-        "I",
-        "d",
-        "D",
-        "E",
-        "i",
-        "e",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token, match2, options) {
-      const valueCallback = (value) => {
-        const wholeWeekDays = Math.floor((value - 1) / 7) * 7;
-        return (value + options.weekStartsOn + 6) % 7 + wholeWeekDays;
-      };
-      switch (token) {
-        case "c":
-        case "cc":
-          return mapValue(parseNDigits(token.length, dateString), valueCallback);
-        case "co":
-          return mapValue(
-            match2.ordinalNumber(dateString, {
-              unit: "day"
-            }),
-            valueCallback
-          );
-        case "ccc":
-          return match2.day(dateString, {
-            width: "abbreviated",
-            context: "standalone"
-          }) || match2.day(dateString, { width: "short", context: "standalone" }) || match2.day(dateString, { width: "narrow", context: "standalone" });
-        case "ccccc":
-          return match2.day(dateString, {
-            width: "narrow",
-            context: "standalone"
-          });
-        case "cccccc":
-          return match2.day(dateString, { width: "short", context: "standalone" }) || match2.day(dateString, { width: "narrow", context: "standalone" });
-        case "cccc":
-        default:
-          return match2.day(dateString, { width: "wide", context: "standalone" }) || match2.day(dateString, {
-            width: "abbreviated",
-            context: "standalone"
-          }) || match2.day(dateString, { width: "short", context: "standalone" }) || match2.day(dateString, { width: "narrow", context: "standalone" });
-      }
-    }
-    validate(_date, value) {
-      return value >= 0 && value <= 6;
-    }
-    set(date, _flags, value, options) {
-      date = setDay(date, value, options);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  function setISODay(date, day) {
-    const _date = toDate(date);
-    const currentDay = getISODay(_date);
-    const diff = day - currentDay;
-    return addDays(_date, diff);
-  }
-  class ISODayParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 90);
-      __publicField(this, "incompatibleTokens", [
-        "y",
-        "Y",
-        "u",
-        "q",
-        "Q",
-        "M",
-        "L",
-        "w",
-        "d",
-        "D",
-        "E",
-        "e",
-        "c",
-        "t",
-        "T"
-      ]);
-    }
-    parse(dateString, token, match2) {
-      const valueCallback = (value) => {
-        if (value === 0) {
-          return 7;
-        }
-        return value;
-      };
-      switch (token) {
-        case "i":
-        case "ii":
-          return parseNDigits(token.length, dateString);
-        case "io":
-          return match2.ordinalNumber(dateString, { unit: "day" });
-        case "iii":
-          return mapValue(
-            match2.day(dateString, {
-              width: "abbreviated",
-              context: "formatting"
-            }) || match2.day(dateString, {
-              width: "short",
-              context: "formatting"
-            }) || match2.day(dateString, {
-              width: "narrow",
-              context: "formatting"
-            }),
-            valueCallback
-          );
-        case "iiiii":
-          return mapValue(
-            match2.day(dateString, {
-              width: "narrow",
-              context: "formatting"
-            }),
-            valueCallback
-          );
-        case "iiiiii":
-          return mapValue(
-            match2.day(dateString, {
-              width: "short",
-              context: "formatting"
-            }) || match2.day(dateString, {
-              width: "narrow",
-              context: "formatting"
-            }),
-            valueCallback
-          );
-        case "iiii":
-        default:
-          return mapValue(
-            match2.day(dateString, {
-              width: "wide",
-              context: "formatting"
-            }) || match2.day(dateString, {
-              width: "abbreviated",
-              context: "formatting"
-            }) || match2.day(dateString, {
-              width: "short",
-              context: "formatting"
-            }) || match2.day(dateString, {
-              width: "narrow",
-              context: "formatting"
-            }),
-            valueCallback
-          );
-      }
-    }
-    validate(_date, value) {
-      return value >= 1 && value <= 7;
-    }
-    set(date, _flags, value) {
-      date = setISODay(date, value);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-  }
-  class AMPMParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 80);
-      __publicField(this, "incompatibleTokens", ["b", "B", "H", "k", "t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "a":
-        case "aa":
-        case "aaa":
-          return match2.dayPeriod(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.dayPeriod(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-        case "aaaaa":
-          return match2.dayPeriod(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-        case "aaaa":
-        default:
-          return match2.dayPeriod(dateString, {
-            width: "wide",
-            context: "formatting"
-          }) || match2.dayPeriod(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.dayPeriod(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-      }
-    }
-    set(date, _flags, value) {
-      date.setHours(dayPeriodEnumToHours(value), 0, 0, 0);
-      return date;
-    }
-  }
-  class AMPMMidnightParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 80);
-      __publicField(this, "incompatibleTokens", ["a", "B", "H", "k", "t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "b":
-        case "bb":
-        case "bbb":
-          return match2.dayPeriod(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.dayPeriod(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-        case "bbbbb":
-          return match2.dayPeriod(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-        case "bbbb":
-        default:
-          return match2.dayPeriod(dateString, {
-            width: "wide",
-            context: "formatting"
-          }) || match2.dayPeriod(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.dayPeriod(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-      }
-    }
-    set(date, _flags, value) {
-      date.setHours(dayPeriodEnumToHours(value), 0, 0, 0);
-      return date;
-    }
-  }
-  class DayPeriodParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 80);
-      __publicField(this, "incompatibleTokens", ["a", "b", "t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "B":
-        case "BB":
-        case "BBB":
-          return match2.dayPeriod(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.dayPeriod(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-        case "BBBBB":
-          return match2.dayPeriod(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-        case "BBBB":
-        default:
-          return match2.dayPeriod(dateString, {
-            width: "wide",
-            context: "formatting"
-          }) || match2.dayPeriod(dateString, {
-            width: "abbreviated",
-            context: "formatting"
-          }) || match2.dayPeriod(dateString, {
-            width: "narrow",
-            context: "formatting"
-          });
-      }
-    }
-    set(date, _flags, value) {
-      date.setHours(dayPeriodEnumToHours(value), 0, 0, 0);
-      return date;
-    }
-  }
-  class Hour1to12Parser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 70);
-      __publicField(this, "incompatibleTokens", ["H", "K", "k", "t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "h":
-          return parseNumericPattern(numericPatterns.hour12h, dateString);
-        case "ho":
-          return match2.ordinalNumber(dateString, { unit: "hour" });
-        default:
-          return parseNDigits(token.length, dateString);
-      }
-    }
-    validate(_date, value) {
-      return value >= 1 && value <= 12;
-    }
-    set(date, _flags, value) {
-      const isPM = date.getHours() >= 12;
-      if (isPM && value < 12) {
-        date.setHours(value + 12, 0, 0, 0);
-      } else if (!isPM && value === 12) {
-        date.setHours(0, 0, 0, 0);
-      } else {
-        date.setHours(value, 0, 0, 0);
-      }
-      return date;
-    }
-  }
-  class Hour0to23Parser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 70);
-      __publicField(this, "incompatibleTokens", ["a", "b", "h", "K", "k", "t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "H":
-          return parseNumericPattern(numericPatterns.hour23h, dateString);
-        case "Ho":
-          return match2.ordinalNumber(dateString, { unit: "hour" });
-        default:
-          return parseNDigits(token.length, dateString);
-      }
-    }
-    validate(_date, value) {
-      return value >= 0 && value <= 23;
-    }
-    set(date, _flags, value) {
-      date.setHours(value, 0, 0, 0);
-      return date;
-    }
-  }
-  class Hour0To11Parser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 70);
-      __publicField(this, "incompatibleTokens", ["h", "H", "k", "t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "K":
-          return parseNumericPattern(numericPatterns.hour11h, dateString);
-        case "Ko":
-          return match2.ordinalNumber(dateString, { unit: "hour" });
-        default:
-          return parseNDigits(token.length, dateString);
-      }
-    }
-    validate(_date, value) {
-      return value >= 0 && value <= 11;
-    }
-    set(date, _flags, value) {
-      const isPM = date.getHours() >= 12;
-      if (isPM && value < 12) {
-        date.setHours(value + 12, 0, 0, 0);
-      } else {
-        date.setHours(value, 0, 0, 0);
-      }
-      return date;
-    }
-  }
-  class Hour1To24Parser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 70);
-      __publicField(this, "incompatibleTokens", ["a", "b", "h", "H", "K", "t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "k":
-          return parseNumericPattern(numericPatterns.hour24h, dateString);
-        case "ko":
-          return match2.ordinalNumber(dateString, { unit: "hour" });
-        default:
-          return parseNDigits(token.length, dateString);
-      }
-    }
-    validate(_date, value) {
-      return value >= 1 && value <= 24;
-    }
-    set(date, _flags, value) {
-      const hours = value <= 24 ? value % 24 : value;
-      date.setHours(hours, 0, 0, 0);
-      return date;
-    }
-  }
-  class MinuteParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 60);
-      __publicField(this, "incompatibleTokens", ["t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "m":
-          return parseNumericPattern(numericPatterns.minute, dateString);
-        case "mo":
-          return match2.ordinalNumber(dateString, { unit: "minute" });
-        default:
-          return parseNDigits(token.length, dateString);
-      }
-    }
-    validate(_date, value) {
-      return value >= 0 && value <= 59;
-    }
-    set(date, _flags, value) {
-      date.setMinutes(value, 0, 0);
-      return date;
-    }
-  }
-  class SecondParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 50);
-      __publicField(this, "incompatibleTokens", ["t", "T"]);
-    }
-    parse(dateString, token, match2) {
-      switch (token) {
-        case "s":
-          return parseNumericPattern(numericPatterns.second, dateString);
-        case "so":
-          return match2.ordinalNumber(dateString, { unit: "second" });
-        default:
-          return parseNDigits(token.length, dateString);
-      }
-    }
-    validate(_date, value) {
-      return value >= 0 && value <= 59;
-    }
-    set(date, _flags, value) {
-      date.setSeconds(value, 0);
-      return date;
-    }
-  }
-  class FractionOfSecondParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 30);
-      __publicField(this, "incompatibleTokens", ["t", "T"]);
-    }
-    parse(dateString, token) {
-      const valueCallback = (value) => Math.trunc(value * Math.pow(10, -token.length + 3));
-      return mapValue(parseNDigits(token.length, dateString), valueCallback);
-    }
-    set(date, _flags, value) {
-      date.setMilliseconds(value);
-      return date;
-    }
-  }
-  class ISOTimezoneWithZParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 10);
-      __publicField(this, "incompatibleTokens", ["t", "T", "x"]);
-    }
-    parse(dateString, token) {
-      switch (token) {
-        case "X":
-          return parseTimezonePattern(
-            timezonePatterns.basicOptionalMinutes,
-            dateString
-          );
-        case "XX":
-          return parseTimezonePattern(timezonePatterns.basic, dateString);
-        case "XXXX":
-          return parseTimezonePattern(
-            timezonePatterns.basicOptionalSeconds,
-            dateString
-          );
-        case "XXXXX":
-          return parseTimezonePattern(
-            timezonePatterns.extendedOptionalSeconds,
-            dateString
-          );
-        case "XXX":
-        default:
-          return parseTimezonePattern(timezonePatterns.extended, dateString);
-      }
-    }
-    set(date, flags, value) {
-      if (flags.timestampIsSet)
-        return date;
-      return constructFrom(
-        date,
-        date.getTime() - getTimezoneOffsetInMilliseconds(date) - value
-      );
-    }
-  }
-  class ISOTimezoneParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 10);
-      __publicField(this, "incompatibleTokens", ["t", "T", "X"]);
-    }
-    parse(dateString, token) {
-      switch (token) {
-        case "x":
-          return parseTimezonePattern(
-            timezonePatterns.basicOptionalMinutes,
-            dateString
-          );
-        case "xx":
-          return parseTimezonePattern(timezonePatterns.basic, dateString);
-        case "xxxx":
-          return parseTimezonePattern(
-            timezonePatterns.basicOptionalSeconds,
-            dateString
-          );
-        case "xxxxx":
-          return parseTimezonePattern(
-            timezonePatterns.extendedOptionalSeconds,
-            dateString
-          );
-        case "xxx":
-        default:
-          return parseTimezonePattern(timezonePatterns.extended, dateString);
-      }
-    }
-    set(date, flags, value) {
-      if (flags.timestampIsSet)
-        return date;
-      return constructFrom(
-        date,
-        date.getTime() - getTimezoneOffsetInMilliseconds(date) - value
-      );
-    }
-  }
-  class TimestampSecondsParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 40);
-      __publicField(this, "incompatibleTokens", "*");
-    }
-    parse(dateString) {
-      return parseAnyDigitsSigned(dateString);
-    }
-    set(date, _flags, value) {
-      return [constructFrom(date, value * 1e3), { timestampIsSet: true }];
-    }
-  }
-  class TimestampMillisecondsParser extends Parser {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "priority", 20);
-      __publicField(this, "incompatibleTokens", "*");
-    }
-    parse(dateString) {
-      return parseAnyDigitsSigned(dateString);
-    }
-    set(date, _flags, value) {
-      return [constructFrom(date, value), { timestampIsSet: true }];
-    }
-  }
-  const parsers = {
-    G: new EraParser(),
-    y: new YearParser(),
-    Y: new LocalWeekYearParser(),
-    R: new ISOWeekYearParser(),
-    u: new ExtendedYearParser(),
-    Q: new QuarterParser(),
-    q: new StandAloneQuarterParser(),
-    M: new MonthParser(),
-    L: new StandAloneMonthParser(),
-    w: new LocalWeekParser(),
-    I: new ISOWeekParser(),
-    d: new DateParser(),
-    D: new DayOfYearParser(),
-    E: new DayParser(),
-    e: new LocalDayParser(),
-    c: new StandAloneLocalDayParser(),
-    i: new ISODayParser(),
-    a: new AMPMParser(),
-    b: new AMPMMidnightParser(),
-    B: new DayPeriodParser(),
-    h: new Hour1to12Parser(),
-    H: new Hour0to23Parser(),
-    K: new Hour0To11Parser(),
-    k: new Hour1To24Parser(),
-    m: new MinuteParser(),
-    s: new SecondParser(),
-    S: new FractionOfSecondParser(),
-    X: new ISOTimezoneWithZParser(),
-    x: new ISOTimezoneParser(),
-    t: new TimestampSecondsParser(),
-    T: new TimestampMillisecondsParser()
-  };
-  const formattingTokensRegExp = /[yYQqMLwIdDecihHKkms]o|(\w)\1*|''|'(''|[^'])+('|$)|./g;
-  const longFormattingTokensRegExp = /P+p+|P+|p+|''|'(''|[^'])+('|$)|./g;
-  const escapedStringRegExp = /^'([^]*?)'?$/;
-  const doubleQuoteRegExp = /''/g;
-  const notWhitespaceRegExp = /\S/;
-  const unescapedLatinCharacterRegExp = /[a-zA-Z]/;
-  function parse(dateStr, formatStr, referenceDate, options) {
-    const defaultOptions2 = getDefaultOptions();
-    const locale = options?.locale ?? defaultOptions2.locale ?? enUS;
-    const firstWeekContainsDate = options?.firstWeekContainsDate ?? options?.locale?.options?.firstWeekContainsDate ?? defaultOptions2.firstWeekContainsDate ?? defaultOptions2.locale?.options?.firstWeekContainsDate ?? 1;
-    const weekStartsOn = options?.weekStartsOn ?? options?.locale?.options?.weekStartsOn ?? defaultOptions2.weekStartsOn ?? defaultOptions2.locale?.options?.weekStartsOn ?? 0;
-    if (formatStr === "") {
-      if (dateStr === "") {
-        return toDate(referenceDate);
-      } else {
-        return constructFrom(referenceDate, NaN);
-      }
-    }
-    const subFnOptions = {
-      firstWeekContainsDate,
-      weekStartsOn,
-      locale
-    };
-    const setters = [new DateToSystemTimezoneSetter()];
-    const tokens = formatStr.match(longFormattingTokensRegExp).map((substring) => {
-      const firstCharacter = substring[0];
-      if (firstCharacter in longFormatters) {
-        const longFormatter = longFormatters[firstCharacter];
-        return longFormatter(substring, locale.formatLong);
-      }
-      return substring;
-    }).join("").match(formattingTokensRegExp);
-    const usedTokens = [];
-    for (let token of tokens) {
-      if (!options?.useAdditionalWeekYearTokens && isProtectedWeekYearToken(token)) {
-        warnOrThrowProtectedError(token, formatStr, dateStr);
-      }
-      if (!options?.useAdditionalDayOfYearTokens && isProtectedDayOfYearToken(token)) {
-        warnOrThrowProtectedError(token, formatStr, dateStr);
-      }
-      const firstCharacter = token[0];
-      const parser = parsers[firstCharacter];
-      if (parser) {
-        const { incompatibleTokens } = parser;
-        if (Array.isArray(incompatibleTokens)) {
-          const incompatibleToken = usedTokens.find(
-            (usedToken) => incompatibleTokens.includes(usedToken.token) || usedToken.token === firstCharacter
-          );
-          if (incompatibleToken) {
-            throw new RangeError(
-              `The format string mustn't contain \`${incompatibleToken.fullToken}\` and \`${token}\` at the same time`
-            );
-          }
-        } else if (parser.incompatibleTokens === "*" && usedTokens.length > 0) {
-          throw new RangeError(
-            `The format string mustn't contain \`${token}\` and any other token at the same time`
-          );
-        }
-        usedTokens.push({ token: firstCharacter, fullToken: token });
-        const parseResult = parser.run(
-          dateStr,
-          token,
-          locale.match,
-          subFnOptions
-        );
-        if (!parseResult) {
-          return constructFrom(referenceDate, NaN);
-        }
-        setters.push(parseResult.setter);
-        dateStr = parseResult.rest;
-      } else {
-        if (firstCharacter.match(unescapedLatinCharacterRegExp)) {
-          throw new RangeError(
-            "Format string contains an unescaped latin alphabet character `" + firstCharacter + "`"
-          );
-        }
-        if (token === "''") {
-          token = "'";
-        } else if (firstCharacter === "'") {
-          token = cleanEscapedString(token);
-        }
-        if (dateStr.indexOf(token) === 0) {
-          dateStr = dateStr.slice(token.length);
-        } else {
-          return constructFrom(referenceDate, NaN);
-        }
-      }
-    }
-    if (dateStr.length > 0 && notWhitespaceRegExp.test(dateStr)) {
-      return constructFrom(referenceDate, NaN);
-    }
-    const uniquePrioritySetters = setters.map((setter) => setter.priority).sort((a, b) => b - a).filter((priority, index, array) => array.indexOf(priority) === index).map(
-      (priority) => setters.filter((setter) => setter.priority === priority).sort((a, b) => b.subPriority - a.subPriority)
-    ).map((setterArray) => setterArray[0]);
-    let date = toDate(referenceDate);
-    if (isNaN(date.getTime())) {
-      return constructFrom(referenceDate, NaN);
-    }
-    const flags = {};
-    for (const setter of uniquePrioritySetters) {
-      if (!setter.validate(date, subFnOptions)) {
-        return constructFrom(referenceDate, NaN);
-      }
-      const result = setter.set(date, flags, subFnOptions);
-      if (Array.isArray(result)) {
-        date = result[0];
-        Object.assign(flags, result[1]);
-      } else {
-        date = result;
-      }
-    }
-    return constructFrom(referenceDate, date);
-  }
-  function cleanEscapedString(input) {
-    return input.match(escapedStringRegExp)[1].replace(doubleQuoteRegExp, "'");
   }
   function subDays(date, amount) {
     return addDays(date, -amount);
@@ -6057,20 +4179,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       }
     });
   }
-  function getCookie(cname) {
-    const name = `${cname}=`;
-    const ca = document.cookie.split(";");
-    for (let i = 0; i < ca.length; i++) {
-      let c = ca[i];
-      while (c.charAt(0) == " ") {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
-    }
-    return "";
-  }
   function formatRelativeTime(dateInput) {
     if (!dateInput || !isValid(dateInput))
       return "";
@@ -6108,142 +4216,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     }
     return result;
   }
-  function isAllGirlPage() {
-    return location.hostname == "allgirl.booru.org";
-  }
-  async function fetchAllGirlPosts(page, tags) {
-    const url = new URL("https://allgirl.booru.org/index.php");
-    url.searchParams.set("page", "post");
-    url.searchParams.set("s", "list");
-    url.searchParams.set("pid", `${(page - 1) * 20}`);
-    tags && url.searchParams.set("tags", tags);
-    const htmlResp = await fetch(url.href);
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const results = [...doc.querySelectorAll(".content .thumb")].map(async (el) => {
-      const a = el.querySelector("a");
-      const img = el.querySelector("img");
-      const id = a.getAttribute("id")?.slice(1);
-      const previewUrl = img.src;
-      const { width, height } = await getImageSize(previewUrl);
-      const tags2 = img.title.split(/\s/).filter(Boolean);
-      return {
-        id,
-        postView: a.href,
-        previewUrl,
-        fileUrl: "",
-        tags: tags2,
-        width: Number(width),
-        height: Number(height),
-        aspectRatio: Number(width) / Number(height),
-        fileExt: "jpg",
-        fileDownloadName: `allgirl ${id} ${tags2.join(" ")}`,
-        rating: img.title.includes("rating:Safe") ? "s" : "e"
-      };
-    });
-    return Promise.all(results);
-  }
-  async function getAllGirlDetail(id) {
-    const resp = await fetch(`https://allgirl.booru.org/index.php?page=post&s=view&id=${id}`);
-    const doc = new DOMParser().parseFromString(await resp.text(), "text/html");
-    return {
-      fileUrl: doc.querySelector("#image")?.src
-    };
-  }
-  const allgirl = {
-    is: isAllGirlPage,
-    posts: fetchAllGirlPosts,
-    detail: getAllGirlDetail
-  };
-  function isAnihonetwallpaperPage() {
-    return location.hostname == "anihonetwallpaper.com";
-  }
-  async function fetchAnihonetwallpaperPosts(page, tags) {
-    const htmlResp = await fetch(`https://anihonetwallpaper.com/page/${page}${tags ? `?s=${tags}` : ""}`);
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const results = [...doc.querySelectorAll("main .post_box ")].map((el) => {
-      const a = el.querySelector(".posttitle a");
-      const img = el.querySelector(".thumbnail-image");
-      const id = a?.href.match(/(\d+)/)?.[1];
-      const previewUrl = img?.getAttribute("data-src");
-      const width = img?.getAttribute("width");
-      const height = img?.getAttribute("height");
-      const tags2 = [...el.querySelectorAll(".itiran a[rel*=tag]")].map((e) => e.innerText);
-      const fileUrl = previewUrl?.includes("wp.com") ? previewUrl.replace(/i\d\.wp\.com\//, "").replace(/\?fit\=\d+\,\d+/, "") : previewUrl?.replace(/\-\d+x\d+\.(jpg|jpeg|png|webp)/, ".$1");
-      return {
-        id,
-        postView: a?.href,
-        previewUrl,
-        fileUrl,
-        tags: tags2,
-        width: Number(width),
-        height: Number(height),
-        aspectRatio: Number(width) / Number(height),
-        fileExt: "jpg",
-        fileDownloadName: `Anihonetwallpaper_${id}`,
-        rating: ""
-      };
-    });
-    return results;
-  }
-  const anihonetwallpaper = {
-    is: isAnihonetwallpaperPage,
-    posts: fetchAnihonetwallpaperPosts
-  };
-  function isAnimePicturesPage() {
-    return location.hostname == "anime-pictures.net";
-  }
-  async function fetchAnimePicturesPosts(page, tags) {
-    const url = new URL("https://api.anime-pictures.net/api/v3/posts");
-    url.searchParams.set("page", `${page - 1}`);
-    url.searchParams.set("lang", "zh_CN");
-    url.searchParams.set("ldate", "0");
-    if (tags) {
-      const { realTags, orders } = tags.split(/\s/).reduce((acc, cur) => {
-        cur.startsWith("order_by:") ? acc.orders.push(cur) : acc.realTags.push(cur);
-        return acc;
-      }, { realTags: [], orders: [] });
-      realTags.length && url.searchParams.set("search_tag", realTags.join(" "));
-      orders.length && url.searchParams.set("order_by", orders[0].split(":")[1]);
-    }
-    const resp = await fetch(url.href);
-    const json = await resp.json();
-    return json.posts.map((e) => {
-      const fileExt = e.ext.slice(1);
-      return {
-        id: e.id,
-        postView: `https://anime-pictures.net/posts/${e.id}`,
-        previewUrl: `https://opreviews.anime-pictures.net/${e.md5.slice(0, 3)}/${e.md5}_cp.avif`,
-        sampleUrl: `https://opreviews.anime-pictures.net/${e.md5.slice(0, 3)}/${e.md5}_bp.avif`,
-        fileUrl: "",
-        tags: [],
-        width: e.width,
-        height: e.height,
-        aspectRatio: e.width / e.height,
-        fileExt,
-        fileDownloadName: `anime-pictures_${e.id}_${e.width}\xD7${e.height}.${fileExt}`,
-        fileDownloadText: `${e.width}\xD7${e.height} [${(e.size / 1024 / 1024).toFixed(2)} MB] ${e.ext.slice(1).toUpperCase()}`,
-        rating: e.erotics == 0 ? "s" : "q",
-        createdAt: new Date(`${e.pubtime.replace(" ", "T")}Z`)
-      };
-    });
-  }
-  async function getAnimePicturesDetail(id) {
-    try {
-      const resp = await fetch(`https://api.anime-pictures.net/api/v3/posts/${id}`);
-      const json = await resp.json();
-      return {
-        tags: json.tags.map((t) => `${t.tag.tag}${t.tag.tag_jp ? `[${t.tag.tag_jp}]` : ""}`),
-        fileUrl: `https://api.anime-pictures.net/pictures/get_image/${json.file_url}`
-      };
-    } catch (error) {
-      return { tags: [], fileUrl: "" };
-    }
-  }
-  const animepictures = {
-    is: isAnimePicturesPage,
-    posts: fetchAnimePicturesPosts,
-    detail: getAnimePicturesDetail
-  };
   function getAugmentedNamespace(n) {
     if (n.__esModule)
       return n;
@@ -6588,10 +4560,10 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   };
   var sites = sites_default;
   var BooruError = class extends Error {
-    constructor(message2) {
-      super(message2 instanceof Error ? message2.message : message2);
-      if (message2 instanceof Error) {
-        this.stack = message2.stack;
+    constructor(message) {
+      super(message instanceof Error ? message.message : message);
+      if (message instanceof Error) {
+        this.stack = message.stack;
       } else {
         Error.captureStackTrace(this, BooruError);
       }
@@ -6624,13 +4596,13 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0"
     }
   };
-  function resolveSite(domain2) {
-    if (typeof domain2 !== "string") {
+  function resolveSite(domain) {
+    if (typeof domain !== "string") {
       return null;
     }
-    domain2 = domain2.toLowerCase();
+    domain = domain.toLowerCase();
     for (const site in sites) {
-      if (site === domain2 || sites[site].domain === domain2 || sites[site].aliases.includes(domain2)) {
+      if (site === domain || sites[site].domain === domain || sites[site].aliases.includes(domain)) {
         return site;
       }
     }
@@ -6646,15 +4618,15 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     const data = xmlParser.parse(xml);
     if (data.html || data["!doctype"]) {
       const page = data.html || data["!doctype"]?.html;
-      const message2 = [];
+      const message = [];
       if (page.body.h1) {
-        message2.push(page.body.h1);
+        message.push(page.body.h1);
       }
       if (page.body.p) {
-        message2.push(page.body.p["#text"]);
+        message.push(page.body.p["#text"]);
       }
       throw new BooruError(
-        `The Booru sent back an error: '${message2.join(": ")}'`
+        `The Booru sent back an error: '${message.join(": ")}'`
       );
     }
     if (data.posts.post) {
@@ -6988,11 +4960,11 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       __publicField(this, "domain");
       __publicField(this, "site");
       __publicField(this, "credentials");
-      const domain2 = resolveSite(site.domain);
-      if (domain2 === null) {
+      const domain = resolveSite(site.domain);
+      if (domain === null) {
         throw new Error(`Invalid site passed: ${site}`);
       }
-      this.domain = domain2;
+      this.domain = domain;
       this.site = site;
       this.credentials = credentials;
     }
@@ -7226,251 +5198,19 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     }
     return booruCache[rSite].search(tags, { limit, random, page, credentials });
   }
-  function isSankakuComplexPage() {
-    return location.hostname == "chan.sankakucomplex.com";
-  }
-  const state = {
-    base: "https://chan.sankakucomplex.com/cn/posts?auto_page=t",
-    nextUrl: null
-  };
-  const ratingMap = {
-    "G": "s",
-    "R15+": "q",
-    "R18+": "e"
-  };
-  async function fetchSankakuComplexPosts(page, tags) {
-    const w = unsafeWindow;
-    w.$.ajax = () => {
-    };
-    w.jQuery.ajax = () => {
-    };
-    if (page == 1) {
-      state.nextUrl = null;
-      document.documentElement.scrollTop = 0;
-    }
-    const url = new URL(state.nextUrl ? `https://chan.sankakucomplex.com${state.nextUrl}` : state.base);
-    url.searchParams.set("auto_page", "t");
-    url.searchParams.set("page", `${page}`);
-    !state.nextUrl && tags && url.searchParams.set("tags", tags);
-    const htmlResp = await fetch(url.href);
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    state.nextUrl = doc.querySelector("body > div[next-page-url]")?.getAttribute("next-page-url")?.replace(/amp;/g, "");
-    const results = [...doc.querySelectorAll(".post-gallery .post-preview")].map((el) => {
-      const id = el.getAttribute("data-id");
-      const img = el.querySelector("img");
-      const tagsText = img?.getAttribute("data-auto_page") || "";
-      const tagsArr = tagsText.split(/\s/) || [];
-      const [_, width, height] = tagsText.match(/Size:(\d+)x(\d+)/) || [];
-      const [__, ratingText] = tagsText.match(/Rating:(\S+)/) || [];
-      return {
-        id,
-        postView: el.querySelector("a")?.href,
-        previewUrl: img?.src,
-        fileUrl: "",
-        tags: tagsArr,
-        width: Number(width),
-        height: Number(height),
-        aspectRatio: Number(width) / Number(height),
-        fileExt: el.querySelector(".animated_details") ? "mp4" : "jpg",
-        fileDownloadName: `sankaku-complex ${id} ${tagsArr.join(" ")}`,
-        fileDownloadText: `${width}\xD7${height}`,
-        rating: ratingMap[ratingText] || ratingText
-      };
-    });
-    return results;
-  }
-  async function getSankakuComplexDetail(id) {
-    const url = new URL(`https://chan.sankakucomplex.com/cn/posts/${id}`);
-    const htmlResp = await fetch(url.href);
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const imgSrc = doc.querySelector("#post-content img")?.src;
-    const fileUrl = doc.querySelector("#post-content a")?.href;
-    const videoSrc = doc.querySelector("#post-content video")?.src;
-    return {
-      sampleUrl: imgSrc,
-      fileUrl: fileUrl || imgSrc || videoSrc
-    };
-  }
-  function isSankakuIdolPage() {
-    return location.hostname == "www.idolcomplex.com";
-  }
-  const pageState$1 = { next: null };
-  async function fetchSankakuIdolPosts(page, tags) {
-    if (page == 1)
-      pageState$1.next = null;
-    const url = new URL("https://i.sankakuapi.com/v2/posts/keyset");
-    url.searchParams.set("lang", navigator.language || "zh-CN");
-    url.searchParams.set("default_threshold", "1");
-    url.searchParams.set("hide_posts_in_books", "in-larger-tags");
-    url.searchParams.set("limit", "40");
-    url.searchParams.set("page", `${page}`);
-    pageState$1.next && url.searchParams.set("next", `${pageState$1.next}`);
-    tags && url.searchParams.set("tags", tags);
-    const resp = await fetch(url.href, {
-      headers: {
-        "api-version": "2",
-        "client-type": "non-premium",
-        "platform": "web-app",
-        "priority": "u=1, i"
-      }
-    });
-    const json = await resp.json();
-    pageState$1.next = json.meta.next;
-    return json.data.filter((e) => e.preview_url).map((e) => {
-      const fileExt = e.file_ext;
-      return {
-        id: e.id,
-        postView: `https://www.idolcomplex.com/posts/${e.id}`,
-        previewUrl: e.preview_url,
-        fileUrl: "",
-        tags: e.tags.map((t) => t.name + (t.name_ja ? `[${t.name_ja}]` : "")),
-        width: e.width,
-        height: e.height,
-        aspectRatio: e.width / e.height,
-        fileExt,
-        fileDownloadName: `sankaku ${e.id} ${e.tags.join(" ")}.${fileExt}`,
-        fileDownloadText: `${e.width}\xD7${e.height} [${(e.file_size / 1e3).toFixed(0)} kB] ${fileExt.toUpperCase()}`,
-        rating: e.rating,
-        createdAt: e.created_at.s * 1e3
-      };
-    });
-  }
-  async function getSankakuIdolDetail(id) {
-    const resp = await fetch(`https://i.sankakuapi.com/posts/${id}/fu?lang=${navigator.language || "zh-CN"}`, {
-      headers: {
-        "api-version": "2",
-        "client-type": "non-premium",
-        "platform": "web-app",
-        "priority": "u=1, i"
-      }
-    });
-    const json = await resp.json();
-    return {
-      sampleUrl: json.data.sample_url,
-      fileUrl: json.data.file_url
-    };
-  }
-  const isSankakuSite = location.host.includes("sankaku") || location.host.includes("idolcomplex");
-  function isSankakuPage() {
-    return location.hostname == "sankaku.app" || location.hostname == "www.sankakucomplex.com";
-  }
-  const pageState = { next: null };
-  async function fetchSankakuPosts(page, tags) {
-    if (page == 1)
-      pageState.next = null;
-    const url = new URL("https://sankakuapi.com/v2/posts/keyset");
-    url.searchParams.set("lang", navigator.language || "zh-CN");
-    url.searchParams.set("default_threshold", "1");
-    url.searchParams.set("hide_posts_in_books", "in-larger-tags");
-    url.searchParams.set("limit", "40");
-    url.searchParams.set("page", `${page}`);
-    pageState.next && url.searchParams.set("next", `${pageState.next}`);
-    tags && url.searchParams.set("tags", tags);
-    const resp = await fetch(url.href, {
-      headers: {
-        "api-version": "2",
-        "client-type": "non-premium",
-        "platform": "web-app",
-        "priority": "u=1, i"
-      }
-    });
-    const json = await resp.json();
-    pageState.next = json.meta.next;
-    return json.data.filter((e) => e.preview_url).map((e) => {
-      const fileExt = e.file_ext;
-      return {
-        id: e.id,
-        postView: `https://sankaku.app/posts/${e.id}`,
-        previewUrl: e.preview_url,
-        fileUrl: "",
-        tags: e.tags.map((t) => t.name + (t.name_ja ? `[${t.name_ja}]` : "")),
-        width: e.width,
-        height: e.height,
-        aspectRatio: e.width / e.height,
-        fileExt,
-        fileDownloadName: `sankaku ${e.id} ${e.tags.join(" ")}.${fileExt}`,
-        fileDownloadText: `${e.width}\xD7${e.height} [${(e.file_size / 1e3).toFixed(0)} kB] ${fileExt.toUpperCase()}`,
-        rating: e.rating,
-        createdAt: e.created_at.s * 1e3
-      };
-    });
-  }
-  async function getSankakuDetail(id) {
-    const resp = await fetch(`https://sankakuapi.com/posts/${id}/fu?lang=${navigator.language || "zh-CN"}`, {
-      headers: {
-        "api-version": "2",
-        "client-type": "non-premium",
-        "platform": "web-app",
-        "priority": "u=1, i"
-      }
-    });
-    const json = await resp.json();
-    return {
-      sampleUrl: json.data.sample_url,
-      fileUrl: json.data.file_url
-    };
-  }
-  const sankaku = {
-    is: isSankakuPage,
-    posts: fetchSankakuPosts,
-    detail: getSankakuDetail,
-    idol: {
-      is: isSankakuIdolPage,
-      posts: fetchSankakuIdolPosts,
-      detail: getSankakuIdolDetail
-    },
-    complex: {
-      is: isSankakuComplexPage,
-      posts: fetchSankakuComplexPosts,
-      detail: getSankakuComplexDetail
-    }
-  };
-  const blackList = /* @__PURE__ */ new Set(["e621.net", "e926.net", "hypnohub.net", "derpibooru.org", "realbooru.com"]);
-  const siteKeys = Object.keys(sites).filter((e) => !blackList.has(e));
-  const isBooruSite = () => siteKeys.includes(location.host);
-  [
-    ...siteKeys,
-    "e-shuushuu.net",
-    "zerochan.net",
-    "chan.sankakucomplex.com",
-    "www.idolcomplex.com",
-    "sankaku.app",
-    "anime-pictures.net",
-    "allgirl.booru.org",
-    "booru.eu",
-    "kusowanka.com",
-    "anihonetwallpaper.com",
-    "nozomi.la",
-    "realbooru.com",
-    "rule34hentai.net"
-  ];
-  const isSupportTagSearch = isBooruSite() || !["nozomi.la"].includes(location.host);
-  const notPartialSupportSite = ![
-    "e-shuushuu.net",
-    "www.zerochan.net",
-    "www.idolcomplex.com",
-    "allgirl.booru.org",
-    "booru.eu",
-    "kusowanka.com",
-    "anihonetwallpaper.com",
-    "nozomi.la",
-    "realbooru.com",
-    "rule34hentai.net"
-  ].includes(location.host);
+  const supportedHosts = /* @__PURE__ */ new Set(["yande.re", "konachan.com", "konachan.net", "danbooru.donmai.us", "gelbooru.com"]);
+  const isBooruSite = () => supportedHosts.has(location.host);
+  [...supportedHosts];
+  const isSupportTagSearch = isBooruSite();
+  const notPartialSupportSite = isBooruSite();
   const defCompTags = (() => {
     if (store.isYKSite) {
       return ["rating:s", "rating:q", "rating:e", "order:score", "order:vote", "order:mpixels", "order:landscape", "order:portrait"];
     }
-    if (isSankakuSite) {
-      return ["order:quality", "order:popularity", "order:random", "order:recently_favorited", "order:recently_voted", "rating:s", "rating:q", "rating:e", "threshold:0", "threshold:1", "threshold:2", "threshold:3", "threshold:4", "threshold:5", "sankaku_ai order:popular"];
-    }
-    if (animepictures.is()) {
-      return ["order_by:date", "order_by:date_r", "order_by:rating", "order_by:views", "order_by:size", "order_by:tag_num"];
-    }
     if (location.host.includes("danbooru")) {
       return ["order:rank", "order:score", "order:favcount", "order:none", "order:upvotes", "rating:general", "rating:questionable", "rating:explicit", "rating:sensitive", "order:landscape", "order:portrait", "order:mpixels"];
     }
-    if (/gelbooru\.com|rule34\.xxx/.test(location.host)) {
+    if (location.host === "gelbooru.com") {
       return ["rating:safe", "rating:questionable", "rating:explicit", "sort:score"];
     }
     return [];
@@ -7493,8 +5233,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     "booru.eu": "Hentai Booru",
     "rule34hentai.net": "Rule34Hentai"
   };
-  function getSiteTitle(domain2 = location.host) {
-    const host = domain2.toLowerCase().replace("www.", "");
+  function getSiteTitle(domain = location.host) {
+    const host = domain.toLowerCase().replace("www.", "");
     return specTitleMap[host] || host[0].toUpperCase() + host.slice(1).split(".")[0];
   }
   const defaultLimitMap = {
@@ -7511,7 +5251,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     "realbooru.com": 42
   };
   const BOORU_PAGE_LIMIT = defaultLimitMap[location.host] || 40;
-  const isPidSite = () => sites[location.host]?.paginate === "pid" || realbooru.is();
+  const isPidSite = () => sites[location.host]?.paginate === "pid";
   async function searchBooru(page, tags) {
     if (!tags || tags === "all")
       tags = "";
@@ -7529,50 +5269,28 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       if (settings.isHoldsFalse)
         tags = `holds:false ${tags || ""}`.trim();
       const results = await searchBooru(page, tags);
-      if (rule34.is()) {
-        results.forEach((e) => {
-          const re = /api-cdn[^.]*\./;
-          if (e.previewUrl)
-            e.previewUrl = e.previewUrl.replace(re, "");
-          if (e.sampleUrl)
-            e.sampleUrl = e.sampleUrl.replace(re, "");
-          if (e.fileUrl)
-            e.fileUrl = e.fileUrl.replace(re, "");
-        });
-      }
-      if (location.hostname == "xbooru.com") {
-        results.forEach((e) => {
-          const args = [/api-cdn(-mp4)?\.rule34\.xxx/, "xbooru.com"];
-          if (e.previewUrl)
-            e.previewUrl = e.previewUrl.replace(...args);
-          if (e.sampleUrl)
-            e.sampleUrl = e.sampleUrl.replace(...args);
-          if (e.fileUrl)
-            e.fileUrl = e.fileUrl.replace(...args);
-        });
-      }
       return results;
     }
   };
   function isDanbooruPage() {
     return location.hostname == "danbooru.donmai.us";
   }
-  const isCNLang$3 = i18n.locale.includes("zh");
-  const tagSortOrder$2 = ["artist", "copyright", "character", "general"];
+  const isCNLang$2 = i18n.locale.includes("zh");
+  const tagSortOrder$1 = ["artist", "copyright", "character", "general"];
   function getDanbooruTagDetail(image) {
     const { data, tags } = image;
-    const tagMap2 = {
+    const tagMap = {
       artist: [i18n.t("Ym0HIEu9Q80qXB31LuC6c"), "#FB8C00", data.tag_string_artist.split(/\s+/)],
       copyright: [i18n.t("juT6gwLOg5r1h2vFpFf6P"), "#AB47BC", data.tag_string_copyright.split(/\s+/)],
       character: [i18n.t("aonlPAu9kEkkwNvQg0DBk"), "#66BB6A", data.tag_string_character.split(/\s+/)]
     };
     return {
       voted: false,
-      tags: tags.map((tag2) => {
-        const tagCN = isCNLang$3 && window.__tagsCN?.[tag2.replace(/_/g, " ")];
+      tags: tags.map((tag) => {
+        const tagCN = isCNLang$2 && window.__tagsCN?.[tag.replace(/_/g, " ")];
         const typedTag = { type: "", text: "", color: "" };
-        for (const [key, val] of Object.entries(tagMap2)) {
-          if (val[2].includes(tag2)) {
+        for (const [key, val] of Object.entries(tagMap)) {
+          if (val[2].includes(tag)) {
             typedTag.type = key;
             typedTag.text = val[0];
             typedTag.color = val[1];
@@ -7581,17 +5299,17 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         }
         const tagText = [
           typedTag.text && `[ ${typedTag.text} ] `,
-          tag2,
+          tag,
           tagCN && ` [ ${tagCN} ]`
         ].filter(Boolean).join("");
         return {
-          tag: tag2,
+          tag,
           tagText,
           color: typedTag.color || "#8F77B5",
           type: typedTag.type || "general"
         };
       }).sort((a, b) => {
-        return tagSortOrder$2.indexOf(a.type) - tagSortOrder$2.indexOf(b.type);
+        return tagSortOrder$1.indexOf(a.type) - tagSortOrder$1.indexOf(b.type);
       })
     };
   }
@@ -7631,124 +5349,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   const danbooruExplore = {
     is: isDanbooruExplorePage,
     posts: async () => fetchDanbooruExplorePosts()
-  };
-  function isEshuushuuPage() {
-    return location.hostname == "e-shuushuu.net";
-  }
-  function extract(allData) {
-    const images = [];
-    for (let i = 2; i < allData.length; i++) {
-      const schema = allData[i];
-      if (typeof schema !== "object" || schema === null || Array.isArray(schema))
-        continue;
-      if (!schema.image_id)
-        continue;
-      const img = {};
-      for (const [fieldName, fieldIdx] of Object.entries(schema)) {
-        const val = allData[fieldIdx];
-        if (val === void 0)
-          continue;
-        if (fieldName === "tags" && Array.isArray(val)) {
-          const tags = [];
-          for (const tagIdx of val) {
-            const tagData = allData[tagIdx];
-            if (tagData && typeof tagData === "object" && tagData.tag_id) {
-              tags.push({
-                id: tagData.tag_id,
-                name: allData[tagData.title],
-                type_id: allData[tagData.type],
-                type_name: allData[tagData.type_name]
-              });
-            }
-          }
-          img[fieldName] = tags;
-        } else if (fieldName === "user" && typeof val === "object" && val.user_id !== void 0) {
-          img.user = {
-            user_id: allData[val.user_id],
-            username: allData[val.username],
-            avatar: allData[val.avatar],
-            user_title: allData[val.user_title],
-            avatar_url: allData[val.avatar_url]
-          };
-        } else {
-          img[fieldName] = val;
-        }
-      }
-      if (img.image_id) {
-        images.push(img);
-      }
-    }
-    return images;
-  }
-  async function fetchEshuushuuPosts(page, tags) {
-    const url = new URL("https://e-shuushuu.net/__data.json");
-    url.searchParams.set("page", `${page}`);
-    if (tags) {
-      const match2 = tags.match(/[\w\s]+#(\d+)/);
-      if (match2?.[1])
-        url.searchParams.set("tags", match2[1]);
-    }
-    const resp = await fetch(url);
-    const json = await resp.json();
-    const results = extract(json.nodes[1].data).map((img) => {
-      const id = img.image_id;
-      const fileExt = img.ext;
-      const width = img.width;
-      const height = img.height;
-      const tags2 = (img.tags || []).map((e) => e.name);
-      return {
-        id,
-        postView: `https://e-shuushuu.net/images/${id}`,
-        previewUrl: img.thumbnail_url,
-        fileUrl: img.url,
-        tags: tags2,
-        _tags: img.tags,
-        width,
-        height,
-        aspectRatio: width / height,
-        fileExt,
-        fileDownloadName: `e-shuushuu ${id} ${tags2.join(" ")}.${fileExt}`,
-        fileDownloadText: `${width}\xD7${height} [${(img.filesize / 1024 / 1024).toFixed(2)} MB] ${fileExt?.toUpperCase()}`,
-        rating: "",
-        createdAt: new Date(img.date_added)
-      };
-    });
-    return results;
-  }
-  const isCNLang$2 = i18n.locale.includes("zh");
-  const tagSortOrder$1 = ["artist", "copyright", "character", "general"];
-  const tagMap = {
-    Artist: [i18n.t("Ym0HIEu9Q80qXB31LuC6c"), "#FB8C00", "artist"],
-    Source: [i18n.t("juT6gwLOg5r1h2vFpFf6P"), "#AB47BC", "copyright"],
-    Character: [i18n.t("aonlPAu9kEkkwNvQg0DBk"), "#66BB6A", "character"]
-  };
-  function getTagDetail(image) {
-    const tags = image._tags;
-    return {
-      voted: false,
-      tags: tags.map((tag2) => {
-        const tagCN = isCNLang$2 && window.__tagsCN?.[tag2.name.replace(/_/g, " ")];
-        const tagType = tagMap[tag2.type_name];
-        const tagText = [
-          tagType?.[0] && `[ ${tagType[0]} ] `,
-          tag2.name,
-          tagCN && ` [ ${tagCN} ]`
-        ].filter(Boolean).join("");
-        return {
-          tag: tag2.name,
-          tagText,
-          color: tagType?.[1] || "#8F77B5",
-          type: tagType?.[2] || "general"
-        };
-      }).sort((a, b) => {
-        return tagSortOrder$1.indexOf(a.type) - tagSortOrder$1.indexOf(b.type);
-      })
-    };
-  }
-  const eshuushuu = {
-    is: isEshuushuuPage,
-    posts: fetchEshuushuuPosts,
-    tagDetail: getTagDetail
   };
   function isGelbooruFavPage() {
     return /gelbooru\.com\/index\.php\?page\=favorites\&s\=view/.test(location.href);
@@ -7846,114 +5446,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       is: isGelbooruFavPage,
       posts: fetchGelbooruFavorites
     }
-  };
-  function isHentaiBooruPage() {
-    return location.hostname == "booru.eu";
-  }
-  async function fetchHentaiBooruPosts(page, tags) {
-    document.onclick = function() {
-    };
-    document.onmouseup = function() {
-    };
-    document.onclick_copy = function() {
-    };
-    unsafeWindow.show_pop = function() {
-    };
-    unsafeWindow.open = function(url2) {
-      const a = document.createElement("a");
-      a.href = url2;
-      a.target = "_blank";
-      a.rel = "noreferrer";
-      a.click();
-    };
-    const url = `https://booru.eu/post/list${tags ? `/${tags}` : ""}/${page}`;
-    const htmlResp = await fetch(url);
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const results = [...doc.querySelectorAll(".shm-image-list span.thumb")].map((el) => {
-      const a = el.querySelector("a");
-      const img = el.querySelector("img");
-      const id = a?.getAttribute("data-post-id");
-      const previewUrl = img.src;
-      const tags2 = a?.getAttribute("data-tags")?.split(/\s/).filter(Boolean) || [];
-      const [_, width, height] = img?.title.match(/\/\/\s+(\d+)x(\d+)\s+\/\//) || [];
-      const [__, size] = img?.title.match(/\/\/\s+\d+x\d+\s+\/\/\s+([\w\.]+)/) || [];
-      return {
-        id,
-        postView: a?.href,
-        previewUrl,
-        fileUrl: "",
-        tags: tags2,
-        width: Number(width),
-        height: Number(height),
-        aspectRatio: Number(width) / Number(height),
-        fileExt: "jpg",
-        fileDownloadName: `HentaiBooru ${id} ${tags2.join(" ")}`,
-        fileDownloadText: `${width}\xD7${height} [${size}]`,
-        rating: ""
-      };
-    });
-    return results;
-  }
-  async function getHentaiBooruDetail(id) {
-    const resp = await fetch(`https://booru.eu/post/view/${id}`);
-    const doc = new DOMParser().parseFromString(await resp.text(), "text/html");
-    return {
-      fileUrl: doc.querySelector("#main_image")?.src
-    };
-  }
-  const hentaibooru = {
-    is: isHentaiBooruPage,
-    posts: fetchHentaiBooruPosts,
-    detail: getHentaiBooruDetail
-  };
-  function isKusowankaPage() {
-    return location.hostname == "kusowanka.com";
-  }
-  async function fetchKusowankaPosts(page, tags) {
-    const url = new URL(`https://kusowanka.com${tags ? `/tag/${tags}/` : ""}`);
-    url.searchParams.set("page", `${page}`);
-    const htmlResp = await fetch(url.href);
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const results = [...doc.querySelectorAll(".box_thumbs .box_thumb")].map(async (el) => {
-      const a = el.querySelector("a");
-      const img = el.querySelector("[data-bg]");
-      const id = a.href.match(/(\d+)/)?.[1];
-      const previewUrl = img.getAttribute("data-bg");
-      const { width, height } = await getImageSize(previewUrl);
-      return {
-        id,
-        postView: a.href,
-        previewUrl,
-        fileUrl: "",
-        tags: [],
-        width: Number(width),
-        height: Number(height),
-        aspectRatio: Number(width) / Number(height),
-        fileExt: "jpg",
-        fileDownloadName: `kusowanka_${id}`,
-        rating: ""
-      };
-    });
-    return Promise.all(results);
-  }
-  async function getKusowankaDetail(id) {
-    const resp = await fetch(`https://kusowanka.com/post/${id}/`);
-    const doc = new DOMParser().parseFromString(await resp.text(), "text/html");
-    return {
-      fileUrl: doc.querySelector(".post_image img")?.getAttribute("data-src"),
-      tags: [
-        ...[...doc.querySelectorAll(".parodies_list a")].map((e) => e.innerText),
-        ...[...doc.querySelectorAll(".characters_list a")].map((e) => e.innerText),
-        ...[...doc.querySelectorAll(".artists_list a")].map((e) => e.innerText),
-        ...[...doc.querySelectorAll(".metadatas_list a")].map((e) => e.innerText),
-        ...[...doc.querySelectorAll(".tags_list a")].map((e) => e.innerText)
-      ]
-    };
-  }
-  const kusowanka = {
-    is: isKusowankaPage,
-    posts: fetchKusowankaPosts,
-    detail: getKusowankaDetail
   };
   function extractRegisteredPosts(html) {
     const doc = new DOMParser().parseFromString(html, "text/html");
@@ -8059,16 +5551,16 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       const result = await response.json();
       return {
         voted: result.votes[id] == 3,
-        tags: Object.entries(result.tags).map(([tag2, type]) => {
-          const tagCN = window.__tagsCN?.[tag2];
+        tags: Object.entries(result.tags).map(([tag, type]) => {
+          const tagCN = window.__tagsCN?.[tag];
           const typeText = tagInfoMap[type]?.[0];
           const tagText = [
             typeText && `[ ${typeText} ] `,
-            tag2,
+            tag,
             isCNLang$1 && tagCN && ` [ ${tagCN} ]`
           ].filter(Boolean).join("");
           return {
-            tag: tag2,
+            tag,
             type,
             tagText,
             color: tagInfoMap[type]?.[1] || tagInfoMap.general[1]
@@ -8204,163 +5696,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       }
     }
   };
-  function isNozomiPage() {
-    return location.hostname == "nozomi.la" && location.pathname == "/";
-  }
-  let resPosts = [];
-  function fetchNozomiPosts(page) {
-    resPosts = [];
-    return new Promise((resolve) => {
-      fetch_nozomi(page);
-      let times = 0;
-      const si = setInterval(() => {
-        times = times + 1;
-        if (times > 10) {
-          clearInterval(si);
-          resolve([]);
-          return;
-        }
-        if (resPosts.length) {
-          clearInterval(si);
-          resolve(resPosts.map((e) => ({
-            id: e.postid,
-            postView: e.postView,
-            previewUrl: e.previewUrl,
-            fileUrl: e.fileUrl,
-            tags: e.tags,
-            width: e.width,
-            height: e.height,
-            aspectRatio: e.width / e.height,
-            fileExt: e.type,
-            fileDownloadName: `NOZOMI ${e.postid} ${e.tags.join(" ")}.${e.type}`,
-            rating: ""
-          })));
-        }
-      }, 1e3);
-    });
-  }
-  const nozomila = {
-    is: isNozomiPage,
-    posts: fetchNozomiPosts
-  };
-  const tns_per_page = 64;
-  const nozomiextension = ".nozomi";
-  const postdir = "post";
-  const results_array = {};
-  const outstanding_requests = {};
-  let number_of_outstanding_requests = 0;
-  const nozomi = [];
-  let total_items = 0;
-  const tag = "index";
-  let page_number;
-  let nozomi_address;
-  const domain = "n.nozomi.la";
-  const full_path_from_hash = (hash) => {
-    if (hash.length < 3) {
-      return hash;
-    }
-    return hash.replace(/^.*(..)(.)$/, `$2/$1/${hash}`);
-  };
-  const urlencode = (str) => {
-    return str.replace(/[\;\/\?\:\@\=\&#%\+]/g, (c) => {
-      return `%${c.charCodeAt(0).toString(16)}`;
-    });
-  };
-  const remove_slashes = (input) => {
-    return input.replace(/[\/]/g, "");
-  };
-  function path_from_postid(postid) {
-    if (postid.length < 3)
-      return postid;
-    return postid.replace(/^(.*(..)(.))$/, "$3/$2/$1");
-  }
-  function fetch_nozomi(page) {
-    page_number = page;
-    nozomi_address = `https://${domain}`;
-    nozomi_address += `/${urlencode(remove_slashes(tag))}`;
-    nozomi_address += nozomiextension;
-    const start_byte = (page_number - 1) * tns_per_page * 4;
-    const end_byte = start_byte + tns_per_page * 4 - 1;
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", nozomi_address);
-    xhr.responseType = "arraybuffer";
-    xhr.setRequestHeader("Range", `bytes=${start_byte.toString()}-${end_byte.toString()}`);
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200 || xhr.status === 206) {
-          const arrayBuffer = xhr.response;
-          if (arrayBuffer) {
-            const view = new DataView(arrayBuffer);
-            for (let pos = 0; pos < view.byteLength; pos += 4) {
-              nozomi.push(view.getUint32(pos, false));
-            }
-            total_items = parseInt(xhr.getResponseHeader("Content-Range").replace(/^[Bb]ytes \d+-\d+\//, "")) / 4;
-            console.log("total_items: ", total_items);
-            get_jsons();
-          }
-        }
-      }
-    };
-    xhr.send();
-  }
-  function get_jsons() {
-    const datas = [];
-    for (const i in nozomi) {
-      const postid = nozomi[i];
-      if (postid in results_array) {
-        datas.push(results_array[postid]);
-        continue;
-      }
-      if (!outstanding_requests[postid]) {
-        outstanding_requests[postid] = 1;
-        ++number_of_outstanding_requests;
-        get_json(postid);
-      }
-    }
-    if (number_of_outstanding_requests)
-      return;
-    results_to_page(datas);
-  }
-  function get_json(postid) {
-    const url = `https://j.gold-usergeneratedcontent.net/${postdir}/${path_from_postid(postid.toString())}.json`;
-    const xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("GET", url);
-    xmlhttp.onreadystatechange = function() {
-      if (this.readyState == 4) {
-        if (this.status == 200) {
-          results_array[postid] = JSON.parse(this.responseText);
-        } else {
-          results_array[postid] = "";
-        }
-        delete outstanding_requests[postid];
-        --number_of_outstanding_requests;
-        get_jsons();
-      }
-    };
-    xmlhttp.send();
-  }
-  function results_to_page(datas) {
-    for (const d in datas) {
-      const data = datas[d];
-      if (!data)
-        continue;
-      data.tags = [
-        ...data.artist?.map((e) => e.tag) || [],
-        ...data.copyright?.map((e) => e.tag) || [],
-        ...data.character?.map((e) => e.tag) || [],
-        ...data.general?.map((e) => e.tag) || []
-      ];
-      data.postView = `https://nozomi.la/post/${data.postid}.html`;
-      data.previewUrl = `https://qtn.gold-usergeneratedcontent.net/${full_path_from_hash(data.imageurls[0].dataid)}.${data.imageurls[0].type}.webp`;
-      const url = data.imageurls[0];
-      if (url.is_video) {
-        data.fileUrl = `https://v.gold-usergeneratedcontent.net/${full_path_from_hash(url.dataid)}.${url.type}`;
-      } else {
-        data.fileUrl = `https://${url.type === "gif" ? "g" : "w"}.gold-usergeneratedcontent.net/${full_path_from_hash(url.dataid)}.${url.type === "gif" ? "gif" : "webp"}`;
-      }
-    }
-    resPosts = datas;
-  }
   function isRule34Page() {
     return location.hostname == "rule34.xxx";
   }
@@ -8471,61 +5806,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       posts: fetchRule34Posts
     }
   };
-  function isR34PahealPage() {
-    return location.hostname == "rule34.paheal.net" && location.pathname != "/";
-  }
-  function isR34PahealHome() {
-    return location.hostname == "rule34.paheal.net" && location.pathname == "/";
-  }
-  async function fetchR34PahealPosts(page, tags) {
-    document.onclick = function() {
-    };
-    document.onmouseup = function() {
-    };
-    document.onclick_copy = function() {
-    };
-    unsafeWindow.show_pop = function() {
-    };
-    unsafeWindow.open = function(url2) {
-      const a = document.createElement("a");
-      a.href = url2;
-      a.target = "_blank";
-      a.rel = "noreferrer";
-      a.click();
-    };
-    const url = `https://rule34.paheal.net/post/list${tags ? `/${tags}` : ""}/${page}`;
-    const htmlResp = await fetch(url);
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const results = [...doc.querySelectorAll(".shm-image-list .shm-thumb.thumb")].map((el) => {
-      const id = el.getAttribute("data-post-id");
-      const fileExt = el.getAttribute("data-ext");
-      const tags2 = el.getAttribute("data-tags")?.split(/\s/).filter(Boolean) || [];
-      const img = el.querySelector("img");
-      const [_, width, height] = img?.title.match(/\s+(\d+)x(\d+)[,\s]+/) || [];
-      const [__, size] = img?.title.match(/\s+\d+x\d+\s+\/\/\s+([\w\.]+)/) || [];
-      const date = img?.title.split("\n").pop();
-      return {
-        id,
-        postView: el.querySelector(".shm-thumb-link")?.href,
-        previewUrl: img?.src,
-        fileUrl: el.querySelector(".shm-thumb-link + br + a")?.href,
-        tags: tags2,
-        width: Number(width),
-        height: Number(height),
-        aspectRatio: Number(width) / Number(height),
-        fileExt,
-        fileDownloadName: `Rule34.Paheal ${id} ${tags2.join(" ")}.${fileExt}`,
-        fileDownloadText: `${width}\xD7${height} [${size}] ${fileExt?.toUpperCase()}`,
-        rating: "e",
-        createdAt: date && parse(`${date} +00`, "MMMM do, yyyy; HH:mm x", new Date())
-      };
-    });
-    return results;
-  }
-  const r34paheal = {
-    is: isR34PahealPage,
-    posts: fetchR34PahealPosts
-  };
   function isRealbooruPage() {
     return location.hostname == "realbooru.com";
   }
@@ -8568,53 +5848,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   const realbooru = {
     is: isRealbooruPage,
     posts: fetchRealbooruPosts
-  };
-  function isRule34HentaiPage() {
-    return location.hostname == "rule34hentai.net";
-  }
-  async function fetchRule34HentaiPosts(page, tags) {
-    if (!tags) {
-      tags = location.pathname.match(/post\/list\/(.+)\/\d+/)?.[1] || "";
-    }
-    const url = `https://rule34hentai.net/post/list/${tags ? `${tags}/` : ""}${page}`;
-    const htmlResp = await fetch(url);
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const results = [...doc.querySelectorAll("#image-list .thumb")].map((el) => {
-      const img = el.querySelector("img");
-      const id = el.getAttribute("data-post-id");
-      const previewUrl = img?.src || "";
-      const previewWidth = Number(img?.getAttribute("width"));
-      const previewHeight = Number(img?.getAttribute("height"));
-      const width = Number(el.getAttribute("data-width"));
-      const height = Number(el.getAttribute("data-height"));
-      const postTags = el.getAttribute("data-tags")?.split(/\s+/).filter(Boolean) || [];
-      const m = img?.title.split("//").map((e) => e.trim()) || [];
-      const fileExt = m[3] || "";
-      const fileSizeText = m[2] || "";
-      const fileUrl = previewUrl.replace(/(.*)\/_thumbs\/(.*)\/thumb\..*/, `$1/_images/$2/${id}.${fileExt}`);
-      return {
-        id,
-        postView: el.getAttribute("href"),
-        previewUrl,
-        previewWidth,
-        previewHeight,
-        fileUrl,
-        fileSizeText,
-        tags: postTags,
-        width,
-        height,
-        aspectRatio: width / height,
-        fileExt,
-        fileDownloadName: `rule34hentai_${id}`,
-        fileDownloadText: `${width}\xD7${height} [${fileSizeText}] ${fileExt.toUpperCase()}`,
-        rating: "e"
-      };
-    });
-    return results;
-  }
-  const rule34hentai = {
-    is: isRule34HentaiPage,
-    posts: fetchRule34HentaiPosts
   };
   function isZerochanPage() {
     return location.hostname == "www.zerochan.net";
@@ -8677,35 +5910,10 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     moebooru.yanderehtml,
     danbooruExplore,
     gelbooru,
-    gelbooru.fav,
-    rule34.fav,
-    rule34.firefox,
-    r34paheal,
     booruAction,
-    eshuushuu,
-    zerochan,
-    animepictures,
-    allgirl,
-    hentaibooru,
-    kusowanka,
-    anihonetwallpaper,
-    nozomila,
-    sankaku.idol,
-    sankaku,
-    sankaku.complex,
-    realbooru,
-    rule34hentai,
     { is: () => true, posts: async () => [] }
   ];
-  const fetchDetailActions = [
-    animepictures,
-    sankaku.idol,
-    sankaku,
-    sankaku.complex,
-    allgirl,
-    hentaibooru,
-    kusowanka
-  ];
+  const fetchDetailActions = [];
   function getFirstPageNo(params2) {
     if (isPidSite()) {
       const page = Number(params2.get("pid")) || 0;
@@ -8714,8 +5922,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     return Number(params2.get("page")) || 1;
   }
   function pushPageState(pageNo, latePageQuery = false) {
-    if (rule34.fav.is() || allgirl.is() || nozomila.is())
-      return;
     let pageParamName = "page";
     if (isPidSite()) {
       pageParamName = "pid";
@@ -8728,15 +5934,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     history.replaceState("", "", url);
   }
   function handleBlacklist(results) {
-    if (rule34.is() && !results.__isR34Fav) {
-      if (getCookie("filter_ai") == "1") {
-        results = results.filter((e) => !e.tags.includes("ai_assisted") && !e.tags.includes("ai_generated"));
-      }
-      const threshold = +getCookie("post_threshold");
-      if (threshold > 0) {
-        results = results.filter((e) => e.score ? +e.score >= threshold : true);
-      }
-    }
     if (!settings.blacklist.length)
       return results;
     return typeof results.blacklist == "function" ? results.blacklist(settings.blacklist) : results.filter((e) => {
@@ -8857,6 +6054,10 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   const isAutocompleteAct = Object.keys(autocompleteActions).includes(location.hostname);
   const fetchAutocomplete = autocompleteActions[location.hostname] || (() => {
   });
+  const isSankakuSite = location.host.includes("sankaku") || location.host.includes("idolcomplex");
+  function isR34PahealHome() {
+    return location.hostname == "rule34.paheal.net" && location.pathname == "/";
+  }
   var _sfc_main$d = /* @__PURE__ */ Vue2.defineComponent({
     __name: "AppBar",
     setup(__props) {
@@ -8912,9 +6113,9 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         searchState.searchItems = await fetchAutocomplete(lastTag);
         searchState.loading = false;
       }, 500);
-      function selectTag(tag2) {
+      function selectTag(tag) {
         const termArr = searchState.searchTerm.split(/\s+/);
-        searchState.searchTerm = termArr.slice(0, -1).concat(tag2).join(" ");
+        searchState.searchTerm = termArr.slice(0, -1).concat(tag).join(" ");
         searchState.showMenu = false;
         searchState.searchItems = defCompTags;
       }
@@ -8933,8 +6134,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         searchState.searchTerm = tags;
         loadPostsByTags(tags);
       }
-      function selectMobileTag(tag2) {
-        selectTag(tag2);
+      function selectMobileTag(tag) {
+        selectTag(tag);
         searchState.showMenu = false;
       }
       function submitMobileSearch() {
@@ -9930,11 +7131,11 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         return _setup.exportTags(type[0]);
       } } }, [_vm._v(_vm._s(_vm.$t("QH_xm27zhgs5E1077asf1")))])] : _vm._e()], 2), _c("v-chip-group", { attrs: { "column": "", "multiple": "" }, model: { value: _setup.selTags[type[0]], callback: function($$v) {
         _vm.$set(_setup.selTags, type[0], $$v);
-      }, expression: "selTags[type[0]]" } }, _vm._l(_setup.postTags[type[0]], function(tag2) {
-        return _c("div", { key: tag2, staticClass: "d-flex-col" }, [_c("v-chip", { attrs: { "filter": "", "small": "", "color": _setup.tagColorMap[type[0]], "value": tag2, "ripple": false } }, [_vm._v(_vm._s(tag2))]), _setup.isSettingWght ? _c("input", { directives: [{ name: "model", rawName: "v-model", value: _setup.wghtMap[tag2], expression: "wghtMap[tag]" }], staticClass: "export-tags-wght-inp", attrs: { "type": "number" }, domProps: { "value": _setup.wghtMap[tag2] }, on: { "input": function($event) {
+      }, expression: "selTags[type[0]]" } }, _vm._l(_setup.postTags[type[0]], function(tag) {
+        return _c("div", { key: tag, staticClass: "d-flex-col" }, [_c("v-chip", { attrs: { "filter": "", "small": "", "color": _setup.tagColorMap[type[0]], "value": tag, "ripple": false } }, [_vm._v(_vm._s(tag))]), _setup.isSettingWght ? _c("input", { directives: [{ name: "model", rawName: "v-model", value: _setup.wghtMap[tag], expression: "wghtMap[tag]" }], staticClass: "export-tags-wght-inp", attrs: { "type": "number" }, domProps: { "value": _setup.wghtMap[tag] }, on: { "input": function($event) {
           if ($event.target.composing)
             return;
-          _vm.$set(_setup.wghtMap, tag2, $event.target.value);
+          _vm.$set(_setup.wghtMap, tag, $event.target.value);
         } } }) : _vm._e()], 1);
       }), 0)], 1);
     })], 2), _c("v-card-actions", [_c("v-btn", { attrs: { "color": "blue accent-2", "text": "" }, on: { "click": function($event) {
@@ -10067,18 +7268,14 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       postDetail.value = getDanbooruTagDetail(imageSelected.value);
       return;
     }
-    if (eshuushuu.is()) {
-      postDetail.value = eshuushuu.tagDetail(imageSelected.value);
-      return;
-    }
     await handlePostDetail(imageSelected);
     postDetail.value = {
       voted: false,
-      tags: imageSelected.value.tags.map((tag2) => {
-        const tagCN = window.__tagsCN?.[tag2.replace(/_/g, " ")];
+      tags: imageSelected.value.tags.map((tag) => {
+        const tagCN = window.__tagsCN?.[tag.replace(/_/g, " ")];
         return {
-          tag: tag2,
-          tagText: isCNLang && tagCN ? `${tag2} [ ${tagCN} ]` : tag2,
+          tag,
+          tagText: isCNLang && tagCN ? `${tag} [ ${tagCN} ]` : tag,
           color: "#8F77B5",
           type: "general"
         };
@@ -10253,12 +7450,12 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         }
         showImageToolbar.value = !showImageToolbar.value;
       }
-      function toTagsPage(tag2) {
+      function toTagsPage(tag) {
         if (store.isYKSite) {
-          window.open(`/post?tags=${tag2}`, "_blank", "noreferrer");
+          window.open(`/post?tags=${tag}`, "_blank", "noreferrer");
         }
         if (isDanbooruPage()) {
-          window.open(`/posts?tags=${tag2}`, "_blank", "noreferrer");
+          window.open(`/posts?tags=${tag}`, "_blank", "noreferrer");
         }
       }
       function toPidPage(pid) {
