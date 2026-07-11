@@ -17,15 +17,21 @@
 - [x] 云端 lint/日期测试/build 成功（run `29136700283`）
 - [x] Stay 实机验收（Yande.re、Konachan 首页/随机及阶段 1 数据路径确认）
 
-## 阶段 2：统一日期组件（代码完成，待 Stay 验收）
+## 阶段 2：统一日期组件（阻塞，实机不可用）
 - [x] 公共 DateFilter 状态
-- [x] 最近/日期模式
-- [x] 日/周/月/年
-- [x] 日期选择与前后移动
+- [x] 最近/日期模式的数据和路由基础
+- [x] 日/周/月/年路由与状态恢复
+- [x] 日期前后移动路由
 - [x] URL 状态恢复基础参数
 - [x] 站点能力动态显示
-- [x] 云端 lint/日期测试/build 成功（run `29138295320`）
-- [ ] Stay 实机验收
+- [x] 云端 lint/日期测试/build 成功
+- [ ] Yande.re / Konachan 完整月历可见（当前只显示月份标题）
+- [ ] Danbooru 完整月历稳定可见
+- [ ] 自定义开始/结束日期范围可操作
+- [ ] 范围路由实际返回目标日期帖子
+- [ ] 顶部周范围不遮挡全屏与设置
+- [ ] 右下角悬浮搜索 Stay 实机验收
+- [ ] Stay 阶段 2 总验收
 
 ## 阶段 3：触摸与详情稳定性
 - [ ] 分享期间保持长按预览
@@ -37,7 +43,7 @@
 - [ ] Stay 实机验收
 
 ## 阶段 4：iOS UI 重构
-- [ ] 左侧站点仅保留 Yande.re、Konachan、Konachan Safe、Danbooru、Gelbooru
+- [ ] 左侧站点仅保留 Yande.re、Konachan、Danbooru、Gelbooru、Rule34
 - [ ] Konachan Safe 从站点主列表移除或统一命名后并入 Konachan 入口
 - [ ] 五站使用清晰、统一风格的本地 Icon 资产
 - [ ] 深色 iOS 语义色完整覆盖

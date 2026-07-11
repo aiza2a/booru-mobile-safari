@@ -505,9 +505,77 @@ scripts/verify-site-date-routes.mjs
 
 阶段 1 已关闭，进入阶段 2。
 
-## 6. 阶段 2：统一日期组件实施计划
+## 6. 阶段 2：统一日期组件（当前阻塞，禁止进入阶段 3）
 
-阶段 1 完成后再开始。
+### 6.0 2026-07-11 实机失败记录
+
+阶段 2 **不能视为完成**。虽然路由、状态解析、lint、自动测试与 build 均通过，但 Stay 实机持续出现以下阻断问题：
+
+1. **Yande.re / Konachan 日期面板只显示标题**
+   - 弹层能显示“选择日期”和 `July 2026`。
+   - 星期、日期网格完全为空白。
+   - Danbooru 曾在旧结构中显示完整月历，但统一组件改造后同样可能出现空白。
+   - 多次调整 `.ios-date-sheet`、`full-width`、`min-height`、`overflow`、延迟挂载均未解决。
+
+2. **Danbooru 自定义范围不可用**
+   - 代码中存在 `rangeStart / rangeEnd`、范围路由和双 `v-date-picker`。
+   - 实机界面没有形成稳定可操作的开始/结束日期选择流程。
+   - 不能标记为已实现。
+
+3. **顶部遮挡问题只部分修复**
+   - 已删除重复/禁用的下一周期按钮占位，并取消 `.mobile-date-filter` 的 `overflow:hidden`。
+   - 仍需在不同日期长度、周跨月范围和小屏设备上验证不会覆盖全屏/设置按钮。
+
+4. **悬浮搜索已接入但未完成实机验收**
+   - `MobileSearchFab.vue` 已接入公共 `store.showMobileSearch`。
+   - 需要确认按钮显示条件、Safari 底栏避让、搜索面板打开和隐藏状态。
+
+### 6.0.1 已尝试但失败的路径
+
+以下路径禁止不经分析机械重复：
+
+- 在 `.v-date-picker-table` 上强制 `min-height`：会破坏 Vuetify 内部行高，日期网格消失。
+- 单纯给 `v-date-picker` 添加 `full-width`：Y/K 仍只显示月份标题。
+- 在 `v-dialog` 内延迟一帧挂载日期选择器：无效。
+- 反复切换外层 `overflow:auto/visible/hidden`：没有解决根因。
+- 把原本工作在 Danbooru 的日期选择器直接嵌入统一 Sheet：不同站点表现仍不一致。
+
+### 6.0.2 下一位执行者必须先做的诊断
+
+1. 用 Safari Web Inspector 或临时调试样式读取空白状态下：
+   - `.v-picker` 实际高度
+   - `.v-date-picker-table` 实际高度
+   - `table/tbody/tr` 的 `display`、高度和可见性
+   - 是否被项目早期全局日期 CSS 覆盖
+2. 重点审查 `src/styles/custom.css` 第 218 行附近的全局规则：
+   - `.v-date-picker-table>table>thead>tr>th`
+   - 使用 `:before` 替换星期文字的规则
+   - 这些旧规则可能与 Vuetify 当前渲染结构或 iOS WebKit 冲突
+3. 建立最小隔离组件：
+   - 页面只挂载原生 `<v-dialog><v-date-picker /></v-dialog>`
+   - 不使用 `.ios-date-sheet`、不使用项目日期 CSS
+   - 先在 Stay 验证完整月历，再逐条恢复样式
+4. 若 Vuetify 在 Stay 中仍不稳定，停止使用 `v-date-picker`，改为自建轻量日历：
+   - 原生 `input[type=date]` 可作为最低风险基线
+   - 或用 7×6 CSS Grid 自绘月历，不依赖 Vuetify 内部高度计算
+5. 自定义范围应在单日期稳定后实现：
+   - 第一步选择开始日期
+   - 第二步选择结束日期
+   - 同一个稳定日历复用两次，不要同时渲染两个 Vuetify 月历
+   - 仅 Y/K 首页、Danbooru 首页、Danbooru 历史高分开放范围
+
+### 6.0.3 当前相关文件
+
+- `src/components/MobileDateFilter.vue`
+- `src/store/date-filter.ts`
+- `src/utils/date-filter.ts`
+- `src/utils/parse-date-route.ts`
+- `src/utils/site-date-routes.ts`
+- `src/config/site-capabilities.ts`
+- `src/styles/custom.css`
+- `src/components/MobileSearchFab.vue`
+
+当前最后一次成功构建：Actions run `29141774444`，提交 `01cb3e0`。**构建成功不代表日期 UI 可用。**
 
 ### 6.1 组件设计
 
@@ -701,6 +769,13 @@ idle → pressing → previewing → sharing → restoring → idle
 - 无白闪、黑闪、主题切换残留色
 
 ## 9. 已知问题与禁止回归
+
+### 9.0 当前最高优先级阻塞
+
+- 阶段 2 日期 Sheet 在 Stay 中只显示月份标题，日期网格为空白。
+- Danbooru 自定义日期范围尚不可操作。
+- 不得因为 CI/build 成功而宣称日期 UI 完成。
+- 下一位执行者必须先完成最小隔离日历诊断，或改用原生/自绘日历。
 
 ### 9.1 不得重新引入
 
