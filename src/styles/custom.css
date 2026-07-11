@@ -913,10 +913,6 @@ html.ym-immersive .v-main {
   padding-bottom: 0 !important;
 }
 
-html.ym-immersive .posts-image-card {
-  border-radius: 0 !important;
-}
-
 .mobile-settings-btn {
   flex: 0 0 44px !important;
 }
@@ -958,18 +954,7 @@ html.ym-immersive .posts-image-card {
   -webkit-backdrop-filter: blur(14px);
 }
 
-html.ym-immersive .wf-layout,
-html.ym-immersive .wf-layout > div,
-html.ym-immersive .v-main__wrap {
-  width: 100vw !important;
-  max-width: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-html.ym-immersive .posts-image-card {
-  margin: 0 !important;
-}
+/* Immersive mode hides chrome only; preserve the selected layout spacing and card radii. */
 
 @media screen and (max-width: 959px) {
   .mobile-pop-mode {
@@ -997,8 +982,8 @@ html.ym-immersive .posts-image-card {
 .drawer-shortcuts .v-list-item {
   display: flex !important;
   align-items: center;
-  min-height: 48px;
-  height: 48px;
+  min-height: 52px;
+  height: 52px;
   margin-bottom: 0;
   padding: 0 12px !important;
   border-radius: 12px;
@@ -1010,16 +995,16 @@ html.ym-immersive .posts-image-card {
   align-self: center;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  min-width: 40px;
-  height: 40px;
-  margin: 0 14px 0 0 !important;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  margin: 0 16px 0 0 !important;
 }
 
 .drawer-shortcuts .v-list-item__icon .v-icon {
-  width: 32px;
-  height: 32px;
-  font-size: 26px;
+  width: 34px;
+  height: 34px;
+  font-size: 29px;
 }
 
 .drawer-shortcuts .v-list-item__content {
@@ -1029,15 +1014,16 @@ html.ym-immersive .posts-image-card {
   align-items: flex-start;
   justify-content: center;
   min-width: 0;
-  height: 48px;
+  height: 52px;
   padding: 0 !important;
 }
 
 .drawer-shortcuts .v-list-item__title {
   display: flex;
   align-items: center;
-  min-height: 48px;
-  font-size: 17px;
+  min-height: 52px;
+  font-size: 18px;
+  font-weight: 500;
   line-height: 1.25;
 }
 
