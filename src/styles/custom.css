@@ -1195,7 +1195,51 @@ html.ym-immersive .v-main {
   line-height: 1.25;
 }
 
-html.long-press-sharing,
+@media (prefers-reduced-motion: no-preference) {
+  .v-app-bar .v-btn,
+  .mobile-date-filter,
+  .mobile-detail-nav,
+  .mobile-settings-section,
+  .mobile-site-drawer .v-list-item {
+    transition: transform .16s ease, background-color .18s ease, border-color .18s ease, opacity .18s ease;
+  }
+
+  .v-app-bar .v-btn:active,
+  .mobile-detail-nav .v-btn:active,
+  .mobile-site-drawer .v-list-item:active {
+    transform: scale(.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .mobile-date-filter,
+  .mobile-detail-nav,
+  .mobile-site-drawer,
+  .settings_drawer,
+  .mobile-settings-section {
+    background: rgba(28, 28, 30, .94) !important;
+  }
+
+  .theme--light .mobile-date-filter,
+  .theme--light .mobile-detail-nav,
+  .theme--light .mobile-site-drawer,
+  .theme--light .settings_drawer,
+  .theme--light .mobile-settings-section {
+    background: rgba(255, 255, 255, .96) !important;
+  }
+}
+
 html.long-press-sharing body {
   overflow: hidden !important;
   overscroll-behavior: none;
