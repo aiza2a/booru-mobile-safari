@@ -1,8 +1,7 @@
 import type { SearchResults } from '@himeka/booru'
 import { settings } from '@/store'
-import { allgirl, nozomila, rule34 } from '@/api'
 import { BOORU_PAGE_LIMIT, isPidSite } from '@/api/booru'
-import { getCookie } from '@/utils'
+
 
 export function getFirstPageNo(params: URLSearchParams) {
   if (isPidSite()) {
@@ -13,7 +12,6 @@ export function getFirstPageNo(params: URLSearchParams) {
 }
 
 export function pushPageState(pageNo: number, latePageQuery = false) {
-  if (rule34.fav.is() || allgirl.is() || nozomila.is()) return
   let pageParamName = 'page'
   if (isPidSite()) {
     pageParamName = 'pid'
@@ -26,16 +24,7 @@ export function pushPageState(pageNo: number, latePageQuery = false) {
   history.replaceState('', '', url)
 }
 
-export function handleBlacklist(results: SearchResults & { __isR34Fav?: boolean }) {
-  if (rule34.is() && !results.__isR34Fav) {
-    if (getCookie('filter_ai') == '1') {
-      results = results.filter(e => !e.tags.includes('ai_assisted') && !e.tags.includes('ai_generated')) as any
-    }
-    const threshold = +getCookie('post_threshold')
-    if (threshold > 0) {
-      results = results.filter(e => e.score ? +e.score >= threshold : true) as any
-    }
-  }
+export function handleBlacklist(results: SearchResults) {
   if (!settings.blacklist.length) return results
   return typeof results.blacklist == 'function'
     ? results.blacklist(settings.blacklist)

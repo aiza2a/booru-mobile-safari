@@ -1,7 +1,11 @@
 const { defineTmHeader } = require('@himeka/vite-userscript')
-const { sites } = require('@himeka/booru')
-
-const blackList = new Set(['e621.net', 'e926.net', 'hypnohub.net', 'derpibooru.org'])
+const mobileSites = {
+  'yande.re': { insecure: false },
+  'konachan.com': { insecure: false },
+  'konachan.net': { insecure: false },
+  'danbooru.donmai.us': { insecure: false },
+  'gelbooru.com': { insecure: false },
+}
 
 module.exports = defineTmHeader({
   "name": "Booru Mobile Safari",
@@ -16,22 +20,7 @@ module.exports = defineTmHeader({
   "source": "https://github.com/aiza2a/yandere-masonry",
   "icon": "https://upload-bbs.mihoyo.com/upload/2022/05/23/260511332/f1f6267537a5aff959ee63ec2c9e4e52_4821140735490026106.jpg",
   "license": "MIT",
-  "match": [
-    ...Object.entries(sites).filter(([e]) => !blackList.has(e)).map(([k, v]) => `http${v.insecure ? '' : 's'}://${k}/*`),
-    'https://e-shuushuu.net/*',
-    'https://www.zerochan.net/*',
-    'https://sankaku.app/*',
-    'https://chan.sankakucomplex.com/*',
-    'https://www.sankakucomplex.com/*',
-    'https://www.idolcomplex.com/*',
-    'https://anime-pictures.net/*',
-    'https://allgirl.booru.org/*',
-    'https://booru.eu/*',
-    'https://kusowanka.com/*',
-    'https://anihonetwallpaper.com/*',
-    'https://nozomi.la/*',
-    'https://rule34hentai.net/*'
-  ],
+  "match": Object.entries(mobileSites).map(([host, site]) => `http${site.insecure ? '' : 's'}://${host}/*`),
   "supportURL": "https://github.com/aiza2a/yandere-masonry/issues",
   "run-at": "document-end",
 })

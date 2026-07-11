@@ -1,59 +1,21 @@
 import { search, sites } from '@himeka/booru'
-import { isSankakuSite } from './sankaku'
-import { animepictures, realbooru, rule34 } from '@/api'
 import { settings, store } from '@/store'
 
-const blackList = new Set(['e621.net', 'e926.net', 'hypnohub.net', 'derpibooru.org', 'realbooru.com'])
-const siteKeys = Object.keys(sites).filter(e => !blackList.has(e))
-export const isBooruSite = () => siteKeys.includes(location.host)
+const supportedHosts = new Set(['yande.re', 'konachan.com', 'konachan.net', 'danbooru.donmai.us', 'gelbooru.com'])
+export const isBooruSite = () => supportedHosts.has(location.host)
 
-export const siteDomains = [
-  ...siteKeys,
-  'e-shuushuu.net',
-  'zerochan.net',
-  'chan.sankakucomplex.com',
-  // 'idol.sankakucomplex.com',
-  'www.idolcomplex.com',
-  'sankaku.app',
-  'anime-pictures.net',
-  'allgirl.booru.org',
-  'booru.eu',
-  'kusowanka.com',
-  'anihonetwallpaper.com',
-  'nozomi.la',
-  'realbooru.com',
-  'rule34hentai.net',
-]
-
-export const isSupportTagSearch = isBooruSite() || !['nozomi.la'].includes(location.host)
-export const notPartialSupportSite = !([
-  'e-shuushuu.net',
-  'www.zerochan.net',
-  // 'idol.sankakucomplex.com',
-  'www.idolcomplex.com',
-  'allgirl.booru.org',
-  'booru.eu',
-  'kusowanka.com',
-  'anihonetwallpaper.com',
-  'nozomi.la',
-  'realbooru.com',
-  'rule34hentai.net',
-].includes(location.host))
+export const siteDomains = [...supportedHosts]
+export const isSupportTagSearch = isBooruSite()
+export const notPartialSupportSite = isBooruSite()
 
 export const defCompTags = (() => {
   if (store.isYKSite) {
     return ['rating:s', 'rating:q', 'rating:e', 'order:score', 'order:vote', 'order:mpixels', 'order:landscape', 'order:portrait']
   }
-  if (isSankakuSite) {
-    return ['order:quality', 'order:popularity', 'order:random', 'order:recently_favorited', 'order:recently_voted', 'rating:s', 'rating:q', 'rating:e', 'threshold:0', 'threshold:1', 'threshold:2', 'threshold:3', 'threshold:4', 'threshold:5', 'sankaku_ai order:popular']
-  }
-  if (animepictures.is()) {
-    return ['order_by:date', 'order_by:date_r', 'order_by:rating', 'order_by:views', 'order_by:size', 'order_by:tag_num']
-  }
   if (location.host.includes('danbooru')) {
     return ['order:rank', 'order:score', 'order:favcount', 'order:none', 'order:upvotes', 'rating:general', 'rating:questionable', 'rating:explicit', 'rating:sensitive', 'order:landscape', 'order:portrait', 'order:mpixels']
   }
-  if (/gelbooru\.com|rule34\.xxx/.test(location.host)) {
+  if (location.host === 'gelbooru.com') {
     return ['rating:safe', 'rating:questionable', 'rating:explicit', 'sort:score']
   }
   return []
@@ -99,7 +61,7 @@ const defaultLimitMap: Record<string, number> = {
 
 export const BOORU_PAGE_LIMIT = defaultLimitMap[location.host] || 40
 
-export const isPidSite = () => sites[location.host]?.paginate === 'pid' || realbooru.is()
+export const isPidSite = () => sites[location.host]?.paginate === 'pid'
 
 export async function searchBooru(page: number, tags: string | null) {
   if (!tags || tags === 'all') tags = ''
@@ -117,22 +79,6 @@ export const booruAction = {
   posts: async (page: number, tags: string | null) => {
     if (settings.isHoldsFalse) tags = `holds:false ${tags || ''}`.trim()
     const results = await searchBooru(page, tags)
-    if (rule34.is()) {
-      results.forEach(e => {
-        const re = /api-cdn[^.]*\./
-        if (e.previewUrl) e.previewUrl = e.previewUrl.replace(re, '')
-        if (e.sampleUrl) e.sampleUrl = e.sampleUrl.replace(re, '')
-        if (e.fileUrl) e.fileUrl = e.fileUrl.replace(re, '')
-      })
-    }
-    if (location.hostname == 'xbooru.com') {
-      results.forEach(e => {
-        const args = [/api-cdn(-mp4)?\.rule34\.xxx/, 'xbooru.com'] as const
-        if (e.previewUrl) e.previewUrl = e.previewUrl.replace(...args)
-        if (e.sampleUrl) e.sampleUrl = e.sampleUrl.replace(...args)
-        if (e.fileUrl) e.fileUrl = e.fileUrl.replace(...args)
-      })
-    }
     return results
   },
 }

@@ -4,7 +4,6 @@ import { fetchDetailActions } from './site'
 import { store } from '@/store'
 import { type PostDetail, getPostDetail } from '@/api/moebooru'
 import { getDanbooruTagDetail, isDanbooruPage } from '@/api/danbooru'
-import { eshuushuu } from '@/api'
 import i18n from '@/utils/i18n'
 
 const isCNLang = i18n.locale.includes('zh')
@@ -31,11 +30,6 @@ export async function setPostDetail(imageSelected: Ref<Post>, postDetail: Ref<Po
 
   if (isDanbooruPage()) {
     postDetail.value = getDanbooruTagDetail(imageSelected.value)
-    return
-  }
-
-  if (eshuushuu.is()) {
-    postDetail.value = eshuushuu.tagDetail(imageSelected.value)
     return
   }
 
