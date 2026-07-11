@@ -2,7 +2,7 @@
 // @name                 Booru Mobile Safari
 // @name:en              Booru Mobile Safari
 // @name:zh              Booru 手机瀑布流
-// @version              0.40.0
+// @version              0.37.5
 // @description          面向 iPhone Safari 的 Yande.re、Konachan、Danbooru、Gelbooru 瀑布流与快速分享
 // @description:en       Mobile-first masonry browsing and native sharing for Yande.re, Konachan, Danbooru and Gelbooru.
 // @description:zh       面向 iPhone Safari 的 Yande.re、Konachan、Danbooru、Gelbooru 瀑布流与快速分享
@@ -40,7 +40,7 @@
 // @match                https://rule34hentai.net/*
 // @homepage             https://github.com/aiza2a/yandere-masonry
 // @source               https://github.com/aiza2a/yandere-masonry
-// @icon                 https://img.nagi.xx.kg/file/github:github_1783748006551_qtg8z0.png
+// @icon                 https://upload-bbs.mihoyo.com/upload/2022/05/23/260511332/f1f6267537a5aff959ee63ec2c9e4e52_4821140735490026106.jpg
 // @supportURL           https://github.com/aiza2a/yandere-masonry/issues
 // @run-at               document-end
 // @grant                GM_addStyle
