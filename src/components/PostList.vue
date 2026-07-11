@@ -88,8 +88,8 @@
     <wf-layout v-else>
       <v-card
         v-for="(image, index) in store.imageList"
-        :key="image.id || index"
         :id="`post-card-${image?.id}`"
+        :key="image.id || index"
         class="posts-image-card"
         :style="imgCardStyle(image)"
         @touchstart="onPostTouchStart($event, image)"
