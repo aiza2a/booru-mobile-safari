@@ -2,6 +2,17 @@
   <v-dialog v-model="store.showImageSelected" fullscreen content-class="ios-detail-dialog">
     <div
       v-if="store.showImageSelected"
+      class="detail-ambient-bg"
+      :style="detailAmbientStyle"
+      aria-hidden="true"
+    ></div>
+    <div
+      v-if="store.showImageSelected"
+      class="detail-ambient-shade"
+      aria-hidden="true"
+    ></div>
+    <div
+      v-if="store.showImageSelected"
       class="img_detail_cont"
       @click="onDtlContClick"
       @touchstart.passive="onTouchStart"
@@ -522,6 +533,10 @@ const imgLasySrc = computed(() => {
     ?? imageSelected.value.sampleUrl
     ?? imageSelected.value.fileUrl
     ?? void 0
+})
+const detailAmbientStyle = computed(() => {
+  const src = imgLasySrc.value
+  return src ? { backgroundImage: `url("${src.replace(/"/g, '\\"')}")` } : {}
 })
 
 const imageSelectedWidth = computed(() => {
