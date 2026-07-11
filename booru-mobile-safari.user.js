@@ -6664,13 +6664,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       _vm.$set(_setup.settings, "detailButtonsBottom", $$v);
     }, expression: "settings.detailButtonsBottom" } })], 1)], 1)], 1), _c("v-subheader", [_vm._v("\u89E6\u6478\u4E0E\u5206\u4EAB")]), _c("div", { staticClass: "mobile-settings-section" }, [_c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u957F\u6309\u7ACB\u5373\u5206\u4EAB\u5E16\u5B50")]), _c("v-list-item-subtitle", [_vm._v("\u5173\u95ED\u65F6\u663E\u793A\u64CD\u4F5C\u83DC\u5355\uFF1B\u5F00\u542F\u65F6\u6253\u5F00 iOS \u5206\u4EAB\u9762\u677F")])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "", "hide-details": "" }, model: { value: _setup.settings.longPressDirectShare, callback: function($$v) {
       _vm.$set(_setup.settings, "longPressDirectShare", $$v);
-    }, expression: "settings.longPressDirectShare" } })], 1)], 1)], 1), _c("v-subheader", [_vm._v("\u4E0B\u8F7D\u4E0E\u9884\u52A0\u8F7D")]), _c("div", { staticClass: "mobile-settings-section" }, [_setup.notPartialSupportSite ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u4E0B\u8F7D\u65B9\u5F0F")]), _c("v-list-item-subtitle", [_vm._v("\u624B\u673A\u7AEF\u63A8\u8350\u65B0\u6807\u7B7E\u9875\u6216 Tampermonkey")])], 1), _c("v-list-item-action", [_c("v-menu", { attrs: { "offset-y": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function({ on, attrs }) {
-      return [_c("v-btn", _vm._g(_vm._b({ staticClass: "sel_menu_btn", attrs: { "small": "" } }, "v-btn", attrs, false), on), [_vm._v(_vm._s(_setup.actDownloadMethod)), _c("v-icon", { attrs: { "size": 16 } }, [_vm._v(_vm._s(_setup.mdiChevronDown))])], 1)];
-    } }], null, false, 2781644739) }, [_c("v-list", { attrs: { "dense": "" } }, _vm._l(_setup.mobileDownloadMethods, function(it) {
-      return _c("v-list-item", { key: it.value, on: { "click": function($event) {
-        _setup.settings.downloadBy = it.value;
-      } } }, [_c("v-list-item-title", [_vm._v(_vm._s(it.text))])], 1);
-    }), 1)], 1)], 1)], 1) : _vm._e(), _setup.notPartialSupportSite ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u5B8C\u6574\u56FE\u7247\u9884\u52A0\u8F7D")]), _c("v-list-item-subtitle", [_vm._v("\u63D0\u524D\u52A0\u8F7D\u8BE6\u60C5\u4E2D\u7684\u540E\u7EED\u56FE\u7247")])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "", "hide-details": "" }, model: { value: _setup.settings.isFullImgPreload, callback: function($$v) {
+    }, expression: "settings.longPressDirectShare" } })], 1)], 1)], 1), _c("v-subheader", [_vm._v("\u4E0B\u8F7D\u4E0E\u9884\u52A0\u8F7D")]), _c("div", { staticClass: "mobile-settings-section" }, [_setup.notPartialSupportSite ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u5B8C\u6574\u56FE\u7247\u9884\u52A0\u8F7D")]), _c("v-list-item-subtitle", [_vm._v("\u63D0\u524D\u52A0\u8F7D\u8BE6\u60C5\u4E2D\u7684\u540E\u7EED\u56FE\u7247")])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "", "hide-details": "" }, model: { value: _setup.settings.isFullImgPreload, callback: function($$v) {
       _vm.$set(_setup.settings, "isFullImgPreload", $$v);
     }, expression: "settings.isFullImgPreload" } })], 1)], 1) : _vm._e(), _setup.notPartialSupportSite && _setup.settings.isFullImgPreload ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u9884\u52A0\u8F7D\u6570\u91CF")]), _c("v-list-item-subtitle", [_vm._v("\u6700\u591A\u9884\u52A0\u8F7D 5 \u5F20")])], 1), _c("v-list-item-action", [_c("input", { staticClass: "text-center rounded preload_num", attrs: { "type": "number", "min": "0", "max": "5" }, domProps: { "value": _setup.settings.imgPreloadNum }, on: { "blur": _setup.onPreloadNumBlur } })])], 1) : _vm._e()], 1), _c("v-subheader", [_vm._v("\u9AD8\u7EA7")]), _c("div", { staticClass: "mobile-settings-section" }, [_c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u8BED\u8A00")])], 1), _c("v-list-item-action", [_c("v-menu", { attrs: { "offset-y": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function({ on, attrs }) {
       return [_c("v-btn", _vm._g(_vm._b({ staticClass: "sel_menu_btn", attrs: { "small": "" } }, "v-btn", attrs, false), on), [_vm._v(_vm._s(_setup.currentLanglabel)), _c("v-icon", { attrs: { "size": 16 } }, [_vm._v(_vm._s(_setup.mdiChevronDown))])], 1)];
@@ -7986,25 +7980,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         const imgId = id || ctxActPost.value?.id;
         imgId && addPostToFavorites(imgId);
       }
-      async function downloadCtxPost(post) {
-        const img = post || ctxActPost.value;
-        if (!img)
-          return;
-        let { fileDownloadName } = img;
-        if (!img.fileUrl)
-          return;
-        if (store.isYKSite) {
-          fileDownloadName = `${location.hostname} ${img.id} ${img.tags.join(" ")}`;
-        }
-        if (isR34PahealHome()) {
-          fileDownloadName = `${fileDownloadName}.${img.data.file_name.split(".").pop()}`;
-        }
-        try {
-          await downloadFile(img.fileUrl, fileDownloadName);
-        } catch (error) {
-          showMsg({ msg: `${i18n.t("FAqj5ONm50QMfIt9Vq2p1")}: ${error}`, type: "error" });
-        }
-      }
       function isPostChecked(id) {
         return store.selectedImageList.some((e) => e.id === id);
       }
@@ -8064,7 +8039,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         unlockLongPressScroll();
         resetLongPressState();
       });
-      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, openedDetailIndex, detailCloseRefreshTimer, longPressState, longPressTimer, longPressStartX, longPressStartY, suppressNextClick, suppressContextMenuUntil, shareInFlight, lockedScrollY, activeLongPressPost, pendingDirectSharePost, showNoMore, showLoadMore, longPressPreview, ctxActPost, showMenu, x, y, maxHeightStyle, imageRenderKey, imgCardStyle, getImgSrc, openPostMenu, clearLongPressTimer, resetLongPressState, cancelPostLongPress, onPostTouchStart, onPostTouchMove, lockLongPressScroll, unlockLongPressScroll, sharePostOnce, onPostTouchEnd, onImageClick, onCtxMenu, preloadDetailImage, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, downloadCtxPost, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, onVisibilityChange, mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
+      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, openedDetailIndex, detailCloseRefreshTimer, longPressState, longPressTimer, longPressStartX, longPressStartY, suppressNextClick, suppressContextMenuUntil, shareInFlight, lockedScrollY, activeLongPressPost, pendingDirectSharePost, showNoMore, showLoadMore, longPressPreview, ctxActPost, showMenu, x, y, maxHeightStyle, imageRenderKey, imgCardStyle, getImgSrc, openPostMenu, clearLongPressTimer, resetLongPressState, cancelPostLongPress, onPostTouchStart, onPostTouchMove, lockLongPressScroll, unlockLongPressScroll, sharePostOnce, onPostTouchEnd, onImageClick, onCtxMenu, preloadDetailImage, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, onVisibilityChange, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
     }
   });
   var _sfc_render$4 = function render() {
@@ -8085,14 +8060,11 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       } } })], 1) : _vm._e(), _setup.settings.showListPostReso ? _c("div", { staticClass: "posts-image-wh" }, [_vm._v(_vm._s(item?.width) + " \xD7 " + _vm._s(item?.height))]) : _vm._e(), !_setup.isR34Fav ? _c("div", { staticClass: "posts-image-actions" }, [_c("v-btn", { attrs: { "icon": "", "color": "#fff", "title": _vm.$t("EsiorRgoeHI8h7IHMLDA4"), "href": item?.postView, "target": "_blank", "rel": "noreferrer" } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiLinkVariant))])], 1), _setup.notPartialSupportSite ? _c("v-btn", { attrs: { "icon": "", "color": "#fff", "title": _vm.$t("hVmfDxXoj8vkgVQabEOSr") }, on: { "click": function($event) {
         $event.stopPropagation();
         return _setup.addToSelectedList(item);
-      } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiPlaylistPlus))])], 1) : _vm._e(), _setup.notPartialSupportSite ? _c("v-btn", { attrs: { "icon": "", "color": "#fff", "title": _vm.$t("VpuyxZtIoDF9-YyOm0tK_") }, on: { "click": function($event) {
-        $event.stopPropagation();
-        return _setup.downloadCtxPost(item);
-      } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiDownload))])], 1) : _vm._e(), _setup.isFavBtnShow ? _c("v-btn", { attrs: { "icon": "", "color": "#fff", "title": _vm.$t("Dnnio9m9RZA6bkTLytc99") }, on: { "click": function($event) {
+      } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiPlaylistPlus))])], 1) : _vm._e(), _setup.isFavBtnShow ? _c("v-btn", { attrs: { "icon": "", "color": "#fff", "title": _vm.$t("Dnnio9m9RZA6bkTLytc99") }, on: { "click": function($event) {
         $event.stopPropagation();
         return _setup.addFavorite(item?.id);
       } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiHeartPlusOutline))])], 1) : _vm._e()], 1) : _vm._e()], 2)];
-    } }], null, false, 1513620916) }) : _c("wf-layout", _vm._l(_setup.store.imageList, function(image, index) {
+    } }], null, false, 3981195613) }) : _c("wf-layout", _vm._l(_setup.store.imageList, function(image, index) {
       return _c("v-card", { key: index, staticClass: "posts-image-card", style: _setup.imgCardStyle(image), on: { "touchstart": function($event) {
         return _setup.onPostTouchStart($event, image);
       }, "touchmove": _setup.onPostTouchMove, "touchend": _setup.onPostTouchEnd, "touchcancel": _setup.cancelPostLongPress, "contextmenu": function($event) {
@@ -8116,10 +8088,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       } } })], 1) : _vm._e(), _setup.settings.showListPostReso ? _c("div", { staticClass: "posts-image-wh" }, [_vm._v(_vm._s(image?.width) + " \xD7 " + _vm._s(image?.height))]) : _vm._e(), !_setup.isR34Fav ? _c("div", { staticClass: "posts-image-actions" }, [_c("v-btn", { attrs: { "icon": "", "color": "#fff", "title": _vm.$t("EsiorRgoeHI8h7IHMLDA4"), "href": image?.postView, "target": "_blank", "rel": "noreferrer" } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiLinkVariant))])], 1), _setup.notPartialSupportSite ? _c("v-btn", { staticClass: "hidden-md-and-down", attrs: { "icon": "", "color": "#fff", "title": _vm.$t("hVmfDxXoj8vkgVQabEOSr") }, on: { "click": function($event) {
         $event.stopPropagation();
         return _setup.addToSelectedList(image);
-      } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiPlaylistPlus))])], 1) : _vm._e(), _setup.notPartialSupportSite ? _c("v-btn", { attrs: { "icon": "", "color": "#fff", "title": _vm.$t("VpuyxZtIoDF9-YyOm0tK_") }, on: { "click": function($event) {
-        $event.stopPropagation();
-        return _setup.downloadCtxPost(image);
-      } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiDownload))])], 1) : _vm._e(), _setup.isFavBtnShow ? _c("v-btn", { attrs: { "icon": "", "color": "#fff", "title": _vm.$t("Dnnio9m9RZA6bkTLytc99") }, on: { "click": function($event) {
+      } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiPlaylistPlus))])], 1) : _vm._e(), _setup.isFavBtnShow ? _c("v-btn", { attrs: { "icon": "", "color": "#fff", "title": _vm.$t("Dnnio9m9RZA6bkTLytc99") }, on: { "click": function($event) {
         $event.stopPropagation();
         return _setup.addFavorite(image?.id);
       } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiHeartPlusOutline))])], 1) : _vm._e()], 1) : _vm._e()], 2);
@@ -8133,9 +8102,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       return _setup.sharePost(_setup.ctxActPost);
     } } }, [_c("v-list-item-title", [_vm._v("\u5206\u4EAB\u4F5C\u54C1\u94FE\u63A5")])], 1) : _vm._e(), _setup.isFavBtnShow ? _c("v-list-item", { on: { "click": function($event) {
       return _setup.addFavorite();
-    } } }, [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("Dnnio9m9RZA6bkTLytc99")))])], 1) : _vm._e(), _setup.notPartialSupportSite ? _c("v-list-item", { on: { "click": function($event) {
-      return _setup.downloadCtxPost();
-    } } }, [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("VpuyxZtIoDF9-YyOm0tK_")))])], 1) : _vm._e(), _c("v-list-item", { on: { "click": function($event) {
+    } } }, [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("Dnnio9m9RZA6bkTLytc99")))])], 1) : _vm._e(), _c("v-list-item", { on: { "click": function($event) {
       return _setup.openDetail();
     } } }, [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("EsiorRgoeHI8h7IHMLDA4")))])], 1), _setup.notPartialSupportSite ? _c("v-list-item", { staticClass: "hidden-md-and-down", on: { "click": function($event) {
       return _setup.addToSelectedList();
