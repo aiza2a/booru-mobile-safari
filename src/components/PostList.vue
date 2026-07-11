@@ -22,6 +22,7 @@
           @contextmenu="onCtxMenu($event, item)"
         >
           <img
+            :key="imageRenderKey(item, index)"
             class="post-image-v"
             alt=""
             loading="lazy"
@@ -98,6 +99,7 @@
       >
         <template v-if="settings.masonryLayout === 'justified'">
           <img
+            :key="imageRenderKey(image, index)"
             class="post-image"
             alt=""
             loading="lazy"
@@ -112,6 +114,7 @@
         </template>
         <v-img
           v-else
+          :key="imageRenderKey(image, index)"
           transition="scroll-y-transition"
           :src="getImgSrc(image)"
           :aspect-ratio="image?.aspectRatio"
@@ -234,6 +237,8 @@ const notFitScreen = ref(localStorage.getItem('__fitScreen') == '0')
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const isR34Fav = ref(isRule34FavPage() || isGelbooruFavPage())
 const showImageList = ref(true)
+const imageRenderVersions = ref<Record<string, number>>({})
+let openedDetailIndex = -1
 type LongPressState = 'idle' | 'pressing' | 'previewing' | 'sharing' | 'restoring'
 
 let longPressState: LongPressState = 'idle'
@@ -246,6 +251,16 @@ let shareInFlight = false
 let lockedScrollY = 0
 let activeLongPressPost: Post | undefined
 let pendingDirectSharePost: Post | undefined
+
+watch(
+  () => store.showImageSelected,
+  shown => {
+    if (shown || openedDetailIndex < 0) return
+    const index = openedDetailIndex
+    openedDetailIndex = -1
+    nextTick(() => refreshDetailNeighbourImages(index))
+  },
+)
 
 watch(
   () => settings.selectedColumn,
@@ -271,6 +286,23 @@ const maxHeightStyle = computed(() => {
   if (num == 0 || num > 3) return 'max-height: 60vh;overflow: hidden'
   return ''
 })
+
+function imageRenderKey(image: Post, index: number) {
+  const id = String(image?.id || index)
+  return `${id}-${imageRenderVersions.value[id] || 0}`
+}
+
+function refreshDetailNeighbourImages(index: number) {
+  const start = Math.max(0, index - 8)
+  const versions = { ...imageRenderVersions.value }
+  for (let current = start; current <= index; current++) {
+    const image = store.imageList[current]
+    if (!image) continue
+    const id = String(image.id || current)
+    versions[id] = (versions[id] || 0) + 1
+  }
+  imageRenderVersions.value = versions
+}
 
 function imgCardStyle(image: Post) {
   if (settings.masonryLayout !== 'justified') return maxHeightStyle
@@ -425,6 +457,7 @@ function showImgModal(index: number) {
     fancyboxShow(store.imageList, index)
     return
   }
+  openedDetailIndex = index
   store.imageSelectedIndex = index
   store.showImageSelected = true
 }
