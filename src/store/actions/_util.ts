@@ -2,7 +2,6 @@ import type { SearchResults } from '@himeka/booru'
 import { settings } from '@/store'
 import { BOORU_PAGE_LIMIT, isPidSite } from '@/api/booru'
 
-
 export function getFirstPageNo(params: URLSearchParams) {
   if (isPidSite()) {
     const page = Number(params.get('pid')) || 0
