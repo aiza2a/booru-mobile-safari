@@ -244,9 +244,7 @@
         </v-list-item-group>
       </v-list>
     </v-menu>
-    <v-btn v-if="isMobile" title="沉浸模式" icon @click="toggleImmersive">
-      <v-icon>{{ store.isImmersive ? mdiFullscreenExit : mdiFullscreen }}</v-icon>
-    </v-btn>
+    <!-- Mobile immersive control lives in SettingsDrawer to preserve date capsule space. -->
     <v-btn
       v-if="isMobile"
       class="mobile-settings-btn"
@@ -665,19 +663,7 @@ function exitMasonry() {
   location.assign(url)
 }
 
-async function toggleImmersive() {
-  store.isImmersive = !store.isImmersive
-  document.documentElement.classList.toggle('ym-immersive', store.isImmersive)
-  if (store.isImmersive) {
-    try {
-      await document.documentElement.requestFullscreen?.()
-    } catch (_error) {}
-  } else if (document.fullscreenElement) {
-    try {
-      await document.exitFullscreen()
-    } catch (_error) {}
-  }
-}
+
 
 async function toggleFullscreen() {
   try {

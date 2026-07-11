@@ -1623,24 +1623,7 @@ html.long-press-sharing body {
     background: rgba(8, 9, 12, .52);
   }
 
-  .mobile-detail-color-glass {
-    position: absolute;
-    z-index: -1;
-    top: calc(50% - 45px);
-    left: 50%;
-    width: min(var(--detail-glass-width), calc(100vw - 20px));
-    height: min(var(--detail-glass-height), calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 92px));
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, .13);
-    border-radius: 26px;
-    background:
-      radial-gradient(circle at 22% 18%, rgba(var(--detail-color-c), .64), transparent 48%),
-      radial-gradient(circle at 82% 74%, rgba(var(--detail-color-a), .68), transparent 52%),
-      linear-gradient(145deg, rgba(var(--detail-color-b), .82), rgba(var(--detail-color-a), .48));
-    box-shadow: inset 0 1px rgba(255, 255, 255, .10), 0 18px 54px rgba(0, 0, 0, .28);
-    filter: saturate(1.08);
-    transform: translate(-50%, -50%);
-  }
+  /* Ambient preview now lives inside .detail-media-stage. */
 
   .mobile-detail-overlay .img_detail_cont {
     position: absolute;
@@ -1954,5 +1937,107 @@ html.mobile-detail-open body {
 
   .theme--light body::before {
     background: rgba(242, 242, 247, .22);
+  }
+}
+
+/* Final mobile media stage: ambient preview and main image share one centered box. */
+@media screen and (max-width: 959px), (pointer: coarse) {
+  body::before,
+  .mobile-detail-overlay::before {
+    display: none !important;
+  }
+
+  .mobile-detail-overlay,
+  .theme--light .mobile-detail-overlay {
+    background: transparent !important;
+  }
+
+  .mobile-detail-overlay .img_detail_cont {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(env(safe-area-inset-top) + 16px) 10px calc(env(safe-area-inset-bottom) + 88px);
+  }
+
+  .mobile-detail-overlay .detail-media-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    box-sizing: content-box;
+    width: var(--detail-media-width);
+    height: var(--detail-media-height);
+    max-width: calc(100vw - 48px);
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 174px);
+    padding: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .13);
+    border-radius: 26px;
+    background: rgba(var(--detail-color-b), .72);
+    box-shadow: inset 0 1px rgba(255, 255, 255, .10), 0 18px 54px rgba(0, 0, 0, .30);
+  }
+
+  .detail-media-ambient,
+  .detail-media-shade {
+    position: absolute;
+    inset: -24px;
+    width: calc(100% + 48px);
+    height: calc(100% + 48px);
+    pointer-events: none;
+  }
+
+  .detail-media-ambient {
+    z-index: 0;
+    object-fit: cover;
+    filter: blur(26px) saturate(1.25);
+    opacity: .66;
+    transform: scale(1.08);
+  }
+
+  .detail-media-shade {
+    z-index: 1;
+    background:
+      radial-gradient(circle at 24% 18%, rgba(var(--detail-color-c), .20), transparent 52%),
+      linear-gradient(145deg, rgba(var(--detail-color-b), .46), rgba(8, 9, 12, .34));
+  }
+
+  .mobile-detail-overlay .detail-media-stage .img_detail_sample {
+    position: relative;
+    z-index: 2;
+    width: var(--detail-media-width) !important;
+    height: var(--detail-media-height) !important;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 18px;
+    object-fit: contain;
+  }
+
+  .mobile-detail-overlay .detail-media-stage .img_detail_loading {
+    z-index: 3;
+    inset: 14px;
+    width: auto;
+    height: auto;
+  }
+
+  .v-application .mobile-date-filter {
+    max-width: calc(100vw - 112px);
+  }
+
+  .mobile-date-filter.date-filter--expanded {
+    display: flex;
+    width: fit-content;
+    max-width: calc(100vw - 112px);
+  }
+
+  .mobile-date-filter .date-mode-toggle,
+  .mobile-date-filter > .v-menu,
+  .mobile-date-filter .date-nav-button {
+    flex: 0 0 auto;
+  }
+
+  .mobile-date-filter .native-date-trigger,
+  .mobile-date-filter > .date-display {
+    flex: 1 1 auto;
+    min-width: 52px;
   }
 }

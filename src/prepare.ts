@@ -295,7 +295,7 @@ function replaceDocument() {
   token && sessionStorage.setItem('csrf-token', token)
   document.head.innerHTML = /* html */`
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="${initialSettings.darkMode !== 'light' ? '#111318' : '#f2f2f7'}">
     <title>${location.host.toUpperCase()} Masonry</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">

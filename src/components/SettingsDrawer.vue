@@ -27,6 +27,10 @@
           <v-list-item-action><v-switch v-model="isDarkMode" inset hide-details @change="onDarkModeChange" /></v-list-item-action>
         </v-list-item>
         <v-list-item>
+          <v-list-item-content><v-list-item-title>沉浸模式</v-list-item-title><v-list-item-subtitle>隐藏顶部控件并进入全屏浏览</v-list-item-subtitle></v-list-item-content>
+          <v-list-item-action><v-switch :input-value="store.isImmersive" inset hide-details @change="toggleImmersive" /></v-list-item-action>
+        </v-list-item>
+        <v-list-item>
           <v-list-item-content><v-list-item-title>布局方式</v-list-item-title><v-list-item-subtitle>选择瀑布流、网格或其他布局</v-list-item-subtitle></v-list-item-content>
           <v-list-item-action>
             <v-menu offset-y><template #activator="{ on, attrs }"><v-btn small class="sel_menu_btn" v-bind="attrs" v-on="on">{{ actLayout }}<v-icon :size="16">{{ mdiChevronDown }}</v-icon></v-btn></template>
@@ -456,6 +460,21 @@ const isDarkMode = ref(settings.darkMode === 'dark')
 function onDarkModeChange(val: boolean) {
   settings.darkMode = val ? 'dark' : 'light'
   vuetify.theme.dark = val
+}
+
+async function toggleImmersive(val: boolean) {
+  store.isImmersive = val
+  document.documentElement.classList.toggle('ym-immersive', val)
+  store.showSettings = false
+  if (val) {
+    try {
+      await document.documentElement.requestFullscreen?.()
+    } catch (_error) {}
+  } else if (document.fullscreenElement) {
+    try {
+      await document.exitFullscreen()
+    } catch (_error) {}
+  }
 }
 
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches

@@ -12,13 +12,6 @@
   >
     <div v-if="isMobile" class="mobile-detail-backdrop" aria-hidden="true" @click="close"></div>
     <div
-      v-if="isMobile"
-      class="mobile-detail-color-glass"
-      :style="detailColorStyle"
-      aria-hidden="true"
-      @click="close"
-    ></div>
-    <div
       v-if="store.showImageSelected"
       class="img_detail_cont"
       @click="onDtlContClick"
@@ -34,9 +27,18 @@
       </template>
       <div
         v-else
-        :class="{ img_scale_scroll: scaleOn, img_scale_normal: !scaleOn }"
+        :class="{ img_scale_scroll: scaleOn, img_scale_normal: !scaleOn, 'detail-media-stage': !scaleOn }"
+        :style="!scaleOn ? detailColorStyle : undefined"
         draggable="false"
       >
+        <img
+          v-if="!scaleOn && imgLasySrc"
+          class="detail-media-ambient"
+          :src="imgLasySrc"
+          alt=""
+          aria-hidden="true"
+        >
+        <div v-if="!scaleOn" class="detail-media-shade" aria-hidden="true"></div>
         <v-row v-show="imgLoading" class="img_detail_loading" @click.stop="close">
           <img v-if="(showPreviewThumb && !scaleOn)" :src="imgLasySrc" :width="imageSelectedWidth" alt="">
           <v-progress-circular :size="100" :width="6" indeterminate color="deep-purple" />
@@ -516,8 +518,8 @@ const detailColorStyle = computed(() => ({
   '--detail-color-a': detailColors.value[0],
   '--detail-color-b': detailColors.value[1],
   '--detail-color-c': detailColors.value[2],
-  '--detail-glass-width': `${detailImageRect.value.width + 28}px`,
-  '--detail-glass-height': `${detailImageRect.value.height + 28}px`,
+  '--detail-media-width': `${detailImageRect.value.width}px`,
+  '--detail-media-height': `${detailImageRect.value.height}px`,
 }))
 const imgLoading = ref(true)
 const innerWidth = ref(window.innerWidth)
@@ -642,8 +644,8 @@ function extractDetailColors(image: HTMLImageElement) {
 }
 
 function updateDetailImageRect(image: HTMLImageElement) {
-  const availableWidth = Math.max(0, innerWidth.value - 36)
-  const availableHeight = Math.max(0, innerHeight.value - 110 - 36)
+  const availableWidth = Math.max(0, innerWidth.value - 48)
+  const availableHeight = Math.max(0, innerHeight.value - 110 - 64)
   const naturalWidth = image.naturalWidth || imageSelected.value.sampleWidth || availableWidth
   const naturalHeight = image.naturalHeight || imageSelected.value.sampleHeight || availableHeight
   const ratio = Math.min(availableWidth / naturalWidth, availableHeight / naturalHeight, 1)
