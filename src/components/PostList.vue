@@ -14,6 +14,7 @@
     >
       <template #default="{ item, index }">
         <div
+          :id="`post-card-${item?.id}`"
           class="posts-image-card"
           @touchstart="onPostTouchStart($event, item)"
           @touchmove="onPostTouchMove"
@@ -87,7 +88,8 @@
     <wf-layout v-else>
       <v-card
         v-for="(image, index) in store.imageList"
-        :key="index"
+        :key="image.id || index"
+        :id="`post-card-${image?.id}`"
         class="posts-image-card"
         :style="imgCardStyle(image)"
         @touchstart="onPostTouchStart($event, image)"
@@ -424,6 +426,13 @@ function showImgModal(index: number) {
   if (settings.useFancybox) {
     fancyboxShow(store.imageList, index)
     return
+  }
+  const post = store.imageList[index]
+  const card = post ? document.getElementById(`post-card-${post.id}`) : null
+  store.detailReturnState = {
+    postId: post?.id ? String(post.id) : '',
+    scrollY: window.scrollY,
+    cardTop: card?.getBoundingClientRect().top ?? 0,
   }
   store.imageSelectedIndex = index
   store.showImageSelected = true

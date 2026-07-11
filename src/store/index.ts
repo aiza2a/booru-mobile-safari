@@ -21,6 +21,7 @@ export const store = Vue.observable({
   showDrawer: false,
   showSettings: false,
   showMobileSearch: false,
+  detailReturnState: null as null | { postId: string; scrollY: number; cardTop: number },
   showFab: false,
   currentPage: 1,
   imageList: [] as Post[],
