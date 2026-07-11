@@ -1,5 +1,12 @@
 <template>
-  <v-dialog v-model="store.showImageSelected" fullscreen content-class="ios-detail-dialog">
+  <v-dialog
+    v-model="store.showImageSelected"
+    fullscreen
+    content-class="ios-detail-dialog"
+    :transition="false"
+    overlay-color="transparent"
+    :overlay-opacity="0"
+  >
     <div
       v-if="store.showImageSelected"
       class="detail-glass-panel"
@@ -505,6 +512,7 @@ const notR34Fav = ref(!(
 ))
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const showImageToolbar = ref(true)
+const detailAmbientSnapshot = ref('')
 const detailVisualState = ref<'closed' | 'opening' | 'open' | 'closing'>('closed')
 const imgLoading = ref(true)
 const innerWidth = ref(window.innerWidth)
@@ -540,7 +548,7 @@ const imgLasySrc = computed(() => {
     ?? void 0
 })
 const detailAmbientStyle = computed(() => {
-  const src = imgLasySrc.value
+  const src = detailAmbientSnapshot.value || imgLasySrc.value
   return src ? { backgroundImage: `url("${src.replace(/"/g, '\\"')}")` } : {}
 })
 
@@ -872,6 +880,7 @@ async function reqFullscreen() {
 
 watch(() => store.showImageSelected, async val => {
   if (val) {
+    detailAmbientSnapshot.value = imgLasySrc.value || ''
     detailVisualState.value = 'opening'
     imgLoading.value = true
     await nextTick()
@@ -884,6 +893,7 @@ watch(() => store.showImageSelected, async val => {
     postDetail.value = {}
     await nextTick()
     showPreviewThumb.value = true
+    window.setTimeout(() => { detailAmbientSnapshot.value = '' }, 120)
   }
 })
 

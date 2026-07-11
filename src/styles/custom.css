@@ -767,8 +767,14 @@ html:has(#app.theme--dark) {
   }
 
   .v-dialog__content:has(.ios-detail-dialog),
-  .v-dialog__content:has(.ios-detail-dialog) .v-dialog {
+  .v-dialog__content:has(.ios-detail-dialog) .v-dialog,
+  .v-overlay:has(.ios-detail-dialog),
+  .v-overlay:has(.ios-detail-dialog) .v-overlay__scrim {
     background: transparent !important;
+  }
+
+  .v-overlay:has(.ios-detail-dialog) .v-overlay__scrim {
+    opacity: 0 !important;
   }
 
   .ios-detail-dialog .detail-glass-panel {
@@ -899,7 +905,7 @@ html:has(#app.theme--dark) {
   }
 
   .theme--light .ios-detail-dialog {
-    background: rgba(242, 242, 247, .56) !important;
+    background: transparent !important;
   }
 
   .theme--light .ios-detail-dialog .mobile-detail-nav {
