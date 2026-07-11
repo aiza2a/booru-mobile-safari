@@ -320,9 +320,29 @@ Gelbooru 没有 Danbooru 对等的官方“最多观看/最受欢迎”，禁止
 - `sort:updated:desc` 是更新时间排序。
 - “最近更新 + 日期范围”界面必须标注日期筛选的是发布日期范围，除非进一步确认存在更新时间条件。
 
-## 5. 阶段 1：数据正确性实施计划
+## 5. 阶段 1：数据正确性实施记录
 
-当前正在执行此阶段。
+当前状态：**代码、自动测试、实时接口抽样和云端构建已完成；等待 Stay 实机验收 Konachan 与五站入口。未通过用户验收前不得进入阶段 2。**
+
+### 5.0 本阶段交付
+
+- `src/utils/date-filter.ts`：日期范围、移动、显示、未来日期限制和 URL 参数解析。
+- `src/utils/site-date-routes.ts`：五站日期能力矩阵与 URL 构建器。
+- `src/utils/moebooru-html.ts`：括号深度解析 `Post.register(...)`，避免嵌套 JSON 截断。
+- `scripts/verify-site-date-routes.mjs`：日期和 URL 单元测试。
+- `scripts/verify-moebooru-html.mjs`：Konachan HTML fixture 测试。
+- `scripts/verify-live-date-routes.mjs`：Yande.re、Danbooru、Gelbooru 实时接口抽样。
+- `.github/workflows/mobile-build.yml`：CI 增加 `pnpm run verify:dates` 门禁。
+
+验证结果：
+
+- Yande.re `1d/1w/1m/1y` 前 20 个帖子 ID 为 4 个不同集合。
+- Yande.re 日期与日期区间实时 API 返回数据。
+- Danbooru Viewed、Popular 的周期接口实时返回数据。
+- Danbooru 历史 `order:rank` 返回空数组，已按计划降级为 `order:score`，实时返回数据。
+- Gelbooru 首页日期、评分日期区间、更新排序日期区间均返回有效 HTML。
+- Konachan 服务端和浏览器自动化均遇到 Cloudflare challenge；解析器只能通过 fixture 自动验证，必须由 Stay 实机完成最终门禁。
+- GitHub Actions run `29136700283`：lint、日期测试和 build 全部成功。
 
 ### 5.1 公共日期工具
 
@@ -472,16 +492,21 @@ scripts/verify-site-date-routes.mjs
 
 不直接依赖实时站点作为唯一 CI 测试，避免 Cloudflare 和网络波动。实时接口验证作为手动验收脚本单独运行。
 
-### 5.7 阶段 1 完成标准
+### 5.7 阶段 1 完成标准与当前门禁
 
-必须全部满足：
+自动化部分已满足：
 
-- `docs/MOBILE_SAFARI_ACCEPTANCE.md` 阶段 1 全部勾选
 - lint 成功
 - build 成功
 - 自动 URL/日期测试成功
-- 实时接口抽样成功
-- 用户在 Stay 中验收五个重点站点
+- Yande.re、Danbooru、Gelbooru 实时接口抽样成功
+
+仍未满足：
+
+- Konachan / Konachan Safe 的 Stay 实机数据加载验证
+- 用户对五个重点站点入口的 Stay 实机验收
+
+因此阶段 1 当前状态为：**等待实机验收，不得进入阶段 2。**
 
 ## 6. 阶段 2：统一日期组件实施计划
 

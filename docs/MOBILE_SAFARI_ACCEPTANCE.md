@@ -1,19 +1,20 @@
 # Mobile Safari 改造验收清单
 
 ## 阶段 1：数据正确性
-- [ ] Yande.re 最近人气 1d/1w/1m/1y 内容实际变化
-- [ ] Yande.re 首页按日/周/月/年查询
-- [ ] Konachan / Konachan Safe 首页可加载
-- [ ] Konachan / Konachan Safe 随机可加载
-- [ ] Konachan 首页按日/周/月/年查询
-- [ ] Danbooru 首页日期筛选
-- [ ] Danbooru 最多观看 day/week/month/year
-- [ ] Danbooru 最受欢迎 day/week/month/year
-- [ ] Danbooru 热度最高日期筛选
-- [ ] Gelbooru 首页日期筛选
-- [ ] Gelbooru 评分最高近期筛选
-- [ ] Gelbooru 最近更新近期筛选
-- [ ] 云端 lint/build 成功
+- [x] Yande.re 最近人气 1d/1w/1m/1y 内容实际变化（实时接口前 20 个 ID 集合共 4 组）
+- [x] Yande.re 首页按日/周/月/年查询（日期与范围语法实时验证）
+- [ ] Konachan / Konachan Safe 首页可加载（HTML 回退与 fixture 已通过；待 Stay 绕过 Cloudflare 实测）
+- [ ] Konachan / Konachan Safe 随机可加载（HTML 回退与 fixture 已通过；待 Stay 绕过 Cloudflare 实测）
+- [ ] Konachan 首页按日/周/月/年查询（路由和解析测试通过；待 Stay 实测）
+- [x] Danbooru 首页日期筛选（路由与 API 语法验证）
+- [x] Danbooru 最多观看 day/week/month/year（Explore JSON 实时验证）
+- [x] Danbooru 最受欢迎 day/week/month/year（Explore JSON 实时验证）
+- [x] Danbooru 热度最高日期筛选（历史范围使用 `order:score`，实时返回数据）
+- [x] Gelbooru 首页日期筛选（实时 HTML 验证）
+- [x] Gelbooru 评分最高近期筛选（实时 HTML 验证）
+- [x] Gelbooru 最近更新近期筛选（按发布日期过滤、更新时间倒序；实时 HTML 验证）
+- [x] 日期范围、路由构建和 Konachan HTML fixture 自动测试
+- [x] 云端 lint/日期测试/build 成功（run `29136700283`）
 - [ ] Stay 实机验收
 
 ## 阶段 2：统一日期组件
