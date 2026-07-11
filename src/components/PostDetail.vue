@@ -1,27 +1,16 @@
 <template>
-  <v-dialog
+  <component
+    :is="isMobile ? 'div' : 'v-dialog'"
+    v-if="!isMobile || store.showImageSelected"
     v-model="store.showImageSelected"
-    fullscreen
-    content-class="ios-detail-dialog"
+    :fullscreen="!isMobile"
+    :content-class="isMobile ? undefined : 'ios-detail-dialog'"
     :transition="false"
     overlay-color="transparent"
     :overlay-opacity="0"
+    :class="isMobile ? ['mobile-detail-overlay', `mobile-detail-overlay--${detailVisualState}`] : undefined"
   >
-    <div
-      v-if="store.showImageSelected"
-      class="detail-glass-panel"
-      :class="`detail-glass-panel--${detailVisualState}`"
-    >
-      <div
-        class="detail-ambient-bg"
-        :style="detailAmbientStyle"
-        aria-hidden="true"
-      ></div>
-      <div
-        class="detail-ambient-shade"
-        aria-hidden="true"
-      ></div>
-    </div>
+    <div v-if="isMobile" class="mobile-detail-backdrop" aria-hidden="true"></div>
     <div
       v-if="store.showImageSelected"
       class="img_detail_cont"
@@ -459,7 +448,7 @@
         val => isExportTagsShow = val"
       :tags="postDetail?.tags || []"
     />
-  </v-dialog>
+  </component>
 </template>
 
 <script setup lang="ts">
@@ -512,7 +501,6 @@ const notR34Fav = ref(!(
 ))
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const showImageToolbar = ref(true)
-const detailAmbientSnapshot = ref('')
 const detailVisualState = ref<'closed' | 'opening' | 'open' | 'closing'>('closed')
 const imgLoading = ref(true)
 const innerWidth = ref(window.innerWidth)
@@ -546,10 +534,6 @@ const imgLasySrc = computed(() => {
     ?? imageSelected.value.sampleUrl
     ?? imageSelected.value.fileUrl
     ?? void 0
-})
-const detailAmbientStyle = computed(() => {
-  const src = detailAmbientSnapshot.value || imgLasySrc.value
-  return src ? { backgroundImage: `url("${src.replace(/"/g, '\\"')}")` } : {}
 })
 
 const imageSelectedWidth = computed(() => {
@@ -880,7 +864,6 @@ async function reqFullscreen() {
 
 watch(() => store.showImageSelected, async val => {
   if (val) {
-    detailAmbientSnapshot.value = imgLasySrc.value || ''
     detailVisualState.value = 'opening'
     imgLoading.value = true
     await nextTick()
@@ -893,7 +876,6 @@ watch(() => store.showImageSelected, async val => {
     postDetail.value = {}
     await nextTick()
     showPreviewThumb.value = true
-    window.setTimeout(() => { detailAmbientSnapshot.value = '' }, 120)
   }
 })
 
