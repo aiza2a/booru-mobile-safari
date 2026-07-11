@@ -1084,8 +1084,10 @@ html.ym-immersive .posts-image-card {
 
 .mobile-date-filter {
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   min-width: 0;
+  max-width: calc(100vw - 164px);
   margin-left: 2px;
   overflow: hidden;
   white-space: nowrap;
@@ -1105,12 +1107,26 @@ html.ym-immersive .posts-image-card {
   box-shadow: none !important;
 }
 
+.mobile-date-filter .date-mode-toggle .v-btn {
+  width: 40px !important;
+  min-width: 40px !important;
+  color: var(--ios-secondary-label) !important;
+}
+
 .mobile-date-filter .date-mode-toggle .v-btn--active {
   color: var(--ios-label) !important;
   background: rgba(118, 118, 128, .46) !important;
 }
 
+.mobile-date-filter .scale-button {
+  width: 34px;
+  min-width: 34px !important;
+  font-size: 15px;
+}
+
 .mobile-date-filter .date-display {
-  min-width: 58px !important;
+  min-width: 54px !important;
+  max-width: 92px;
+  padding: 0 2px !important;
   font-variant-numeric: tabular-nums;
 }

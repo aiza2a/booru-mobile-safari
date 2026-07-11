@@ -10,7 +10,7 @@ export interface SiteDateCapability {
 const allScales = ['day', 'week', 'month', 'year'] as const
 const moeScales = {
   home: [...allScales],
-  random: [...allScales],
+  random: [],
   popular: [...allScales],
   viewed: [],
   ranked: [],
@@ -20,19 +20,19 @@ const moeScales = {
 export const siteCapabilities: Record<SupportedDateSite, SiteDateCapability> = {
   'yandere': {
     site: 'yandere',
-    routes: ['home', 'random', 'popular'],
+    routes: ['home', 'popular'],
     latestRoutes: ['popular'],
     scales: moeScales,
   },
   'konachan-com': {
     site: 'konachan-com',
-    routes: ['home', 'random', 'popular'],
+    routes: ['home', 'popular'],
     latestRoutes: ['popular'],
     scales: moeScales,
   },
   'konachan-net': {
     site: 'konachan-net',
-    routes: ['home', 'random', 'popular'],
+    routes: ['home', 'popular'],
     latestRoutes: ['popular'],
     scales: moeScales,
   },

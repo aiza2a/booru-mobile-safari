@@ -55,9 +55,16 @@ export function clampFutureDate(dateText: string, today = new Date()) {
 
 export function formatDateDisplay(dateText: string, scale: DateScale) {
   const range = getDateRange(dateText, scale)
-  if (scale === 'day') return range.date.slice(5)
-  if (scale === 'week') return `${range.start.slice(5)} ~ ${range.end.slice(5)}`
-  if (scale === 'month') return range.date.slice(0, 7)
+  const slash = (value: string) => value.slice(5).replace('-', '/')
+  if (scale === 'day') return slash(range.date)
+  if (scale === 'week') {
+    const start = slash(range.start)
+    const end = slash(range.end)
+    return range.start.slice(5, 7) === range.end.slice(5, 7)
+      ? `${start}–${end.slice(-2)}`
+      : `${start}–${end}`
+  }
+  if (scale === 'month') return range.date.slice(0, 7).replace('-', '/')
   return range.date.slice(0, 4)
 }
 
