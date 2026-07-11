@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="store.showImageSelected" fullscreen>
+  <v-dialog v-model="store.showImageSelected" fullscreen content-class="ios-detail-dialog">
     <div
       v-if="store.showImageSelected"
       class="img_detail_cont"
