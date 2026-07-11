@@ -3,6 +3,7 @@
     <AppBar />
     <NavDrawer />
     <ImmersiveExit />
+    <MobileSearchFab />
     <v-main app>
       <AppContainer />
       <SettingsDrawer />
@@ -19,6 +20,7 @@ import AppBar from './components/AppBar.vue'
 import NavDrawer from './components/NavDrawer.vue'
 // Mobile page shortcuts live in the settings drawer.
 import ImmersiveExit from './components/ImmersiveExit.vue'
+import MobileSearchFab from './components/MobileSearchFab.vue'
 import SettingsDrawer from './components/SettingsDrawer.vue'
 import AppContainer from './components/AppContainer.vue'
 import { useVuetify } from './plugins/vuetify'

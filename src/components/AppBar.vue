@@ -85,7 +85,7 @@
         </v-btn>
       </template>
       <template v-if="isMobile && isSupportTagSearch">
-        <v-btn class="mobile-search-trigger" title="搜索标签" icon @click="showMobileSearch = true">
+        <v-btn class="mobile-search-trigger" title="搜索标签" icon @click="store.showMobileSearch = true">
           <v-icon>{{ mdiMagnify }}</v-icon>
         </v-btn>
       </template>
@@ -262,10 +262,10 @@
     <v-btn class="hidden-md-and-down" :title="$t('ClZdL9hGweOokP7Mn_Ptq')" icon @click="exitMasonry">
       <v-icon>{{ mdiLocationExit }}</v-icon>
     </v-btn>
-    <v-dialog v-model="showMobileSearch" fullscreen transition="dialog-bottom-transition">
+    <v-dialog v-model="store.showMobileSearch" fullscreen transition="dialog-bottom-transition">
       <v-card class="mobile-search-sheet">
         <v-toolbar flat>
-          <v-btn icon @click="showMobileSearch = false">
+          <v-btn icon @click="store.showMobileSearch = false">
             <v-icon>{{ mdiClose }}</v-icon>
           </v-btn>
           <v-text-field
@@ -376,7 +376,6 @@ function removeFromList(id: string) {
 }
 
 const tagsQuery = new URLSearchParams(location.search).get('tags')
-const showMobileSearch = ref(false)
 const searchState = reactive({
   showInput: !!tagsQuery,
   showMenu: false,
@@ -429,7 +428,7 @@ function selectMobileTag(tag: string) {
 }
 
 function submitMobileSearch() {
-  showMobileSearch.value = false
+  store.showMobileSearch = false
   fetchTaggedPosts(searchState.searchTerm)
 }
 
@@ -692,8 +691,7 @@ function selectLang(val: typeof settings.lang) {
 
 onMounted(() => {
   eventBus.$on('mobileSearch', () => {
-    searchState.showInput = true
-    setTimeout(() => document.querySelector<HTMLInputElement>('.app-bar-tag-input input')?.focus(), 80)
+    store.showMobileSearch = true
   })
   document.addEventListener('fullscreenchange', () => {
     store.isFullscreen = !!document.fullscreenElement

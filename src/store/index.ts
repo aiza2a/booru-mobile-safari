@@ -20,6 +20,7 @@ export const store = Vue.observable({
   imageSelectedIndex: 0,
   showDrawer: false,
   showSettings: false,
+  showMobileSearch: false,
   showFab: false,
   currentPage: 1,
   imageList: [] as Post[],

@@ -1130,3 +1130,50 @@ html.ym-immersive .posts-image-card {
   padding: 0 2px !important;
   font-variant-numeric: tabular-nums;
 }
+
+.mobile-search-fab {
+  right: 16px !important;
+  bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+  width: 48px !important;
+  height: 48px !important;
+  color: var(--ios-label) !important;
+  background: rgba(44, 44, 46, .82) !important;
+  border: 1px solid var(--ios-separator) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .28) !important;
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.theme--light .mobile-search-fab {
+  color: #1c1c1e !important;
+  background: rgba(255, 255, 255, .84) !important;
+}
+
+.ios-date-dialog {
+  width: min(92vw, 430px) !important;
+  margin: 0 !important;
+  align-self: flex-end;
+}
+
+.ios-date-sheet {
+  max-height: 82vh;
+  overflow: auto;
+  border-radius: 22px 22px 0 0 !important;
+  background: var(--ios-surface) !important;
+}
+
+.ios-date-sheet .v-card__title {
+  justify-content: center;
+  color: var(--ios-label);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.ios-year-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  max-height: 48vh;
+  padding: 12px;
+  overflow: auto;
+}

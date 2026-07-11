@@ -22,12 +22,33 @@
     </template>
     <template v-if="dateFilter.mode === 'date'">
       <v-btn icon small @click="move(-1)"><v-icon>{{ mdiChevronLeft }}</v-icon></v-btn>
-      <v-menu v-model="showPicker" :close-on-content-click="false" offset-y>
-        <template #activator="{ on, attrs }">
-          <v-btn class="date-display" small text v-bind="attrs" v-on="on">{{ displayDate }}</v-btn>
-        </template>
-        <v-date-picker v-model="dateFilter.date" :max="today" no-title @input="onDateSelected" />
-      </v-menu>
+      <v-btn class="date-display" small text @click="showPicker = true">{{ displayDate }}</v-btn>
+      <v-dialog v-model="showPicker" content-class="ios-date-dialog">
+        <v-card class="ios-date-sheet">
+          <v-card-title>{{ pickerTitle }}</v-card-title>
+          <v-date-picker
+            v-if="dateFilter.scale === 'day' || dateFilter.scale === 'week'"
+            v-model="dateFilter.date"
+            :max="today"
+            full-width
+            no-title
+            @input="onDateSelected"
+          />
+          <v-date-picker
+            v-else-if="dateFilter.scale === 'month'"
+            v-model="pickerMonth"
+            :max="today.slice(0, 7)"
+            type="month"
+            full-width
+            no-title
+            @input="onMonthSelected"
+          />
+          <div v-else class="ios-year-picker">
+            <v-btn v-for="year in years" :key="year" text @click="onYearSelected(year)">{{ year }}</v-btn>
+          </div>
+          <v-card-actions><v-spacer /><v-btn text @click="showPicker = false">取消</v-btn></v-card-actions>
+        </v-card>
+      </v-dialog>
       <v-btn icon small :disabled="!canMoveNext" @click="move(1)"><v-icon>{{ mdiChevronRight }}</v-icon></v-btn>
     </template>
   </div>
@@ -60,6 +81,10 @@ const scaleLabel = computed(() => labels[dateFilter.scale])
 const displayDate = computed(() => formatDateDisplay(dateFilter.date, dateFilter.scale))
 const today = formatISODate(new Date())
 const showPicker = ref(false)
+const pickerMonth = ref(dateFilter.date.slice(0, 7))
+const pickerTitle = computed(() => ({ day: '选择日期', week: '选择周所在日期', month: '选择月份', year: '选择年份' })[dateFilter.scale])
+const currentYear = Number(today.slice(0, 4))
+const years = Array.from({ length: 30 }, (_, index) => currentYear - index)
 const canMoveNext = computed(() => shiftDate(dateFilter.date, dateFilter.scale, 1) <= today)
 
 if (routeKind) updateDateFilter({ routeKind })
@@ -79,6 +104,16 @@ function move(offset: number) {
   navigate()
 }
 function onDateSelected() {
+  showPicker.value = false
+  navigate()
+}
+function onMonthSelected(month: string) {
+  updateDateFilter({ date: `${month}-01` })
+  showPicker.value = false
+  navigate()
+}
+function onYearSelected(year: number) {
+  updateDateFilter({ date: `${year}-01-01` })
   showPicker.value = false
   navigate()
 }
