@@ -967,6 +967,19 @@ html.ym-immersive .posts-image-card {
   border-radius: 12px;
 }
 
+html.long-press-sharing,
+html.long-press-sharing body {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+html.long-press-sharing body {
+  position: fixed;
+  right: 0;
+  left: 0;
+  width: 100%;
+}
+
 .long-press-preview {
   position: fixed;
   z-index: 9998;

@@ -13,7 +13,14 @@
       style="min-height: 93vh"
     >
       <template #default="{ item, index }">
-        <div class="posts-image-card">
+        <div
+          class="posts-image-card"
+          @touchstart="onPostTouchStart($event, item)"
+          @touchmove="onPostTouchMove"
+          @touchend="onPostTouchEnd"
+          @touchcancel="cancelPostLongPress"
+          @contextmenu="onCtxMenu($event, item)"
+        >
           <img
             class="post-image-v"
             alt=""
@@ -24,11 +31,6 @@
             draggable="false"
             @dragstart.prevent
             @click="onImageClick(index)"
-            @touchstart="onPostTouchStart($event, item)"
-            @touchmove="onPostTouchMove"
-            @touchend="onPostTouchEnd"
-            @touchcancel="cancelPostLongPress"
-            @contextmenu="onCtxMenu($event, item)"
             @error="onImageLoadError(item?.id || '')"
           >
           <template v-if="store.isYKSite">
@@ -88,6 +90,11 @@
         :key="index"
         class="posts-image-card"
         :style="imgCardStyle(image)"
+        @touchstart="onPostTouchStart($event, image)"
+        @touchmove="onPostTouchMove"
+        @touchend="onPostTouchEnd"
+        @touchcancel="cancelPostLongPress"
+        @contextmenu="onCtxMenu($event, image)"
       >
         <template v-if="settings.masonryLayout === 'justified'">
           <img
@@ -100,11 +107,6 @@
             draggable="false"
             @dragstart.prevent
             @click="onImageClick(index)"
-            @touchstart="onPostTouchStart($event, image)"
-            @touchmove="onPostTouchMove"
-            @touchend="onPostTouchEnd"
-            @touchcancel="cancelPostLongPress"
-            @contextmenu="onCtxMenu($event, image)"
             @error="onImageLoadError(image?.id || '')"
           >
         </template>
@@ -116,11 +118,6 @@
           draggable="false"
           @dragstart.prevent
           @click="onImageClick(index)"
-          @touchstart="onPostTouchStart($event, image)"
-          @touchmove="onPostTouchMove"
-          @touchend="onPostTouchEnd"
-          @touchcancel="cancelPostLongPress"
-          @contextmenu="onCtxMenu($event, image)"
           @error="onImageLoadError(image?.id)"
         >
           <template #placeholder>
@@ -246,6 +243,7 @@ let longPressStartY = 0
 let suppressNextClick = false
 let suppressContextMenuUntil = 0
 let shareInFlight = false
+let lockedScrollY = 0
 let activeLongPressPost: Post | undefined
 let pendingDirectSharePost: Post | undefined
 
@@ -353,15 +351,32 @@ function onPostTouchMove(ev: TouchEvent) {
   if (Math.abs(touch.clientX - longPressStartX) > 12 || Math.abs(touch.clientY - longPressStartY) > 12) cancelPostLongPress()
 }
 
+function lockLongPressScroll() {
+  if (document.documentElement.classList.contains('long-press-sharing')) return
+  lockedScrollY = window.scrollY
+  document.documentElement.classList.add('long-press-sharing')
+  document.body.style.top = `-${lockedScrollY}px`
+}
+
+function unlockLongPressScroll() {
+  if (!document.documentElement.classList.contains('long-press-sharing')) return
+  document.documentElement.classList.remove('long-press-sharing')
+  document.body.style.top = ''
+  window.scrollTo(0, lockedScrollY)
+}
+
 async function sharePostOnce(post: Post) {
   if (shareInFlight) return
   shareInFlight = true
   longPressState = 'sharing'
+  lockLongPressScroll()
   try {
     await sharePost(post)
   } finally {
     shareInFlight = false
     longPressState = 'restoring'
+    await new Promise(resolve => window.setTimeout(resolve, 120))
+    unlockLongPressScroll()
     resetLongPressState()
   }
 }
@@ -503,6 +518,7 @@ function onVisibilityChange() {
 onUnmounted(() => {
   window.removeEventListener('scroll', scrollFn)
   document.removeEventListener('visibilitychange', onVisibilityChange)
+  unlockLongPressScroll()
   resetLongPressState()
 })
 </script>
