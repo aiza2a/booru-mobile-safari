@@ -12,34 +12,39 @@ function canonicalPostUrl(post: Post): string {
   return post.postView || location.href
 }
 
-export async function shareUrl(url: string, title: string): Promise<boolean> {
-  if (!url) return false
+async function copyUrl(url: string): Promise<boolean> {
   try {
-    if (navigator.share) {
-      await navigator.share({ title, text: url })
-      return true
-    }
     await navigator.clipboard.writeText(url)
     showMsg({ msg: '链接已复制', type: 'success' })
     return true
-  } catch (error) {
-    if ((error as DOMException)?.name === 'AbortError') return false
-    try {
-      await navigator.clipboard.writeText(url)
-      showMsg({ msg: '链接已复制', type: 'success' })
-      return true
-    } catch (_copyError) {
-      const textarea = document.createElement('textarea')
-      textarea.value = url
-      textarea.style.position = 'fixed'
-      textarea.style.opacity = '0'
-      document.body.appendChild(textarea)
-      textarea.select()
-      const copied = document.execCommand('copy')
-      textarea.remove()
-      showMsg({ msg: copied ? '链接已复制' : `无法打开分享：${url}`, type: copied ? 'success' : 'error' })
-      return copied
-    }
+  } catch (_error) {
+    const textarea = document.createElement('textarea')
+    textarea.value = url
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.select()
+    const copied = document.execCommand('copy')
+    textarea.remove()
+    if (copied) showMsg({ msg: '链接已复制', type: 'success' })
+    return copied
+  }
+}
+
+export async function shareUrl(url: string, title: string): Promise<boolean> {
+  if (!url) return false
+  if (!navigator.share) return copyUrl(url)
+
+  const shareData: ShareData = { title, url }
+  if (navigator.canShare && !navigator.canShare(shareData)) return false
+  try {
+    await navigator.share(shareData)
+    return true
+  } catch (_error) {
+    // Stay/Safari can reject an otherwise valid request when native sharing is
+    // temporarily unavailable. Do not start a second clipboard permission flow
+    // or show a false failure banner; the long-press state restores normally.
+    return false
   }
 }
 
