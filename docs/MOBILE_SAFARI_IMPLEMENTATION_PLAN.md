@@ -577,6 +577,25 @@ scripts/verify-site-date-routes.mjs
 
 当前最后一次成功构建：Actions run `29141774444`，提交 `01cb3e0`。**构建成功不代表日期 UI 可用。**
 
+### 6.0.4 2026-07-11 自绘月历修复候选（等待 Stay 验收）
+
+为绕开 Stay 中 Vuetify `v-date-picker` 只显示月份标题、日期网格为空白的问题，提交 `b9b7dca` 完成以下修改：
+
+- 新增 `src/components/MobileCalendarGrid.vue`，使用固定 7×6 CSS Grid 渲染单月历，不依赖 Vuetify 日期表格内部高度计算。
+- Yande.re、Konachan 与 Danbooru 的日/周日期选择统一改用自绘月历。
+- 自定义范围改为同一个月历分两步选择：先开始日期，再结束日期；选择完整后才允许“查看结果”。
+- 月份选择使用原生 `input[type=month]`，年份继续使用轻量按钮网格。
+- 删除 `custom.css` 中全局覆盖 `.v-date-picker-table` 星期表头并用 `:before` 注入文字的旧规则，避免继续影响 Vuetify DOM。
+- 未添加 `full-width`、日期表格 `min-height` 或 overflow 补丁，未同时渲染两个日期选择器。
+
+验证状态：
+
+- 无依赖日期路由、路由解析与 Konachan HTML fixture 测试通过。
+- GitHub Actions run `29142352766` 成功，包含依赖安装、lint、`verify:dates` 和 build；artifact 已生成。
+- 本地完整 pnpm 验证因新克隆工作区在当前 iSH pnpm 中未识别项目而未执行，云端 CI 已完成等价门禁。
+- **尚未通过 Stay 实机验收**：月历网格可见性、日期选择后的 URL/顶部显示/帖子一致性、自定义范围结果、顶部遮挡和悬浮搜索均待确认。
+- 阶段 2 继续保持阻塞，禁止进入阶段 3、阶段 4。
+
 ### 6.1 组件设计
 
 新增：

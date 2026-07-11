@@ -4,7 +4,7 @@
       <v-btn icon small aria-label="上个月" @click="shiftMonth(-1)"><v-icon>{{ mdiChevronLeft }}</v-icon></v-btn>
       <strong>{{ monthTitle }}</strong>
       <v-btn v-if="canMoveNextMonth" icon small aria-label="下个月" @click="shiftMonth(1)"><v-icon>{{ mdiChevronRight }}</v-icon></v-btn>
-      <span v-else class="calendar-nav-spacer" />
+      <span v-else class="calendar-nav-spacer"></span>
     </div>
     <div class="calendar-weekdays" aria-hidden="true">
       <span v-for="weekday in weekdays" :key="weekday">{{ weekday }}</span>
