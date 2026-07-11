@@ -780,29 +780,21 @@ html:has(#app.theme--dark) {
   .ios-detail-dialog .detail-glass-panel {
     position: fixed;
     z-index: 1;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    inset: 0;
     overflow: hidden;
     border: 0;
     border-radius: 0;
-    background: transparent;
+    background: rgba(8, 9, 12, .18);
     box-shadow: none;
     opacity: 1;
-    transform: scale(1);
-    transform-origin: center;
-    transition: opacity .16s ease, transform .18s ease;
+    transform: none;
+    transition: none;
   }
 
-  .ios-detail-dialog .detail-glass-panel--opening {
-    opacity: 1;
-    transform: scale(1);
-  }
-
+  .ios-detail-dialog .detail-glass-panel--opening,
   .ios-detail-dialog .detail-glass-panel--closing {
     opacity: 1;
-    transform: scale(1);
+    transform: none;
   }
 
   .ios-detail-dialog .detail-ambient-bg,
@@ -816,6 +808,7 @@ html:has(#app.theme--dark) {
   }
 
   .ios-detail-dialog .detail-ambient-bg {
+    background: rgba(8, 9, 12, .18);
     background-position: center;
     background-size: cover;
     filter: none;
@@ -828,11 +821,7 @@ html:has(#app.theme--dark) {
   }
 
   .ios-detail-dialog:has(.detail-glass-panel--opening) .img_detail_cont,
-  .ios-detail-dialog:has(.detail-glass-panel--opening) .mobile-detail-nav {
-    opacity: 0;
-    transform: none;
-  }
-
+  .ios-detail-dialog:has(.detail-glass-panel--opening) .mobile-detail-nav,
   .ios-detail-dialog:has(.detail-glass-panel--closing) .img_detail_cont,
   .ios-detail-dialog:has(.detail-glass-panel--closing) .mobile-detail-nav {
     opacity: 0;
@@ -843,8 +832,8 @@ html:has(#app.theme--dark) {
     position: relative;
     z-index: 2;
     opacity: 1;
-    transform: scale(1);
-    transition: opacity .15s ease, transform .18s ease;
+    transform: none;
+    transition: opacity .15s ease;
     box-sizing: border-box;
     padding: max(14px, env(safe-area-inset-top)) 16px calc(86px + env(safe-area-inset-bottom));
     background: transparent !important;
@@ -861,14 +850,14 @@ html:has(#app.theme--dark) {
     max-height: calc(100vh - 112px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
     border-radius: 16px;
     object-fit: contain;
-    box-shadow: 0 16px 46px rgba(0, 0, 0, .28);
+    box-shadow: 0 16px 46px rgba(0, 0, 0, .22);
   }
 
   .ios-detail-dialog .img_detail_loading {
     box-sizing: border-box;
     padding: max(14px, env(safe-area-inset-top)) 16px calc(86px + env(safe-area-inset-bottom));
     border-radius: 0;
-    background: rgba(8, 9, 12, .28);
+    background: transparent;
   }
 
   .ios-detail-dialog .img_detail_loading img {
@@ -903,7 +892,8 @@ html:has(#app.theme--dark) {
     border-radius: 15px;
   }
 
-  .theme--light .ios-detail-dialog {
+  .theme--light .ios-detail-dialog,
+  .theme--light .ios-detail-dialog .v-overlay__scrim {
     background: transparent !important;
   }
 
