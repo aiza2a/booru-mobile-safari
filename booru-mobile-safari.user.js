@@ -10495,6 +10495,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       const isMobile2 = window.matchMedia("(max-width: 959px), (pointer: coarse)").matches;
       const isR34Fav = Vue2.ref(isRule34FavPage() || isGelbooruFavPage());
       const showImageList = Vue2.ref(true);
+      const imageRenderVersions = Vue2.ref({});
+      let openedDetailIndex = -1;
       let longPressState = "idle";
       let longPressTimer;
       let longPressStartX = 0;
@@ -10505,6 +10507,16 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       let lockedScrollY = 0;
       let activeLongPressPost;
       let pendingDirectSharePost;
+      Vue2.watch(
+        () => store.showImageSelected,
+        (shown) => {
+          if (shown || openedDetailIndex < 0)
+            return;
+          const index = openedDetailIndex;
+          openedDetailIndex = -1;
+          Vue2.nextTick(() => refreshDetailNeighbourImages(index));
+        }
+      );
       Vue2.watch(
         () => settings.selectedColumn,
         () => {
@@ -10527,6 +10539,22 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           return "max-height: 60vh;overflow: hidden";
         return "";
       });
+      function imageRenderKey(image, index) {
+        const id = String(image?.id || index);
+        return `${id}-${imageRenderVersions.value[id] || 0}`;
+      }
+      function refreshDetailNeighbourImages(index) {
+        const start = Math.max(0, index - 8);
+        const versions = { ...imageRenderVersions.value };
+        for (let current = start; current <= index; current++) {
+          const image = store.imageList[current];
+          if (!image)
+            continue;
+          const id = String(image.id || current);
+          versions[id] = (versions[id] || 0) + 1;
+        }
+        imageRenderVersions.value = versions;
+      }
       function imgCardStyle(image) {
         if (settings.masonryLayout !== "justified")
           return maxHeightStyle;
@@ -10682,6 +10710,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           fancyboxShow(store.imageList, index);
           return;
         }
+        openedDetailIndex = index;
         store.imageSelectedIndex = index;
         store.showImageSelected = true;
       }
@@ -10775,7 +10804,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         unlockLongPressScroll();
         resetLongPressState();
       });
-      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, longPressState, longPressTimer, longPressStartX, longPressStartY, suppressNextClick, suppressContextMenuUntil, shareInFlight, lockedScrollY, activeLongPressPost, pendingDirectSharePost, showNoMore, showLoadMore, longPressPreview, ctxActPost, showMenu, x, y, maxHeightStyle, imgCardStyle, getImgSrc, openPostMenu, clearLongPressTimer, resetLongPressState, cancelPostLongPress, onPostTouchStart, onPostTouchMove, lockLongPressScroll, unlockLongPressScroll, sharePostOnce, onPostTouchEnd, onImageClick, onCtxMenu, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, downloadCtxPost, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, onVisibilityChange, mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
+      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, imageRenderVersions, openedDetailIndex, longPressState, longPressTimer, longPressStartX, longPressStartY, suppressNextClick, suppressContextMenuUntil, shareInFlight, lockedScrollY, activeLongPressPost, pendingDirectSharePost, showNoMore, showLoadMore, longPressPreview, ctxActPost, showMenu, x, y, maxHeightStyle, imageRenderKey, refreshDetailNeighbourImages, imgCardStyle, getImgSrc, openPostMenu, clearLongPressTimer, resetLongPressState, cancelPostLongPress, onPostTouchStart, onPostTouchMove, lockLongPressScroll, unlockLongPressScroll, sharePostOnce, onPostTouchEnd, onImageClick, onCtxMenu, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, downloadCtxPost, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, onVisibilityChange, mdiDownload, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
     }
   });
   var _sfc_render$4 = function render() {
@@ -10785,7 +10814,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         return _setup.onPostTouchStart($event, item);
       }, "touchmove": _setup.onPostTouchMove, "touchend": _setup.onPostTouchEnd, "touchcancel": _setup.cancelPostLongPress, "contextmenu": function($event) {
         return _setup.onCtxMenu($event, item);
-      } } }, [_c("img", { staticClass: "post-image-v", attrs: { "alt": "", "loading": "lazy", "src": _setup.getImgSrc(item), "role": "button", "tabindex": "0", "draggable": "false" }, on: { "dragstart": function($event) {
+      } } }, [_c("img", { key: _setup.imageRenderKey(item, index), staticClass: "post-image-v", attrs: { "alt": "", "loading": "lazy", "src": _setup.getImgSrc(item), "role": "button", "tabindex": "0", "draggable": "false" }, on: { "dragstart": function($event) {
         $event.preventDefault();
       }, "click": function($event) {
         return _setup.onImageClick(index);
@@ -10803,18 +10832,18 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         $event.stopPropagation();
         return _setup.addFavorite(item?.id);
       } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiHeartPlusOutline))])], 1) : _vm._e()], 1) : _vm._e()], 2)];
-    } }], null, false, 2499632841) }) : _c("wf-layout", _vm._l(_setup.store.imageList, function(image, index) {
+    } }], null, false, 1513620916) }) : _c("wf-layout", _vm._l(_setup.store.imageList, function(image, index) {
       return _c("v-card", { key: index, staticClass: "posts-image-card", style: _setup.imgCardStyle(image), on: { "touchstart": function($event) {
         return _setup.onPostTouchStart($event, image);
       }, "touchmove": _setup.onPostTouchMove, "touchend": _setup.onPostTouchEnd, "touchcancel": _setup.cancelPostLongPress, "contextmenu": function($event) {
         return _setup.onCtxMenu($event, image);
-      } } }, [_setup.settings.masonryLayout === "justified" ? [_c("img", { staticClass: "post-image", attrs: { "alt": "", "loading": "lazy", "src": _setup.getImgSrc(image), "role": "button", "tabindex": "0", "draggable": "false" }, on: { "dragstart": function($event) {
+      } } }, [_setup.settings.masonryLayout === "justified" ? [_c("img", { key: _setup.imageRenderKey(image, index), staticClass: "post-image", attrs: { "alt": "", "loading": "lazy", "src": _setup.getImgSrc(image), "role": "button", "tabindex": "0", "draggable": "false" }, on: { "dragstart": function($event) {
         $event.preventDefault();
       }, "click": function($event) {
         return _setup.onImageClick(index);
       }, "error": function($event) {
         return _setup.onImageLoadError(image?.id || "");
-      } } })] : _c("v-img", { attrs: { "transition": "scroll-y-transition", "src": _setup.getImgSrc(image), "aspect-ratio": image?.aspectRatio, "draggable": "false" }, on: { "dragstart": function($event) {
+      } } })] : _c("v-img", { key: _setup.imageRenderKey(image, index), attrs: { "transition": "scroll-y-transition", "src": _setup.getImgSrc(image), "aspect-ratio": image?.aspectRatio, "draggable": "false" }, on: { "dragstart": function($event) {
         $event.preventDefault();
       }, "click": function($event) {
         return _setup.onImageClick(index);
