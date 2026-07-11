@@ -34,7 +34,7 @@ import { mdiCheck, mdiChevronLeft, mdiChevronRight } from '@mdi/js'
 import { currentDateSite, currentRouteKind, siteCapabilities } from '@/config/site-capabilities'
 import { dateFilter, updateDateFilter } from '@/store/date-filter'
 import { buildDateRoute } from '@/utils/site-date-routes'
-import { clampFutureDate, formatDateDisplay, formatISODate, shiftDate, type DateScale } from '@/utils/date-filter'
+import { type DateScale, clampFutureDate, formatDateDisplay, formatISODate, shiftDate } from '@/utils/date-filter'
 
 const site = currentDateSite()
 const routeKind = currentRouteKind()

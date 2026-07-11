@@ -8,27 +8,59 @@ export interface SiteDateCapability {
 }
 
 const allScales = ['day', 'week', 'month', 'year'] as const
+const moeScales = {
+  home: [...allScales],
+  random: [...allScales],
+  popular: [...allScales],
+  viewed: [],
+  ranked: [],
+  updated: [],
+}
 
 export const siteCapabilities: Record<SupportedDateSite, SiteDateCapability> = {
-  yandere: {
-    site: 'yandere', routes: ['home', 'random', 'popular'], latestRoutes: ['popular'],
-    scales: { home: [...allScales], random: [...allScales], popular: [...allScales], viewed: [], ranked: [], updated: [] },
+  'yandere': {
+    site: 'yandere',
+    routes: ['home', 'random', 'popular'],
+    latestRoutes: ['popular'],
+    scales: moeScales,
   },
   'konachan-com': {
-    site: 'konachan-com', routes: ['home', 'random', 'popular'], latestRoutes: ['popular'],
-    scales: { home: [...allScales], random: [...allScales], popular: [...allScales], viewed: [], ranked: [], updated: [] },
+    site: 'konachan-com',
+    routes: ['home', 'random', 'popular'],
+    latestRoutes: ['popular'],
+    scales: moeScales,
   },
   'konachan-net': {
-    site: 'konachan-net', routes: ['home', 'random', 'popular'], latestRoutes: ['popular'],
-    scales: { home: [...allScales], random: [...allScales], popular: [...allScales], viewed: [], ranked: [], updated: [] },
+    site: 'konachan-net',
+    routes: ['home', 'random', 'popular'],
+    latestRoutes: ['popular'],
+    scales: moeScales,
   },
-  danbooru: {
-    site: 'danbooru', routes: ['home', 'popular', 'viewed', 'ranked'], latestRoutes: ['ranked'],
-    scales: { home: [...allScales], random: [], popular: [...allScales], viewed: [...allScales], ranked: [...allScales], updated: [] },
+  'danbooru': {
+    site: 'danbooru',
+    routes: ['home', 'popular', 'viewed', 'ranked'],
+    latestRoutes: ['ranked'],
+    scales: {
+      home: [...allScales],
+      random: [],
+      popular: [...allScales],
+      viewed: [...allScales],
+      ranked: [...allScales],
+      updated: [],
+    },
   },
-  gelbooru: {
-    site: 'gelbooru', routes: ['home', 'ranked', 'updated'], latestRoutes: [],
-    scales: { home: [...allScales], random: [], popular: [], viewed: [], ranked: [...allScales], updated: [...allScales] },
+  'gelbooru': {
+    site: 'gelbooru',
+    routes: ['home', 'ranked', 'updated'],
+    latestRoutes: [],
+    scales: {
+      home: [...allScales],
+      random: [],
+      popular: [],
+      viewed: [],
+      ranked: [...allScales],
+      updated: [...allScales],
+    },
   },
 }
 
