@@ -23,21 +23,10 @@ export const defCompTags = (() => {
 
 const specTitleMap: Record<string, string> = {
   'yande.re': 'yande.re',
-  'konachan.com': 'Koanchan',
-  'konachan.net': 'Koanchan(Safe)',
-  'sakugabooru.com': 'sakugabooru'.toUpperCase(),
-  'behoimi.org': '3dbooru',
-  'rule34.paheal.net': 'Rule34.Paheal',
-  'booru.allthefallen.moe': 'ATFBooru',
-  'aibooru.online': 'AIBooru',
-  'sankaku.app': 'Sankaku APP',
-  'www.sankakucomplex.com': 'Sankaku Complex',
-  'chan.sankakucomplex.com': 'Sankaku Complex',
-  'www.idolcomplex.com': 'Idol Complex',
-  'anime-pictures.net': 'Anime Pictures',
-  'allgirl.booru.org': 'All girl',
-  'booru.eu': 'Hentai Booru',
-  'rule34hentai.net': 'Rule34Hentai',
+  'konachan.com': 'Konachan',
+  'konachan.net': 'Konachan (Safe)',
+  'danbooru.donmai.us': 'Danbooru',
+  'gelbooru.com': 'Gelbooru',
 }
 
 export function getSiteTitle(domain: string = location.host) {
@@ -51,12 +40,6 @@ const defaultLimitMap: Record<string, number> = {
   'konachan.net': 21,
   'danbooru.donmai.us': 20,
   'gelbooru.com': 42,
-  'rule34.xxx': 42,
-  'safebooru.org': 40,
-  'tbib.org': 42,
-  'xbooru.com': 42,
-  'rule34.paheal.net': 70,
-  'realbooru.com': 42,
 }
 
 export const BOORU_PAGE_LIMIT = defaultLimitMap[location.host] || 40
