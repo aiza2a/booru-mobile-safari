@@ -742,7 +742,6 @@ function onImageLoadError(ev: Event) {
   }
   if (fileUrl?.includes('.jpg')) {
     imageSelected.value.fileUrl = fileUrl.replace(/\.jpg(\?\d+)?$/, '.png')
-    return
   }
 }
 
@@ -771,7 +770,6 @@ function onScaleImgError(ev: Event) {
   if (fileUrl?.includes('.jpg')) {
     imageSelected.value.fileUrl = fileUrl.replace(/\.jpg(\?\d+)?$/, '.png')
     img.src = imageSelected.value.fileUrl
-    return
   }
 }
 
