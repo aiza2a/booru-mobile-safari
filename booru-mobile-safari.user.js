@@ -5716,13 +5716,15 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     page: getFirstPageNo(params),
     tags: params.get("tags")
   };
+  let initialPageTarget = query.page;
   const getSearchState = () => query;
   const setPage = (page) => query.page = page;
   const setTags = (tags) => query.tags = tags;
-  const searchPosts = async (latePageQuery = false) => {
+  const searchPosts = async (latePageQuery = false, pageOverride) => {
     store.requestLoading = true;
     try {
-      const { page, tags } = getSearchState();
+      const { tags } = getSearchState();
+      const page = pageOverride ?? query.page;
       let posts = await fetchPostsActions.find((e) => e.is())?.posts(page, tags);
       if (Array.isArray(posts) && posts.length > 0) {
         posts = handleBlacklist(posts);
@@ -5732,7 +5734,8 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           ...settings.showNSFWContents ? posts : posts.filter((e) => ["s", "g"].includes(e.rating))
         ], "id");
         pushPageState(page, latePageQuery);
-        setPage(page + 1);
+        if (pageOverride == null)
+          setPage(page + 1);
       } else {
         store.requestStop = true;
       }
@@ -5748,7 +5751,21 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     const doch = document.documentElement.clientHeight;
     return cnth ? Math.floor(doch / cnth) : 1;
   };
+  async function preloadHistoryPages(targetPage) {
+    if (targetPage <= 1)
+      return;
+    const { page } = getSearchState();
+    for (let current = 1; current < targetPage; current += 1) {
+      if (store.requestStop)
+        break;
+      await searchPosts(true, current);
+    }
+    setPage(Math.max(page, targetPage));
+  }
   const initPosts = async () => {
+    await preloadHistoryPages(initialPageTarget);
+    if (store.requestStop)
+      return;
     await searchPosts(true);
     if (settings.masonryLayout === "virtual") {
       document.documentElement.scrollTop = 1;
@@ -5765,11 +5782,14 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     }
   };
   const loadPostsByPage = (toPage) => {
-    setPage(Number(toPage) || 1);
+    const page = Number(toPage) || 1;
+    initialPageTarget = page;
+    setPage(page);
     store.imageList = [];
     searchPosts();
   };
   const loadPostsByTags = (searchTerm) => {
+    initialPageTarget = 1;
     setPage(1);
     setTags(searchTerm);
     store.imageList = [];
