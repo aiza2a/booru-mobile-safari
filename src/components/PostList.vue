@@ -371,7 +371,14 @@ function unlockLongPressScroll() {
   if (!document.documentElement.classList.contains('long-press-sharing')) return
   document.documentElement.classList.remove('long-press-sharing')
   document.body.style.top = ''
+}
+
+function restoreLongPressScroll() {
   window.scrollTo(0, lockedScrollY)
+}
+
+function nextAnimationFrame() {
+  return new Promise(resolve => window.requestAnimationFrame(() => resolve(undefined)))
 }
 
 async function sharePostOnce(post: Post) {
@@ -384,8 +391,10 @@ async function sharePostOnce(post: Post) {
   } finally {
     shareInFlight = false
     longPressState = 'restoring'
-    await new Promise(resolve => window.setTimeout(resolve, 120))
     unlockLongPressScroll()
+    await nextAnimationFrame()
+    restoreLongPressScroll()
+    await nextAnimationFrame()
     resetLongPressState()
   }
 }
