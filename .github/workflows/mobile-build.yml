@@ -3,8 +3,7 @@ name: Build mobile userscript
 on:
   push:
     branches:
-      - mobile-safari
-      - mobile-safari-slim
+      - main
   workflow_dispatch:
 
 permissions:

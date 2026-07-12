@@ -1,9 +1,9 @@
 {
-  "name": "yandere-masonry",
+  "name": "booru-mobile-safari",
   "version": "0.37.8",
   "private": true,
-  "description": "Yande.re/Konachan Waterfall Layout.",
-  "author": "asadahimeka",
+  "description": "Mobile-only userscript for Yande.re, Konachan, Danbooru and Gelbooru.",
+  "author": "asadahimeka, aiza2a",
   "license": "MIT",
   "main": "dist/yandere-masonry.user.js",
   "scripts": {
