@@ -8,10 +8,12 @@
       'date-filter--expanded': dateFilter.mode === 'date',
     }"
   >
-    <v-btn-toggle v-if="showModeToggle" v-model="dateFilter.mode" mandatory dense class="date-mode-toggle">
+    <v-btn-toggle v-if="showModeToggle" v-model="selectedMode" mandatory dense class="date-mode-toggle" :disabled="gelbooruLoading">
       <v-btn :value="primaryMode" icon small :aria-label="primaryLabel" :title="primaryLabel"><v-icon>{{ primaryIcon }}</v-icon></v-btn>
-      <v-btn value="date" icon small :aria-label="secondaryLabel" :title="secondaryLabel"><v-icon>{{ secondaryIcon }}</v-icon></v-btn>
+      <v-btn :value="secondaryMode" icon small :aria-label="secondaryLabel" :title="secondaryLabel"><v-icon>{{ secondaryIcon }}</v-icon></v-btn>
     </v-btn-toggle>
+    <v-progress-circular v-if="gelbooruLoading" class="gelbooru-recent-loading" :size="22" :width="2" indeterminate />
+    <span v-if="site === 'gelbooru' && dateFilter.mode === 'latest' && !gelbooruLoading" class="gelbooru-recent-scope">投稿范围</span>
     <v-menu v-if="showScale" offset-y>
       <template #activator="{ on, attrs }"><v-btn class="scale-button" small text v-bind="attrs" v-on="on">{{ scaleLabel }}</v-btn></template>
       <v-list dense><v-list-item v-for="scale in scales" :key="scale" @click="setScale(scale)"><v-list-item-title>{{ labels[scale] }}</v-list-item-title></v-list-item></v-list>
@@ -76,6 +78,8 @@ import { currentDateSite, currentRouteKind, siteCapabilities } from '@/config/si
 import { type DateFilterMode, dateFilter, updateDateFilter } from '@/store/date-filter'
 import { type DateScale, clampFutureDate, formatDateDisplay, formatISODate, getDateRange, shiftDate } from '@/utils/date-filter'
 import { buildDateRoute } from '@/utils/site-date-routes'
+import { buildGelbooruAllRoute, buildGelbooruRecentRoute } from '@/utils/gelbooru-recent'
+import { showMsg } from '@/utils'
 
 const site = currentDateSite()
 const routeKind = currentRouteKind()
@@ -84,12 +88,26 @@ const visible = !!(site && routeKind && capability?.routes.includes(routeKind))
 const hasLatestMode = computed(() => !!(routeKind && capability?.latestRoutes.includes(routeKind)))
 const isHome = computed(() => routeKind === 'home')
 const showModeToggle = computed(() => hasLatestMode.value || isHome.value)
-const showScale = computed(() => dateFilter.mode !== 'all')
 const primaryMode = computed<DateFilterMode>(() => hasLatestMode.value ? 'latest' : 'all')
-const primaryLabel = computed(() => hasLatestMode.value ? (routeKind === 'ranked' ? '近期排名' : '最近人气') : '全部帖子')
-const secondaryLabel = computed(() => routeKind === 'ranked' ? '历史高分' : '指定日期')
+const secondaryMode = computed<DateFilterMode>(() => site === 'gelbooru' ? 'all' : 'date')
+const gelbooruLoading = ref(false)
+const showScale = computed(() => dateFilter.mode !== 'all')
+const selectedMode = computed({
+  get: () => dateFilter.mode,
+  set: (mode: DateFilterMode) => {
+    const previousMode = dateFilter.mode
+    updateDateFilter({ mode })
+    if (site === 'gelbooru') navigate(previousMode)
+  },
+})
+const primaryLabel = computed(() => {
+  if (!hasLatestMode.value) return '全部帖子'
+  if (site === 'gelbooru') return routeKind === 'ranked' ? '近期评分最高' : '近期更新'
+  return routeKind === 'ranked' ? '近期排名' : '最近人气'
+})
+const secondaryLabel = computed(() => site === 'gelbooru' ? '全部结果' : routeKind === 'ranked' ? '历史高分' : '指定日期')
 const primaryIcon = computed(() => hasLatestMode.value ? mdiFire : mdiViewGridOutline)
-const secondaryIcon = computed(() => routeKind === 'ranked' ? mdiCalendarStar : mdiCalendarMonthOutline)
+const secondaryIcon = computed(() => site === 'gelbooru' ? mdiViewGridOutline : routeKind === 'ranked' ? mdiCalendarStar : mdiCalendarMonthOutline)
 const scales = computed<DateScale[]>(() => {
   const values = routeKind && capability ? [...capability.scales[routeKind]] : []
   if (dateFilter.mode === 'date' && (routeKind === 'home' || (site === 'danbooru' && routeKind === 'ranked'))) values.push('range')
@@ -135,8 +153,23 @@ if (routeKind) updateDateFilter({ routeKind })
 if (!showModeToggle.value) updateDateFilter({ mode: 'date' })
 if (!scales.value.includes(dateFilter.scale)) updateDateFilter({ scale: scales.value[0] || 'day' })
 
-function navigate() {
-  if (!site || !routeKind) return
+async function navigate(previousMode?: DateFilterMode) {
+  if (!site || !routeKind || gelbooruLoading.value) return
+  if (site === 'gelbooru' && (routeKind === 'ranked' || routeKind === 'updated')) {
+    try {
+      gelbooruLoading.value = true
+      const url = dateFilter.mode === 'latest'
+        ? await buildGelbooruRecentRoute(routeKind, dateFilter.scale)
+        : buildGelbooruAllRoute(routeKind)
+      location.assign(url)
+    } catch (error) {
+      console.error('Gelbooru recent route error:', error)
+      if (previousMode) updateDateFilter({ mode: previousMode })
+      showMsg({ msg: 'Gelbooru 近期范围计算失败，请稍后重试', type: 'error' })
+      gelbooruLoading.value = false
+    }
+    return
+  }
   location.assign(buildDateRoute({ site, kind: routeKind, date: dateFilter.date, scale: dateFilter.scale, mode: dateFilter.mode, rangeStart: dateFilter.rangeStart, rangeEnd: dateFilter.rangeEnd }))
 }
 function setScale(scale: DateScale) {
@@ -193,5 +226,7 @@ function onYearSelected(year: number) {
   showYearPicker.value = false
   navigate()
 }
-watch(() => dateFilter.mode, mode => { if (mode === primaryMode.value) navigate() })
+watch(() => dateFilter.mode, mode => {
+  if (site !== 'gelbooru' && mode === primaryMode.value) navigate()
+})
 </script>

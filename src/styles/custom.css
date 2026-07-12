@@ -2475,3 +2475,16 @@ html:has(#app.theme--light).mobile-detail-open,
 html:has(#app.theme--light).mobile-detail-open body {
   background: #f2f2f7 !important;
 }
+
+
+.gelbooru-recent-loading {
+  flex: 0 0 22px;
+  margin: 0 6px;
+  color: var(--ios-secondary-label) !important;
+}
+
+.gelbooru-recent-scope {
+  color: var(--ios-secondary-label);
+  font-size: 11px;
+  white-space: nowrap;
+}

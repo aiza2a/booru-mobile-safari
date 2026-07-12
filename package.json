@@ -1,6 +1,6 @@
 {
   "name": "booru-mobile-safari",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Mobile-only userscript for Yande.re, Konachan, Danbooru and Gelbooru.",
   "author": "asadahimeka, aiza2a",
@@ -12,7 +12,8 @@
     "build": "vite build",
     "postbuild": "node scripts/postbuild.mjs",
     "lint": "eslint src --ext .ts,.vue",
-    "verify:dates": "node scripts/verify-site-date-routes.mjs && node scripts/verify-date-route-parser.mjs && node scripts/verify-moebooru-html.mjs",
+    "verify:dates": "node scripts/verify-site-date-routes.mjs && node scripts/verify-date-route-parser.mjs && node scripts/verify-moebooru-html.mjs && node scripts/verify-gelbooru-recent.mjs",
+    "verify:gelbooru-live": "node scripts/verify-live-gelbooru-recent.mjs",
     "preinstall": "npx -y only-allow pnpm"
   },
   "dependencies": {
