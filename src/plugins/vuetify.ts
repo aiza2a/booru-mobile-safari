@@ -18,8 +18,12 @@ function installVuetify() {
       dark: false,
       themes: {
         light: {
-          primary: '#1a73e8',
-          accent: '#c2e7ff',
+          primary: '#7b4db2',
+          secondary: '#65558f',
+          accent: '#8e5bc7',
+          background: '#f2f2f7',
+          surface: '#ffffff',
+          anchor: '#68409a',
         },
         dark: {
           primary: '#d8b4fe',
