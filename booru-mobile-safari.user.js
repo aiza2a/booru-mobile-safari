@@ -2,7 +2,7 @@
 // @name                 Booru Mobile Safari
 // @name:en              Booru Mobile Safari
 // @name:zh              Booru 手机瀑布流
-// @version              1.2.2
+// @version              1.2.3
 // @description          面向 iPhone Safari 的 Yande.re、Konachan、Danbooru、Gelbooru 瀑布流与快速分享
 // @description:en       Mobile-first masonry browsing and native sharing for Yande.re, Konachan, Danbooru and Gelbooru.
 // @description:zh       面向 iPhone Safari 的 Yande.re、Konachan、Danbooru、Gelbooru 瀑布流与快速分享
@@ -7362,7 +7362,12 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           return;
         document.documentElement.classList.remove("long-press-sharing");
         document.body.style.top = "";
+      }
+      function restoreLongPressScroll() {
         window.scrollTo(0, lockedScrollY);
+      }
+      function nextAnimationFrame() {
+        return new Promise((resolve) => window.requestAnimationFrame(() => resolve(void 0)));
       }
       async function sharePostOnce(post) {
         if (shareInFlight)
@@ -7375,8 +7380,10 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         } finally {
           shareInFlight = false;
           longPressState = "restoring";
-          await new Promise((resolve) => window.setTimeout(resolve, 120));
           unlockLongPressScroll();
+          await nextAnimationFrame();
+          restoreLongPressScroll();
+          await nextAnimationFrame();
           resetLongPressState();
         }
       }
@@ -7511,7 +7518,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         unlockLongPressScroll();
         resetLongPressState();
       });
-      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, openedDetailIndex, detailCloseRefreshTimer, longPressState, longPressTimer, longPressStartX, longPressStartY, suppressNextClick, suppressContextMenuUntil, shareInFlight, lockedScrollY, activeLongPressPost, pendingDirectSharePost, showNoMore, showLoadMore, longPressPreview, ctxActPost, showMenu, x, y, maxHeightStyle, imageRenderKey, imgCardStyle, getImgSrc, openPostMenu, clearLongPressTimer, resetLongPressState, cancelPostLongPress, onPostTouchStart, onPostTouchMove, lockLongPressScroll, unlockLongPressScroll, sharePostOnce, onPostTouchEnd, onImageClick, onCtxMenu, preloadDetailImage, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, onVisibilityChange, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
+      return { __sfc: true, notFitScreen, isMobile: isMobile2, isR34Fav, showImageList, openedDetailIndex, detailCloseRefreshTimer, longPressState, longPressTimer, longPressStartX, longPressStartY, suppressNextClick, suppressContextMenuUntil, shareInFlight, lockedScrollY, activeLongPressPost, pendingDirectSharePost, showNoMore, showLoadMore, longPressPreview, ctxActPost, showMenu, x, y, maxHeightStyle, imageRenderKey, imgCardStyle, getImgSrc, openPostMenu, clearLongPressTimer, resetLongPressState, cancelPostLongPress, onPostTouchStart, onPostTouchMove, lockLongPressScroll, unlockLongPressScroll, restoreLongPressScroll, nextAnimationFrame, sharePostOnce, onPostTouchEnd, onImageClick, onCtxMenu, preloadDetailImage, showImgModal, openDetail, addToSelectedList: addToSelectedList$1, addFavorite, isPostChecked, onPostCheckboxChange, onImageLoadError, virtualMaxCol, calcItemHeight, scrollFn, onVisibilityChange, mdiFileGifBox, mdiFileTree, mdiFolderNetwork, mdiHeartPlusOutline, mdiLinkVariant, mdiPlaylistPlus, mdiVideo, PostDetail, sharePost, notPartialSupportSite, isFavBtnShow, searchPosts, settings, store };
     }
   });
   var _sfc_render$4 = function render() {
