@@ -2494,3 +2494,106 @@ html:has(#app.theme--light).mobile-detail-open body {
     font-variant-numeric: tabular-nums;
   }
 }
+
+
+@media screen and (max-width: 959px), (pointer: coarse) {
+  /* Keep the common date capsule compact without changing its route behavior. */
+  .mobile-date-filter.date-filter--expanded {
+    gap: 0;
+    padding-right: 8px;
+  }
+
+  .mobile-date-filter.date-filter--expanded > .v-menu {
+    margin-right: 0;
+  }
+
+  .mobile-date-filter.date-filter--expanded .scale-button {
+    min-width: 34px !important;
+    padding-right: 2px !important;
+    padding-left: 2px !important;
+  }
+
+  .mobile-date-filter.date-filter--expanded .native-date-trigger {
+    flex: 0 1 auto;
+    min-width: 82px;
+    margin-left: 0;
+  }
+
+  .mobile-date-filter.date-filter--expanded > .range-display {
+    flex: 0 1 auto;
+    min-width: 94px !important;
+    margin-left: 0;
+  }
+
+  .mobile-date-filter.date-filter--expanded .date-nav-button:last-of-type {
+    margin-right: 6px;
+  }
+
+  /* Gelbooru uses separate mode, scale and range segments. */
+  .v-application .mobile-date-filter.date-filter--gelbooru.date-filter--recent {
+    display: flex;
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: calc(100vw - 112px);
+    overflow: hidden;
+  }
+
+  .v-application .mobile-date-filter.date-filter--gelbooru.date-filter--compact {
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: fit-content;
+    min-width: 0;
+    max-width: calc(100vw - 112px);
+    overflow: hidden;
+  }
+
+  .mobile-date-filter.date-filter--gelbooru .gelbooru-mode-toggle {
+    order: 1;
+  }
+
+  .mobile-date-filter.date-filter--gelbooru > .v-menu {
+    order: 2;
+    flex: 0 0 auto;
+  }
+
+  .mobile-date-filter.date-filter--gelbooru .gelbooru-scale-button {
+    width: 38px;
+    min-width: 38px !important;
+    max-width: 38px;
+    padding: 0 2px !important;
+    font-size: 15px;
+  }
+
+  .mobile-date-filter.date-filter--gelbooru .gelbooru-range-button {
+    order: 3;
+    flex: 1 1 auto;
+    min-width: 74px !important;
+    max-width: 112px;
+    padding: 0 7px !important;
+    overflow: hidden;
+    font-size: clamp(13px, 3.5vw, 16px);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    text-overflow: clip;
+  }
+
+  .mobile-date-filter.date-filter--gelbooru .gelbooru-recent-loading {
+    order: 4;
+  }
+}
+
+.gelbooru-scale-menu {
+  min-width: 88px !important;
+  border-radius: 14px !important;
+}
+
+.gelbooru-scale-menu .v-list-item {
+  min-height: 44px;
+  padding: 0 20px !important;
+}
+
+.gelbooru-scale-menu .v-list-item__title {
+  text-align: center;
+  font-size: 16px;
+}

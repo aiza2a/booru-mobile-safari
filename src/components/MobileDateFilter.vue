@@ -6,17 +6,31 @@
       'date-filter--compact': dateFilter.mode === 'all',
       'date-filter--recent': dateFilter.mode === 'latest',
       'date-filter--expanded': dateFilter.mode === 'date',
+      'date-filter--gelbooru': site === 'gelbooru',
     }"
   >
-    <v-btn-toggle v-if="showModeToggle" v-model="selectedMode" mandatory dense class="date-mode-toggle" :disabled="gelbooruLoading">
-      <v-btn :value="primaryMode" icon small :aria-label="primaryLabel" :title="primaryLabel"><v-icon>{{ primaryIcon }}</v-icon></v-btn>
-      <v-btn :value="secondaryMode" icon small :aria-label="secondaryLabel" :title="secondaryLabel"><v-icon>{{ secondaryIcon }}</v-icon></v-btn>
+    <v-btn-toggle v-if="showModeToggle" v-model="selectedMode" mandatory dense class="date-mode-toggle" :class="{ 'gelbooru-mode-toggle': site === 'gelbooru' }" :disabled="gelbooruLoading">
+      <template v-if="site === 'gelbooru'">
+        <v-btn value="all" icon small aria-label="全部结果" title="全部结果"><v-icon>{{ mdiViewGridOutline }}</v-icon></v-btn>
+        <v-btn value="latest" icon small :aria-label="primaryLabel" :title="primaryLabel"><v-icon>{{ mdiFire }}</v-icon></v-btn>
+      </template>
+      <template v-else>
+        <v-btn :value="primaryMode" icon small :aria-label="primaryLabel" :title="primaryLabel"><v-icon>{{ primaryIcon }}</v-icon></v-btn>
+        <v-btn :value="secondaryMode" icon small :aria-label="secondaryLabel" :title="secondaryLabel"><v-icon>{{ secondaryIcon }}</v-icon></v-btn>
+      </template>
     </v-btn-toggle>
     <v-progress-circular v-if="gelbooruLoading" class="gelbooru-recent-loading" :size="22" :width="2" indeterminate />
-    <v-menu v-if="showScale" offset-y>
-      <template #activator="{ on, attrs }"><v-btn class="scale-button" small text v-bind="attrs" v-on="on">{{ scaleButtonLabel }}</v-btn></template>
+    <v-menu v-if="showScale" :content-class="site === 'gelbooru' ? 'gelbooru-scale-menu' : ''" offset-y>
+      <template #activator="{ on, attrs }"><v-btn class="scale-button" :class="{ 'gelbooru-scale-button': site === 'gelbooru' }" small text v-bind="attrs" v-on="on">{{ scaleButtonLabel }}</v-btn></template>
       <v-list dense><v-list-item v-for="scale in scales" :key="scale" @click="setScale(scale)"><v-list-item-title>{{ labels[scale] }}</v-list-item-title></v-list-item></v-list>
     </v-menu>
+    <v-btn
+      v-if="site === 'gelbooru' && dateFilter.mode === 'latest'"
+      class="gelbooru-range-button"
+      small
+      text
+      @click="dateFilter.scale === 'range' && openRangePicker()"
+    >{{ recentRangeDisplay }}</v-btn>
     <template v-if="dateFilter.mode === 'date' || (site === 'gelbooru' && dateFilter.scale === 'range')">
       <template v-if="dateFilter.mode === 'date' && dateFilter.scale !== 'range'">
         <v-btn class="date-nav-button" icon small @click="move(-1)"><v-icon>{{ mdiChevronLeft }}</v-icon></v-btn>
@@ -34,7 +48,7 @@
         <v-btn v-else class="date-display" small text @click="showYearPicker = true">{{ displayDate }}</v-btn>
         <v-btn class="date-nav-button" icon small :disabled="!canMoveNext" @click="move(1)"><v-icon>{{ mdiChevronRight }}</v-icon></v-btn>
       </template>
-      <v-btn v-else-if="dateFilter.scale === 'range'" class="date-display range-display" small text @click="openRangePicker">{{ rangeDisplay }}</v-btn>
+      <v-btn v-if="site !== 'gelbooru' && dateFilter.scale === 'range'" class="date-display range-display" small text @click="openRangePicker">{{ rangeDisplay }}</v-btn>
       <v-dialog v-model="showRangePicker" content-class="ios-date-dialog">
         <v-card class="ios-date-sheet native-range-sheet">
           <v-card-title>{{ rangeStep === 'start' ? '选择开始日期' : '选择结束日期' }}</v-card-title>
@@ -54,7 +68,7 @@
           </div>
           <v-card-actions>
             <v-btn v-if="site !== 'gelbooru'" text @click="resetRange">重置</v-btn><v-spacer />
-            <v-btn text @click="showRangePicker = false">取消</v-btn>
+            <v-btn text @click="cancelRangePicker">取消</v-btn>
             <v-btn text :disabled="!rangeComplete" @click="applyRange">查看结果</v-btn>
           </v-card-actions>
         </v-card>
@@ -122,6 +136,7 @@ const today = formatISODate(new Date())
 const showYearPicker = ref(false)
 const showRangePicker = ref(false)
 const rangeStep = ref<'start' | 'end'>('start')
+const pendingGelbooruScale = ref<DateScale | null>(null)
 const pendingNativeValue = ref('')
 const rangePendingValue = ref('')
 const rangeComplete = computed(() => !!dateFilter.rangeStart && !!dateFilter.rangeEnd)
@@ -150,7 +165,7 @@ const recentRangeDisplay = computed(() => {
   if (dateFilter.scale === 'month') return `${start.slice(5).replace('-', '/')}–${end.slice(5).replace('-', '/')}`
   return `${startYear}/${startMonth}–${endYear}/${endMonth}`
 })
-const scaleButtonLabel = computed(() => site === 'gelbooru' ? recentRangeDisplay.value : scaleLabel.value)
+const scaleButtonLabel = computed(() => scaleLabel.value)
 const displayDate = computed(() => {
   const { start, end } = getDateRange(dateFilter.date, dateFilter.scale)
   if (dateFilter.scale === 'week') {
@@ -195,14 +210,24 @@ async function navigate(previousMode?: DateFilterMode) {
   location.assign(buildDateRoute({ site, kind: routeKind, date: dateFilter.date, scale: dateFilter.scale, mode: dateFilter.mode, rangeStart: dateFilter.rangeStart, rangeEnd: dateFilter.rangeEnd }))
 }
 function setScale(scale: DateScale) {
+  const previousScale = dateFilter.scale
   updateDateFilter({ scale })
-  if (scale === 'range') openRangePicker()
-  else navigate()
+  if (scale === 'range') {
+    if (site === 'gelbooru' && !rangeComplete.value) pendingGelbooruScale.value = previousScale
+    openRangePicker()
+  } else navigate()
 }
 function openRangePicker() {
   rangeStep.value = 'start'
   rangePendingValue.value = ''
   showRangePicker.value = true
+}
+function cancelRangePicker() {
+  showRangePicker.value = false
+  if (site === 'gelbooru' && !rangeComplete.value && pendingGelbooruScale.value) {
+    updateDateFilter({ scale: pendingGelbooruScale.value })
+  }
+  pendingGelbooruScale.value = null
 }
 function resetRange() {
   updateDateFilter({ rangeStart: '', rangeEnd: '' })
@@ -227,6 +252,7 @@ function applyRange() {
   if (!rangeComplete.value) return
   const [rangeStart, rangeEnd] = [dateFilter.rangeStart, dateFilter.rangeEnd].sort()
   updateDateFilter({ rangeStart, rangeEnd, scale: 'range', mode: site === 'gelbooru' ? 'latest' : dateFilter.mode })
+  pendingGelbooruScale.value = null
   showRangePicker.value = false
   navigate()
 }
