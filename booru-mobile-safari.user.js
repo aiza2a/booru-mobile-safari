@@ -2,7 +2,7 @@
 // @name                 Booru Mobile Safari
 // @name:en              Booru Mobile Safari
 // @name:zh              Booru 手机瀑布流
-// @version              0.37.8
+// @version              1.0.0
 // @description          面向 iPhone Safari 的 Yande.re、Konachan、Danbooru、Gelbooru 瀑布流与快速分享
 // @description:en       Mobile-first masonry browsing and native sharing for Yande.re, Konachan, Danbooru and Gelbooru.
 // @description:zh       面向 iPhone Safari 的 Yande.re、Konachan、Danbooru、Gelbooru 瀑布流与快速分享
@@ -5984,11 +5984,13 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     __name: "SettingsDrawer",
     setup(__props) {
       const vuetify = useVuetify();
-      const isDarkMode = Vue2.ref(settings.darkMode === "dark");
-      function onDarkModeChange(val) {
-        settings.darkMode = val ? "dark" : "light";
-        vuetify.theme.dark = val;
-      }
+      const isDarkMode = Vue2.computed({
+        get: () => settings.darkMode === "dark",
+        set: (val) => {
+          settings.darkMode = val ? "dark" : "light";
+          vuetify.theme.dark = val;
+        }
+      });
       async function toggleImmersive(val) {
         store.isImmersive = val;
         document.documentElement.classList.toggle("ym-immersive", val);
@@ -6065,7 +6067,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
           settings.imgPreloadNum = num;
         }
       }
-      return { __sfc: true, vuetify, isDarkMode, onDarkModeChange, toggleImmersive, isMobile: isMobile2, isBoorus, isYandere, currentLanglabel, selectLang, removeTagFromBlacklist, exportBlacklist, importBlacklist, windowWidth, allColList, colList, cols, actCol, mobileCols, mobileColumnLabel, layoutTypes, actLayout, actLayoutIndex, onMasonryLayoutChange, onPreloadNumBlur, mdiChevronDown, mdiClose, mdiContentCopy, mdiContentPaste, settings, store, langList, notPartialSupportSite };
+      return { __sfc: true, vuetify, isDarkMode, toggleImmersive, isMobile: isMobile2, isBoorus, isYandere, currentLanglabel, selectLang, removeTagFromBlacklist, exportBlacklist, importBlacklist, windowWidth, allColList, colList, cols, actCol, mobileCols, mobileColumnLabel, layoutTypes, actLayout, actLayoutIndex, onMasonryLayoutChange, onPreloadNumBlur, mdiChevronDown, mdiClose, mdiContentCopy, mdiContentPaste, settings, store, langList, notPartialSupportSite };
     }
   });
   var _sfc_render$7 = function render() {
@@ -6074,7 +6076,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       _vm.$set(_setup.store, "showSettings", $$v);
     }, expression: "store.showSettings" } }, [_c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", { staticClass: "title" }, [_vm._v(_vm._s(_vm.$t("UxxldE9xRwmQctrvba5Y8")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("Uw9QwD1SaR2VjZEqDYRdb")))])], 1), _c("v-list-item-icon", { on: { "click": function($event) {
       _setup.store.showSettings = false;
-    } } }, [_c("v-btn", { attrs: { "icon": "" } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiClose))])], 1)], 1)], 1), _c("v-divider"), _setup.isMobile ? _c("v-list", { staticClass: "mobile-settings-groups", attrs: { "nav": "" } }, [_c("v-subheader", [_vm._v("\u5916\u89C2")]), _c("div", { staticClass: "mobile-settings-section" }, [_c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u754C\u9762\u4E3B\u9898")]), _c("v-list-item-subtitle", [_vm._v("\u5207\u6362\u6D45\u8272\u6216\u6DF1\u8272\u663E\u793A\uFF08\u9ED8\u8BA4\u6DF1\u8272\u5F00\u542F\uFF09")])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "", "hide-details": "" }, on: { "change": _setup.onDarkModeChange }, model: { value: _setup.isDarkMode, callback: function($$v) {
+    } } }, [_c("v-btn", { attrs: { "icon": "" } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiClose))])], 1)], 1)], 1), _c("v-divider"), _setup.isMobile ? _c("v-list", { staticClass: "mobile-settings-groups", attrs: { "nav": "" } }, [_c("v-subheader", [_vm._v("\u5916\u89C2")]), _c("div", { staticClass: "mobile-settings-section" }, [_c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u754C\u9762\u4E3B\u9898")]), _c("v-list-item-subtitle", [_vm._v("\u5207\u6362\u6D45\u8272\u6216\u6DF1\u8272\u663E\u793A\uFF08\u9ED8\u8BA4\u6DF1\u8272\u5F00\u542F\uFF09")])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "", "hide-details": "" }, model: { value: _setup.isDarkMode, callback: function($$v) {
       _setup.isDarkMode = $$v;
     }, expression: "isDarkMode" } })], 1)], 1), _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u6C89\u6D78\u6A21\u5F0F")]), _c("v-list-item-subtitle", [_vm._v("\u9690\u85CF\u9876\u90E8\u63A7\u4EF6\u5E76\u8FDB\u5165\u5168\u5C4F\u6D4F\u89C8")])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "input-value": _setup.store.isImmersive, "inset": "", "hide-details": "" }, on: { "change": _setup.toggleImmersive } })], 1)], 1), _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u5E03\u5C40\u65B9\u5F0F")]), _c("v-list-item-subtitle", [_vm._v("\u9009\u62E9\u7011\u5E03\u6D41\u3001\u7F51\u683C\u6216\u5176\u4ED6\u5E03\u5C40")])], 1), _c("v-list-item-action", [_c("v-menu", { attrs: { "offset-y": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function({ on, attrs }) {
       return [_c("v-btn", _vm._g(_vm._b({ staticClass: "sel_menu_btn", attrs: { "small": "" } }, "v-btn", attrs, false), on), [_vm._v(_vm._s(_setup.actLayout)), _c("v-icon", { attrs: { "size": 16 } }, [_vm._v(_vm._s(_setup.mdiChevronDown))])], 1)];
@@ -6140,7 +6142,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       _vm.$set(_setup.settings, "credentialQuery", $$v);
     }, expression: "settings.credentialQuery" } })], 1)], 1)] : _vm._e(), _setup.notPartialSupportSite ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("Lm_HFVHpv4XCjilV3NLKu")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("A16qoBulYQJLbHe9mqNwm")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "", "color": "deep-orange darken-1" }, model: { value: _setup.settings.showNSFWContents, callback: function($$v) {
       _vm.$set(_setup.settings, "showNSFWContents", $$v);
-    }, expression: "settings.showNSFWContents" } })], 1)], 1) : _vm._e(), _setup.isMobile ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u754C\u9762\u4E3B\u9898")]), _c("v-list-item-subtitle", [_vm._v("\u5207\u6362\u6D45\u8272\u6216\u6DF1\u8272\u663E\u793A")])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "", "label": "\u6DF1\u8272" }, on: { "change": _setup.onDarkModeChange }, model: { value: _setup.isDarkMode, callback: function($$v) {
+    }, expression: "settings.showNSFWContents" } })], 1)], 1) : _vm._e(), _setup.isMobile ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u754C\u9762\u4E3B\u9898")]), _c("v-list-item-subtitle", [_vm._v("\u5207\u6362\u6D45\u8272\u6216\u6DF1\u8272\u663E\u793A")])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "", "label": "\u6DF1\u8272" }, model: { value: _setup.isDarkMode, callback: function($$v) {
       _setup.isDarkMode = $$v;
     }, expression: "isDarkMode" } })], 1)], 1) : _vm._e(), _setup.isMobile ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u957F\u6309\u7ACB\u5373\u5206\u4EAB\u5E16\u5B50")]), _c("v-list-item-subtitle", [_vm._v("\u5173\u95ED\u65F6\u957F\u6309\u663E\u793A\u64CD\u4F5C\u83DC\u5355\uFF1B\u5F00\u542F\u65F6\u76F4\u63A5\u6253\u5F00 iOS \u5206\u4EAB\u9762\u677F")])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.longPressDirectShare, callback: function($$v) {
       _vm.$set(_setup.settings, "longPressDirectShare", $$v);
