@@ -32,6 +32,19 @@ function build(kind, scale, startId, input) {
   return url
 }
 
+function estimate(latestId, scale) {
+  const postsPerDay = 7600
+  const days = { day: 1, week: 7, month: 30, year: 365 }[scale]
+  const safetyDays = { day: 1, week: 2, month: 5, year: 30 }[scale]
+  return Math.max(1, Math.floor(latestId - postsPerDay * (days + safetyDays)))
+}
+
+const latestId = 14477965
+assert.equal(estimate(latestId, 'day'), 14462765)
+assert.equal(estimate(latestId, 'week'), 14409565)
+assert.equal(estimate(latestId, 'month'), 14211965)
+assert.equal(estimate(latestId, 'year'), 11475965)
+
 const now = new Date('2026-07-12T12:00:00')
 assert.equal(getRecentStartDate('day', now), '2026-07-11')
 assert.equal(getRecentStartDate('week', now), '2026-07-05')

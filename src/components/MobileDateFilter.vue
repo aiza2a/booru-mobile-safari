@@ -13,7 +13,7 @@
       <v-btn :value="secondaryMode" icon small :aria-label="secondaryLabel" :title="secondaryLabel"><v-icon>{{ secondaryIcon }}</v-icon></v-btn>
     </v-btn-toggle>
     <v-progress-circular v-if="gelbooruLoading" class="gelbooru-recent-loading" :size="22" :width="2" indeterminate />
-    <span v-if="site === 'gelbooru' && dateFilter.mode === 'latest' && !gelbooruLoading" class="gelbooru-recent-scope">投稿范围</span>
+    <span v-if="site === 'gelbooru' && dateFilter.mode === 'latest' && !gelbooruLoading" class="gelbooru-recent-scope">近期范围</span>
     <v-menu v-if="showScale" offset-y>
       <template #activator="{ on, attrs }"><v-btn class="scale-button" small text v-bind="attrs" v-on="on">{{ scaleLabel }}</v-btn></template>
       <v-list dense><v-list-item v-for="scale in scales" :key="scale" @click="setScale(scale)"><v-list-item-title>{{ labels[scale] }}</v-list-item-title></v-list-item></v-list>

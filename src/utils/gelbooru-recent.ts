@@ -1,9 +1,11 @@
 import type { DateScale } from './date-filter'
 import type { DateRouteKind } from '@/store/date-filter'
 
-const CACHE_KEY = 'BMS_GELBOORU_RECENT_ID_V1'
-const CACHE_TTL = 7 * 24 * 60 * 60 * 1000
-const REQUEST_TIMEOUT = 12000
+const CACHE_KEY = 'BMS_GELBOORU_RECENT_ID_V2'
+const LATEST_CACHE_KEY = 'BMS_GELBOORU_LATEST_ID_V1'
+const CACHE_TTL = 6 * 60 * 60 * 1000
+const LATEST_CACHE_TTL = 6 * 60 * 60 * 1000
+const REQUEST_TIMEOUT = 6000
 const GELBOORU_ORIGIN = 'https://gelbooru.com'
 
 type RecentKind = Extract<DateRouteKind, 'ranked' | 'updated'>
@@ -17,9 +19,9 @@ interface BoundaryCache {
   [date: string]: CachedBoundary
 }
 
-interface GelbooruPostAnchor {
+interface LatestPostCache {
   id: number
-  date: string
+  checkedAt: number
 }
 
 const pendingBoundaries = new Map<string, Promise<number>>()
@@ -35,6 +37,20 @@ function readCache(): BoundaryCache {
 function writeCache(cache: BoundaryCache) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(cache))
+  } catch (_error) {}
+}
+
+function readLatestCache(): LatestPostCache | null {
+  try {
+    return JSON.parse(localStorage.getItem(LATEST_CACHE_KEY) || 'null')
+  } catch (_error) {
+    return null
+  }
+}
+
+function writeLatestCache(id: number) {
+  try {
+    localStorage.setItem(LATEST_CACHE_KEY, JSON.stringify({ id, checkedAt: Date.now() }))
   } catch (_error) {}
 }
 
@@ -70,16 +86,6 @@ function parseFirstPostId(html: string) {
   return Number.isFinite(id) && id > 0 ? id : null
 }
 
-function parsePostedDate(html: string) {
-  const text = new DOMParser().parseFromString(html, 'text/html').body.textContent || ''
-  return text.match(/Posted:\s*(\d{4}-\d{2}-\d{2})/)?.[1] || null
-}
-
-async function fetchPostDate(id: number) {
-  const html = await requestText(`${GELBOORU_ORIGIN}/index.php?page=post&s=view&id=${id}`)
-  return parsePostedDate(html)
-}
-
 async function fetchFirstPostId(tags: string) {
   const url = new URL('/index.php', GELBOORU_ORIGIN)
   url.searchParams.set('page', 'post')
@@ -88,61 +94,43 @@ async function fetchFirstPostId(tags: string) {
   return parseFirstPostId(await requestText(url.href))
 }
 
-async function resolvePostAtOrAfter(id: number): Promise<GelbooruPostAnchor | null> {
-  const exactDate = await fetchPostDate(id)
-  if (exactDate) return { id, date: exactDate }
-
-  const nextId = await fetchFirstPostId(`id:>=${id} sort:id:asc`)
-  if (!nextId) return null
-  const nextDate = await fetchPostDate(nextId)
-  return nextDate ? { id: nextId, date: nextDate } : null
+export function estimateGelbooruRecentStartId(latestId: number, scale: DateScale) {
+  const postsPerDay = 7600
+  const days = { day: 1, week: 7, month: 30, year: 365, range: 1 }[scale]
+  const safetyDays = { day: 1, week: 2, month: 5, year: 30, range: 1 }[scale]
+  return Math.max(1, Math.floor(latestId - postsPerDay * (days + safetyDays)))
 }
 
 async function getLatestPostId() {
+  const cached = readLatestCache()
+  if (cached && Date.now() - cached.checkedAt < LATEST_CACHE_TTL) return cached.id
   const id = await fetchFirstPostId('sort:id:desc')
   if (!id) throw new Error('Gelbooru latest post was not found')
+  writeLatestCache(id)
   return id
 }
 
-async function findBoundaryId(targetDate: string) {
-  let low = 1
-  let high = await getLatestPostId()
-  let iterations = 0
-
-  while (low < high && iterations < 32) {
-    iterations += 1
-    const middle = Math.floor((low + high) / 2)
-    const post = await resolvePostAtOrAfter(middle)
-    if (!post) {
-      high = middle
-      continue
-    }
-    if (post.date < targetDate) low = post.id + 1
-    else high = middle
-  }
-
-  const boundary = await resolvePostAtOrAfter(low)
-  if (!boundary || boundary.date < targetDate) throw new Error('Gelbooru recent boundary was not found')
-  return boundary.id
+async function findBoundaryId(scale: DateScale) {
+  return estimateGelbooruRecentStartId(await getLatestPostId(), scale)
 }
 
 export async function getGelbooruRecentStartId(scale: DateScale) {
-  const targetDate = getGelbooruRecentStartDate(scale)
+  const cacheKey = scale
   const cache = readCache()
-  const cached = cache[targetDate]
+  const cached = cache[cacheKey]
   if (cached && Date.now() - cached.checkedAt < CACHE_TTL) return cached.id
 
-  const pending = pendingBoundaries.get(targetDate)
+  const pending = pendingBoundaries.get(cacheKey)
   if (pending) return pending
 
-  const request = findBoundaryId(targetDate)
+  const request = findBoundaryId(scale)
     .then(id => {
-      cache[targetDate] = { id, checkedAt: Date.now() }
+      cache[cacheKey] = { id, checkedAt: Date.now() }
       writeCache(cache)
       return id
     })
-    .finally(() => pendingBoundaries.delete(targetDate))
-  pendingBoundaries.set(targetDate, request)
+    .finally(() => pendingBoundaries.delete(cacheKey))
+  pendingBoundaries.set(cacheKey, request)
   return request
 }
 
