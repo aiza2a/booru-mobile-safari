@@ -24,7 +24,7 @@
       <div class="mobile-settings-section">
         <v-list-item>
           <v-list-item-content><v-list-item-title>界面主题</v-list-item-title><v-list-item-subtitle>切换浅色或深色显示（默认深色开启）</v-list-item-subtitle></v-list-item-content>
-          <v-list-item-action><v-switch v-model="isDarkMode" inset hide-details @change="onDarkModeChange" /></v-list-item-action>
+          <v-list-item-action><v-switch v-model="isDarkMode" inset hide-details /></v-list-item-action>
         </v-list-item>
         <v-list-item>
           <v-list-item-content><v-list-item-title>沉浸模式</v-list-item-title><v-list-item-subtitle>隐藏顶部控件并进入全屏浏览</v-list-item-subtitle></v-list-item-content>
@@ -183,7 +183,7 @@
           <v-list-item-subtitle>切换浅色或深色显示</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
-          <v-switch v-model="isDarkMode" inset label="深色" @change="onDarkModeChange" />
+          <v-switch v-model="isDarkMode" inset label="深色" />
         </v-list-item-action>
       </v-list-item>
       <v-list-item v-if="isMobile">
@@ -405,11 +405,13 @@ import { showMsg } from '@/utils'
 import i18n from '@/utils/i18n'
 
 const vuetify = useVuetify()
-const isDarkMode = ref(settings.darkMode === 'dark')
-function onDarkModeChange(val: boolean) {
-  settings.darkMode = val ? 'dark' : 'light'
-  vuetify.theme.dark = val
-}
+const isDarkMode = computed({
+  get: () => settings.darkMode === 'dark',
+  set: (val: boolean) => {
+    settings.darkMode = val ? 'dark' : 'light'
+    vuetify.theme.dark = val
+  },
+})
 
 async function toggleImmersive(val: boolean) {
   store.isImmersive = val
