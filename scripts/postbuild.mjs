@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 
 async function main() {
-  const distFilePath = './dist/yandere-masonry.user.js'
+  const distFilePath = './dist/booru-mobile-safari.user.js'
   const script = await fs.readFile(distFilePath, 'utf8')
   const start = script.indexOf('var prepareStyle')
   const end = script.indexOf('/*! prepare end */')

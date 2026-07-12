@@ -1,7 +1,9 @@
 MIT License
 
-Copyright (c) 2022 Yumine Sakura
 Copyright (c) 2021 coderzhaoziwei
+Copyright (c) 2022 Yumine Sakura
+Copyright (c) 2026 asadahimeka
+Copyright (c) 2026 aiza2a
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,3 +22,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+Attribution note:
+
+This repository is a mobile-focused derivative work rebuilt from the upstream
+userscript project `asadahimeka/yandere-masonry`, which itself evolved from
+prior open-source work. The current repository narrows the scope to iPhone
+Safari / Stay and only keeps the five supported Booru sites used by this
+project.
+
+Upstream code, retained license notices, and derivative modifications remain
+covered by the MIT License above.

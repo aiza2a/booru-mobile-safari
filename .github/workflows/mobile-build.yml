@@ -27,7 +27,7 @@ jobs:
       - run: pnpm run build
       - name: Publish userscript to branch
         run: |
-          cp dist/yandere-masonry.user.js booru-mobile-safari.user.js
+          cp dist/booru-mobile-safari.user.js booru-mobile-safari.user.js
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add booru-mobile-safari.user.js
@@ -36,4 +36,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: booru-mobile-safari-userscript
-          path: dist/yandere-masonry.user.js
+          path: dist/booru-mobile-safari.user.js
