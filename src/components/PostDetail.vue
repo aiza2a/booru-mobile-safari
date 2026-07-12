@@ -430,25 +430,17 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import DPlayer from './DPlayer.vue'
 import { debounce, dragElement, formatRelativeTime, isURL } from '@/utils'
 import { sharePost, shareUrl, sourceLabel } from '@/utils/share'
-import { gelbooru, realbooru, rule34, zerochan } from '@/api'
+import { gelbooru } from '@/api'
 import { type PostDetail } from '@/api/moebooru'
 import { addPostToFavorites, isFavBtnShow } from '@/api/fav'
 import { notPartialSupportSite } from '@/api/booru'
 import { isDanbooruPage } from '@/api/danbooru'
-import { getZerochanFileUrl } from '@/api/zerochan'
 import { addToSelectedList, settings, store } from '@/store'
 import { searchPosts } from '@/store/actions/post'
 import { setPostDetail } from '@/store/actions/detail'
 import i18n from '@/utils/i18n'
 
-const notR34Fav = ref(!(
-  rule34.fav.is()
-  || rule34.firefox.is()
-  || gelbooru.fav.is()
-  || gelbooru.is()
-  || zerochan.is()
-  || realbooru.is()
-))
+const notR34Fav = ref(!(gelbooru.fav.is() || gelbooru.is()))
 const isMobile = window.matchMedia('(max-width: 959px), (pointer: coarse)').matches
 const showImageToolbar = ref(true)
 const detailVisualState = ref<'closed' | 'opening' | 'open' | 'closing'>('closed')
@@ -740,13 +732,6 @@ function onImageLoadError(ev: Event) {
   const { fileUrl } = imageSelected.value
   const el = ev.target as HTMLImageElement
 
-  if (fileUrl && location.hostname.includes('zerochan')) {
-    getZerochanFileUrl(imageSelected.value.id).then(url => {
-      imageSelected.value.fileUrl = url
-    })
-    return
-  }
-
   if (!el?.src.includes('/images/')) {
     el.src = imageSelected.value.fileUrl || ''
     return
@@ -758,9 +743,6 @@ function onImageLoadError(ev: Event) {
   if (fileUrl?.includes('.jpg')) {
     imageSelected.value.fileUrl = fileUrl.replace(/\.jpg(\?\d+)?$/, '.png')
     return
-  }
-  if (fileUrl && (realbooru.is() || rule34.firefox.is())) {
-    imageSelected.value.fileUrl = fileUrl.replace(/\.png(\?\d+)?$/, '.gif')
   }
 }
 
@@ -781,14 +763,6 @@ function onScaleImgError(ev: Event) {
 
   const img = ev.target as HTMLImageElement
   const { fileUrl } = imageSelected.value
-
-  if (fileUrl && location.hostname.includes('zerochan')) {
-    getZerochanFileUrl(imageSelected.value.id).then(url => {
-      imageSelected.value.fileUrl = url
-      img.src = url
-    })
-    return
-  }
   if (fileUrl?.includes('.jpeg')) {
     imageSelected.value.fileUrl = fileUrl.replace(/\.jpeg(\?\d+)?$/, '.jpg')
     img.src = imageSelected.value.fileUrl
@@ -798,10 +772,6 @@ function onScaleImgError(ev: Event) {
     imageSelected.value.fileUrl = fileUrl.replace(/\.jpg(\?\d+)?$/, '.png')
     img.src = imageSelected.value.fileUrl
     return
-  }
-  if (fileUrl && (realbooru.is() || rule34.firefox.is())) {
-    imageSelected.value.fileUrl = fileUrl.replace(/\.png(\?\d+)?$/, '.gif')
-    img.src = imageSelected.value.fileUrl
   }
 }
 
