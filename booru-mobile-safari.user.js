@@ -2602,7 +2602,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   function pad(value) {
     return value.toString().padStart(2, "0");
   }
-  function formatISODate$1(date) {
+  function formatISODate(date) {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
   }
   function getDateRange(dateText, scale) {
@@ -2623,9 +2623,9 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       end.setMonth(11, 31);
     }
     return {
-      date: formatISODate$1(date),
-      start: formatISODate$1(start),
-      end: formatISODate$1(end),
+      date: formatISODate(date),
+      start: formatISODate(start),
+      end: formatISODate(end),
       scale
     };
   }
@@ -2641,12 +2641,12 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       date.setMonth(date.getMonth() + offset);
     if (scale === "year")
       date.setFullYear(date.getFullYear() + offset);
-    return formatISODate$1(date);
+    return formatISODate(date);
   }
   function clampFutureDate(dateText, today = new Date()) {
     const value = new Date(`${dateText}T12:00:00`);
     const max = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12);
-    return formatISODate$1(value > max ? max : value);
+    return formatISODate(value > max ? max : value);
   }
   function formatDateDisplay(dateText, scale) {
     const range = getDateRange(dateText, scale);
@@ -2688,7 +2688,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   function parseDateRoute(url = new URL(location.href)) {
     const params2 = url.searchParams;
     const tags = params2.get("tags") || "";
-    const today = formatISODate$1(new Date());
+    const today = formatISODate(new Date());
     let routeKind = "home";
     let mode = "all";
     let scale = "day";
@@ -2828,9 +2828,11 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     const order = kind === "ranked" ? "sort:score:desc " : kind === "updated" ? "sort:updated:desc " : "";
     return `https://gelbooru.com/index.php?page=post&s=list&tags=${encodedTags(`${order}${buildDateTags(date, scale)}`)}&_wf=1`;
   }
-  const CACHE_KEY = "BMS_GELBOORU_RECENT_ID_V1";
-  const CACHE_TTL = 7 * 24 * 60 * 60 * 1e3;
-  const REQUEST_TIMEOUT = 12e3;
+  const CACHE_KEY = "BMS_GELBOORU_RECENT_ID_V2";
+  const LATEST_CACHE_KEY = "BMS_GELBOORU_LATEST_ID_V1";
+  const CACHE_TTL = 6 * 60 * 60 * 1e3;
+  const LATEST_CACHE_TTL = 6 * 60 * 60 * 1e3;
+  const REQUEST_TIMEOUT = 6e3;
   const GELBOORU_ORIGIN = "https://gelbooru.com";
   const pendingBoundaries = /* @__PURE__ */ new Map();
   function readCache() {
@@ -2846,15 +2848,18 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     } catch (_error) {
     }
   }
-  function formatISODate(date) {
-    const pad2 = (value) => value.toString().padStart(2, "0");
-    return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+  function readLatestCache() {
+    try {
+      return JSON.parse(localStorage.getItem(LATEST_CACHE_KEY) || "null");
+    } catch (_error) {
+      return null;
+    }
   }
-  function getGelbooruRecentStartDate(scale, now = new Date()) {
-    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
-    const days = { day: 1, week: 7, month: 30, year: 365, range: 1 }[scale];
-    start.setDate(start.getDate() - days);
-    return formatISODate(start);
+  function writeLatestCache(id) {
+    try {
+      localStorage.setItem(LATEST_CACHE_KEY, JSON.stringify({ id, checkedAt: Date.now() }));
+    } catch (_error) {
+    }
   }
   async function requestText(url) {
     const controller = new AbortController();
@@ -2874,14 +2879,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     const id = Number(href?.match(/[?&]id=(\d+)/)?.[1]);
     return Number.isFinite(id) && id > 0 ? id : null;
   }
-  function parsePostedDate(html) {
-    const text = new DOMParser().parseFromString(html, "text/html").body.textContent || "";
-    return text.match(/Posted:\s*(\d{4}-\d{2}-\d{2})/)?.[1] || null;
-  }
-  async function fetchPostDate(id) {
-    const html = await requestText(`${GELBOORU_ORIGIN}/index.php?page=post&s=view&id=${id}`);
-    return parsePostedDate(html);
-  }
   async function fetchFirstPostId(tags) {
     const url = new URL("/index.php", GELBOORU_ORIGIN);
     url.searchParams.set("page", "post");
@@ -2889,59 +2886,40 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     url.searchParams.set("tags", tags);
     return parseFirstPostId(await requestText(url.href));
   }
-  async function resolvePostAtOrAfter(id) {
-    const exactDate = await fetchPostDate(id);
-    if (exactDate)
-      return { id, date: exactDate };
-    const nextId = await fetchFirstPostId(`id:>=${id} sort:id:asc`);
-    if (!nextId)
-      return null;
-    const nextDate = await fetchPostDate(nextId);
-    return nextDate ? { id: nextId, date: nextDate } : null;
+  function estimateGelbooruRecentStartId(latestId, scale) {
+    const postsPerDay = 7600;
+    const days = { day: 1, week: 7, month: 30, year: 365, range: 1 }[scale];
+    const safetyDays = { day: 1, week: 2, month: 5, year: 30, range: 1 }[scale];
+    return Math.max(1, Math.floor(latestId - postsPerDay * (days + safetyDays)));
   }
   async function getLatestPostId() {
+    const cached = readLatestCache();
+    if (cached && Date.now() - cached.checkedAt < LATEST_CACHE_TTL)
+      return cached.id;
     const id = await fetchFirstPostId("sort:id:desc");
     if (!id)
       throw new Error("Gelbooru latest post was not found");
+    writeLatestCache(id);
     return id;
   }
-  async function findBoundaryId(targetDate) {
-    let low = 1;
-    let high = await getLatestPostId();
-    let iterations = 0;
-    while (low < high && iterations < 32) {
-      iterations += 1;
-      const middle = Math.floor((low + high) / 2);
-      const post = await resolvePostAtOrAfter(middle);
-      if (!post) {
-        high = middle;
-        continue;
-      }
-      if (post.date < targetDate)
-        low = post.id + 1;
-      else
-        high = middle;
-    }
-    const boundary = await resolvePostAtOrAfter(low);
-    if (!boundary || boundary.date < targetDate)
-      throw new Error("Gelbooru recent boundary was not found");
-    return boundary.id;
+  async function findBoundaryId(scale) {
+    return estimateGelbooruRecentStartId(await getLatestPostId(), scale);
   }
   async function getGelbooruRecentStartId(scale) {
-    const targetDate = getGelbooruRecentStartDate(scale);
+    const cacheKey = scale;
     const cache = readCache();
-    const cached = cache[targetDate];
+    const cached = cache[cacheKey];
     if (cached && Date.now() - cached.checkedAt < CACHE_TTL)
       return cached.id;
-    const pending = pendingBoundaries.get(targetDate);
+    const pending = pendingBoundaries.get(cacheKey);
     if (pending)
       return pending;
-    const request = findBoundaryId(targetDate).then((id) => {
-      cache[targetDate] = { id, checkedAt: Date.now() };
+    const request = findBoundaryId(scale).then((id) => {
+      cache[cacheKey] = { id, checkedAt: Date.now() };
       writeCache(cache);
       return id;
-    }).finally(() => pendingBoundaries.delete(targetDate));
-    pendingBoundaries.set(targetDate, request);
+    }).finally(() => pendingBoundaries.delete(cacheKey));
+    pendingBoundaries.set(cacheKey, request);
     return request;
   }
   function normaliseTags(url, kind) {
@@ -3945,7 +3923,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         }
         return formatDateDisplay(dateFilter.date, dateFilter.scale).replace("-", "/");
       });
-      const today = formatISODate$1(new Date());
+      const today = formatISODate(new Date());
       const showYearPicker = Vue2.ref(false);
       const showRangePicker = Vue2.ref(false);
       const rangeStep = Vue2.ref("start");
@@ -4069,7 +4047,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       "date-filter--expanded": _setup.dateFilter.mode === "date"
     } }, [_setup.showModeToggle ? _c("v-btn-toggle", { staticClass: "date-mode-toggle", attrs: { "mandatory": "", "dense": "", "disabled": _setup.gelbooruLoading }, model: { value: _setup.selectedMode, callback: function($$v) {
       _setup.selectedMode = $$v;
-    }, expression: "selectedMode" } }, [_c("v-btn", { attrs: { "value": _setup.primaryMode, "icon": "", "small": "", "aria-label": _setup.primaryLabel, "title": _setup.primaryLabel } }, [_c("v-icon", [_vm._v(_vm._s(_setup.primaryIcon))])], 1), _c("v-btn", { attrs: { "value": _setup.secondaryMode, "icon": "", "small": "", "aria-label": _setup.secondaryLabel, "title": _setup.secondaryLabel } }, [_c("v-icon", [_vm._v(_vm._s(_setup.secondaryIcon))])], 1)], 1) : _vm._e(), _setup.gelbooruLoading ? _c("v-progress-circular", { staticClass: "gelbooru-recent-loading", attrs: { "size": 22, "width": 2, "indeterminate": "" } }) : _vm._e(), _setup.site === "gelbooru" && _setup.dateFilter.mode === "latest" && !_setup.gelbooruLoading ? _c("span", { staticClass: "gelbooru-recent-scope" }, [_vm._v("\u6295\u7A3F\u8303\u56F4")]) : _vm._e(), _setup.showScale ? _c("v-menu", { attrs: { "offset-y": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function({ on, attrs }) {
+    }, expression: "selectedMode" } }, [_c("v-btn", { attrs: { "value": _setup.primaryMode, "icon": "", "small": "", "aria-label": _setup.primaryLabel, "title": _setup.primaryLabel } }, [_c("v-icon", [_vm._v(_vm._s(_setup.primaryIcon))])], 1), _c("v-btn", { attrs: { "value": _setup.secondaryMode, "icon": "", "small": "", "aria-label": _setup.secondaryLabel, "title": _setup.secondaryLabel } }, [_c("v-icon", [_vm._v(_vm._s(_setup.secondaryIcon))])], 1)], 1) : _vm._e(), _setup.gelbooruLoading ? _c("v-progress-circular", { staticClass: "gelbooru-recent-loading", attrs: { "size": 22, "width": 2, "indeterminate": "" } }) : _vm._e(), _setup.site === "gelbooru" && _setup.dateFilter.mode === "latest" && !_setup.gelbooruLoading ? _c("span", { staticClass: "gelbooru-recent-scope" }, [_vm._v("\u8FD1\u671F\u8303\u56F4")]) : _vm._e(), _setup.showScale ? _c("v-menu", { attrs: { "offset-y": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function({ on, attrs }) {
       return [_c("v-btn", _vm._g(_vm._b({ staticClass: "scale-button", attrs: { "small": "", "text": "" } }, "v-btn", attrs, false), on), [_vm._v(_vm._s(_setup.scaleLabel))])];
     } }], null, false, 247703037) }, [_c("v-list", { attrs: { "dense": "" } }, _vm._l(_setup.scales, function(scale) {
       return _c("v-list-item", { key: scale, on: { "click": function($event) {
