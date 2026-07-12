@@ -35,8 +35,8 @@ export function parseDateRoute(url = new URL(location.href)): ParsedDateRoute {
   let mode: DateFilterMode = 'all'
   let scale: DateScale = 'day'
   let date = params.get('date') || params.get('date_filter') || today
-  let rangeStart = ''
-  let rangeEnd = ''
+  let rangeStart = params.get('range_start') || ''
+  let rangeEnd = params.get('range_end') || ''
 
   if (/\/post\/popular_recent/.test(url.pathname)) {
     routeKind = 'popular'

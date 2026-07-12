@@ -13,10 +13,10 @@ function getRecentStartDate(scale, now) {
 }
 
 function normaliseTags(url, kind) {
-  const previousBoundary = url.searchParams.get('recent_start_id')
+  const generatedIds = [url.searchParams.get('recent_start_id'), url.searchParams.get('range_start_id'), url.searchParams.get('range_end_id')].filter(Boolean)
   const terms = (url.searchParams.get('tags') || '').split(/\s+/).filter(Boolean)
     .filter(term => !/^sort:(score|updated)(?::(?:asc|desc))?$/i.test(term))
-    .filter(term => !previousBoundary || term !== `id:>=${previousBoundary}`)
+    .filter(term => !generatedIds.some(id => term === `id:>=${id}` || term === `id:<=${id}`))
   terms.push(kind === 'ranked' ? 'sort:score:desc' : 'sort:updated:desc')
   return terms
 }
@@ -44,6 +44,34 @@ assert.equal(estimate(latestId, 'day'), 14462765)
 assert.equal(estimate(latestId, 'week'), 14409565)
 assert.equal(estimate(latestId, 'month'), 14211965)
 assert.equal(estimate(latestId, 'year'), 11475965)
+
+function estimateRange(latestId, startDate, endDate, now = new Date('2026-07-12T12:00:00')) {
+  const anchors = [
+    ['2024-01-01', 9425769], ['2025-01-01', 11229486], ['2026-01-01', 13222588], [formatISODate(now), latestId],
+  ]
+  const value = date => new Date(`${date}T12:00:00`).valueOf()
+  const estimateDate = date => {
+    const target = value(date)
+    for (let index = 0; index < anchors.length - 1; index += 1) {
+      const lower = anchors[index]; const upper = anchors[index + 1]
+      if (target < value(lower[0]) || target > value(upper[0])) continue
+      const ratio = (target - value(lower[0])) / (value(upper[0]) - value(lower[0]))
+      const dailyRate = (upper[1] - lower[1]) / ((value(upper[0]) - value(lower[0])) / 86400000)
+      return { id: Math.round(lower[1] + (upper[1] - lower[1]) * ratio), dailyRate }
+    }
+    return { id: latestId, dailyRate: 7600 }
+  }
+  const start = estimateDate(startDate); const end = estimateDate(endDate)
+  return { startId: Math.max(1, start.id - Math.max(1000, Math.round(start.dailyRate * 2))), endId: Math.min(latestId, end.id + Math.max(1000, Math.round(end.dailyRate * 2))) }
+}
+
+const range = estimateRange(latestId, '2026-07-01', '2026-07-10')
+assert.ok(range.startId < range.endId)
+assert.ok(range.endId <= latestId)
+const rangeInput = new URL(`https://gelbooru.com/index.php?page=post&s=list&tags=id%3A%3E%3D14400000%20id%3A%3C%3D14470000%20sort%3Ascore%3Adesc&range_start_id=14400000&range_end_id=14470000`)
+const rangeTerms = normaliseTags(rangeInput, 'ranked')
+rangeTerms.unshift(`id:>=${range.startId}`, `id:<=${range.endId}`)
+assert.match(rangeTerms.join(' '), /^id:>=\d+ id:<=\d+ sort:score:desc$/)
 
 const now = new Date('2026-07-12T12:00:00')
 assert.equal(getRecentStartDate('day', now), '2026-07-11')

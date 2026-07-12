@@ -2483,8 +2483,14 @@ html:has(#app.theme--light).mobile-detail-open body {
   color: var(--ios-secondary-label) !important;
 }
 
-.gelbooru-recent-scope {
-  color: var(--ios-secondary-label);
-  font-size: 11px;
-  white-space: nowrap;
+
+@media screen and (max-width: 959px), (pointer: coarse) {
+  .mobile-date-filter .scale-button {
+    width: auto;
+    min-width: 46px !important;
+    max-width: 118px;
+    padding: 0 5px !important;
+    font-size: clamp(12px, 3.2vw, 15px);
+    font-variant-numeric: tabular-nums;
+  }
 }

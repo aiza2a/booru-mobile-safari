@@ -59,6 +59,51 @@ function formatISODate(date: Date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
+const gelbooruDateAnchors = [
+  ['2007-07-16', 1], ['2008-01-01', 132204], ['2009-01-01', 407581],
+  ['2010-01-01', 676805], ['2011-01-01', 1020436], ['2012-01-01', 1382384],
+  ['2013-01-01', 1757245], ['2014-01-01', 2116687], ['2015-01-01', 2536659],
+  ['2016-01-01', 2994708], ['2017-01-01', 3497715], ['2018-01-01', 4038325],
+  ['2019-01-01', 4550300], ['2020-01-01', 5065398], ['2021-01-01', 5781187],
+  ['2022-01-01', 6790766], ['2023-01-01', 8084028], ['2024-01-01', 9425769],
+  ['2025-01-01', 11229486], ['2026-01-01', 13222588],
+] as const
+
+function dateValue(dateText: string) {
+  return new Date(`${dateText}T12:00:00`).valueOf()
+}
+
+function estimateDateId(latestId: number, dateText: string, now = new Date()) {
+  const anchors = [...gelbooruDateAnchors, [formatISODate(now), latestId] as const]
+  const target = dateValue(dateText)
+  if (target <= dateValue(anchors[0][0])) return { id: 1, dailyRate: 1000 }
+  if (target >= dateValue(anchors[anchors.length - 1][0])) return { id: latestId, dailyRate: 7600 }
+
+  for (let index = 0; index < anchors.length - 1; index += 1) {
+    const lower = anchors[index]
+    const upper = anchors[index + 1]
+    const lowerDate = dateValue(lower[0])
+    const upperDate = dateValue(upper[0])
+    if (target < lowerDate || target > upperDate) continue
+    const ratio = (target - lowerDate) / (upperDate - lowerDate)
+    const spanDays = Math.max(1, (upperDate - lowerDate) / 86400000)
+    const dailyRate = (upper[1] - lower[1]) / spanDays
+    return { id: Math.round(lower[1] + (upper[1] - lower[1]) * ratio), dailyRate }
+  }
+  return { id: latestId, dailyRate: 7600 }
+}
+
+export function estimateGelbooruDateRangeIds(latestId: number, startDate: string, endDate: string, now = new Date()) {
+  const start = estimateDateId(latestId, startDate, now)
+  const end = estimateDateId(latestId, endDate, now)
+  const startSafety = Math.max(1000, Math.round(start.dailyRate * 2))
+  const endSafety = Math.max(1000, Math.round(end.dailyRate * 2))
+  return {
+    startId: Math.max(1, start.id - startSafety),
+    endId: Math.min(latestId, end.id + endSafety),
+  }
+}
+
 export function getGelbooruRecentStartDate(scale: DateScale, now = new Date()) {
   const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12)
   const days = { day: 1, week: 7, month: 30, year: 365, range: 1 }[scale]
@@ -135,12 +180,16 @@ export async function getGelbooruRecentStartId(scale: DateScale) {
 }
 
 function normaliseTags(url: URL, kind: RecentKind) {
-  const previousBoundary = url.searchParams.get('recent_start_id')
+  const generatedIds = [
+    url.searchParams.get('recent_start_id'),
+    url.searchParams.get('range_start_id'),
+    url.searchParams.get('range_end_id'),
+  ].filter(Boolean)
   const terms = (url.searchParams.get('tags') || '')
     .split(/\s+/)
     .filter(Boolean)
     .filter(term => !/^sort:(score|updated)(?::(?:asc|desc))?$/i.test(term))
-    .filter(term => !previousBoundary || term !== `id:>=${previousBoundary}`)
+    .filter(term => !generatedIds.some(id => term === `id:>=${id}` || term === `id:<=${id}`))
   terms.push(kind === 'ranked' ? 'sort:score:desc' : 'sort:updated:desc')
   return terms
 }
@@ -172,4 +221,24 @@ export function buildGelbooruRecentRouteWithId(kind: RecentKind, scale: DateScal
 export async function buildGelbooruRecentRoute(kind: RecentKind, scale: DateScale, currentUrl = new URL(location.href)) {
   const startId = await getGelbooruRecentStartId(scale)
   return buildGelbooruRecentRouteWithId(kind, scale, startId, currentUrl)
+}
+
+export async function buildGelbooruRangeRoute(kind: RecentKind, rangeStart: string, rangeEnd: string, currentUrl = new URL(location.href)) {
+  const latestId = await getLatestPostId()
+  const [startDate, endDate] = [rangeStart, rangeEnd].sort()
+  const { startId, endId } = estimateGelbooruDateRangeIds(latestId, startDate, endDate)
+  const url = new URL('/index.php', GELBOORU_ORIGIN)
+  const terms = normaliseTags(currentUrl, kind)
+  terms.unshift(`id:>=${startId}`, `id:<=${endId}`)
+  url.searchParams.set('page', 'post')
+  url.searchParams.set('s', 'list')
+  url.searchParams.set('tags', terms.join(' '))
+  url.searchParams.set('date_mode', 'latest')
+  url.searchParams.set('date_scale', 'range')
+  url.searchParams.set('range_start', startDate)
+  url.searchParams.set('range_end', endDate)
+  url.searchParams.set('range_start_id', `${startId}`)
+  url.searchParams.set('range_end_id', `${endId}`)
+  url.searchParams.set('_wf', '1')
+  return url.href
 }

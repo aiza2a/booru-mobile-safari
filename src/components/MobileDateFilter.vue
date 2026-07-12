@@ -13,13 +13,12 @@
       <v-btn :value="secondaryMode" icon small :aria-label="secondaryLabel" :title="secondaryLabel"><v-icon>{{ secondaryIcon }}</v-icon></v-btn>
     </v-btn-toggle>
     <v-progress-circular v-if="gelbooruLoading" class="gelbooru-recent-loading" :size="22" :width="2" indeterminate />
-    <span v-if="site === 'gelbooru' && dateFilter.mode === 'latest' && !gelbooruLoading" class="gelbooru-recent-scope">近期范围</span>
     <v-menu v-if="showScale" offset-y>
-      <template #activator="{ on, attrs }"><v-btn class="scale-button" small text v-bind="attrs" v-on="on">{{ scaleLabel }}</v-btn></template>
+      <template #activator="{ on, attrs }"><v-btn class="scale-button" small text v-bind="attrs" v-on="on">{{ scaleButtonLabel }}</v-btn></template>
       <v-list dense><v-list-item v-for="scale in scales" :key="scale" @click="setScale(scale)"><v-list-item-title>{{ labels[scale] }}</v-list-item-title></v-list-item></v-list>
     </v-menu>
-    <template v-if="dateFilter.mode === 'date'">
-      <template v-if="dateFilter.scale !== 'range'">
+    <template v-if="dateFilter.mode === 'date' || (site === 'gelbooru' && dateFilter.scale === 'range')">
+      <template v-if="dateFilter.mode === 'date' && dateFilter.scale !== 'range'">
         <v-btn class="date-nav-button" icon small @click="move(-1)"><v-icon>{{ mdiChevronLeft }}</v-icon></v-btn>
         <div v-if="dateFilter.scale !== 'year'" class="native-date-trigger">
           <v-btn class="date-display" small text tabindex="-1">{{ displayDate }}</v-btn>
@@ -35,7 +34,7 @@
         <v-btn v-else class="date-display" small text @click="showYearPicker = true">{{ displayDate }}</v-btn>
         <v-btn class="date-nav-button" icon small :disabled="!canMoveNext" @click="move(1)"><v-icon>{{ mdiChevronRight }}</v-icon></v-btn>
       </template>
-      <v-btn v-else class="date-display range-display" small text @click="openRangePicker">{{ rangeDisplay }}</v-btn>
+      <v-btn v-else-if="dateFilter.scale === 'range'" class="date-display range-display" small text @click="openRangePicker">{{ rangeDisplay }}</v-btn>
       <v-dialog v-model="showRangePicker" content-class="ios-date-dialog">
         <v-card class="ios-date-sheet native-range-sheet">
           <v-card-title>{{ rangeStep === 'start' ? '选择开始日期' : '选择结束日期' }}</v-card-title>
@@ -54,7 +53,7 @@
             <span>结束：{{ dateFilter.rangeEnd || '未选择' }}</span>
           </div>
           <v-card-actions>
-            <v-btn text @click="resetRange">重置</v-btn><v-spacer />
+            <v-btn v-if="site !== 'gelbooru'" text @click="resetRange">重置</v-btn><v-spacer />
             <v-btn text @click="showRangePicker = false">取消</v-btn>
             <v-btn text :disabled="!rangeComplete" @click="applyRange">查看结果</v-btn>
           </v-card-actions>
@@ -78,7 +77,7 @@ import { currentDateSite, currentRouteKind, siteCapabilities } from '@/config/si
 import { type DateFilterMode, dateFilter, updateDateFilter } from '@/store/date-filter'
 import { type DateScale, clampFutureDate, formatDateDisplay, formatISODate, getDateRange, shiftDate } from '@/utils/date-filter'
 import { buildDateRoute } from '@/utils/site-date-routes'
-import { buildGelbooruAllRoute, buildGelbooruRecentRoute } from '@/utils/gelbooru-recent'
+import { buildGelbooruAllRoute, buildGelbooruRangeRoute, buildGelbooruRecentRoute, getGelbooruRecentStartDate } from '@/utils/gelbooru-recent'
 import { showMsg } from '@/utils'
 
 const site = currentDateSite()
@@ -110,20 +109,15 @@ const primaryIcon = computed(() => hasLatestMode.value ? mdiFire : mdiViewGridOu
 const secondaryIcon = computed(() => site === 'gelbooru' ? mdiViewGridOutline : routeKind === 'ranked' ? mdiCalendarStar : mdiCalendarMonthOutline)
 const scales = computed<DateScale[]>(() => {
   const values = routeKind && capability ? [...capability.scales[routeKind]] : []
-  if (dateFilter.mode === 'date' && (routeKind === 'home' || (site === 'danbooru' && routeKind === 'ranked'))) values.push('range')
+  if (site === 'gelbooru') {
+    if (!values.includes('range')) values.push('range')
+  } else if (dateFilter.mode === 'date' && (routeKind === 'home' || (site === 'danbooru' && routeKind === 'ranked'))) {
+    values.push('range')
+  }
   return values
 })
 const labels: Record<DateScale, string> = { day: '日', week: '周', month: '月', year: '年', range: '域' }
 const scaleLabel = computed(() => labels[dateFilter.scale])
-const displayDate = computed(() => {
-  const { start, end } = getDateRange(dateFilter.date, dateFilter.scale)
-  if (dateFilter.scale === 'week') {
-    const startMonth = start.slice(5, 7)
-    const endText = startMonth === end.slice(5, 7) ? end.slice(8) : end.slice(5).replace('-', '/')
-    return `${start.slice(5).replace('-', '/')}–${endText}`
-  }
-  return formatDateDisplay(dateFilter.date, dateFilter.scale).replace('-', '/')
-})
 const today = formatISODate(new Date())
 const showYearPicker = ref(false)
 const showRangePicker = ref(false)
@@ -139,6 +133,32 @@ const rangeDisplay = computed(() => {
   const startText = start.slice(5).replace('-', '/')
   const endText = startMonth === endMonth ? end.slice(8) : end.slice(5).replace('-', '/')
   return `${startText}–${endText}`
+})
+const recentRangeDisplay = computed(() => {
+  if (dateFilter.scale === 'range') return rangeDisplay.value
+  const start = getGelbooruRecentStartDate(dateFilter.scale)
+  const end = today
+  const startYear = start.slice(2, 4)
+  const endYear = end.slice(2, 4)
+  const startMonth = start.slice(5, 7)
+  const endMonth = end.slice(5, 7)
+  if (dateFilter.scale === 'day') return `${start.slice(5).replace('-', '/')}–${end.slice(8)}`
+  if (dateFilter.scale === 'week') {
+    const endText = startMonth === endMonth ? end.slice(8) : end.slice(5).replace('-', '/')
+    return `${start.slice(5).replace('-', '/')}–${endText}`
+  }
+  if (dateFilter.scale === 'month') return `${start.slice(5).replace('-', '/')}–${end.slice(5).replace('-', '/')}`
+  return `${startYear}/${startMonth}–${endYear}/${endMonth}`
+})
+const scaleButtonLabel = computed(() => site === 'gelbooru' ? recentRangeDisplay.value : scaleLabel.value)
+const displayDate = computed(() => {
+  const { start, end } = getDateRange(dateFilter.date, dateFilter.scale)
+  if (dateFilter.scale === 'week') {
+    const startMonth = start.slice(5, 7)
+    const endText = startMonth === end.slice(5, 7) ? end.slice(8) : end.slice(5).replace('-', '/')
+    return `${start.slice(5).replace('-', '/')}–${endText}`
+  }
+  return formatDateDisplay(dateFilter.date, dateFilter.scale).replace('-', '/')
 })
 const rangeNativeValue = computed(() => rangeStep.value === 'start' ? (dateFilter.rangeStart || dateFilter.date) : (dateFilter.rangeEnd || dateFilter.rangeStart))
 const nativePickerType = computed(() => dateFilter.scale === 'month' ? 'month' : 'date')
@@ -158,9 +178,11 @@ async function navigate(previousMode?: DateFilterMode) {
   if (site === 'gelbooru' && (routeKind === 'ranked' || routeKind === 'updated')) {
     try {
       gelbooruLoading.value = true
-      const url = dateFilter.mode === 'latest'
-        ? await buildGelbooruRecentRoute(routeKind, dateFilter.scale)
-        : buildGelbooruAllRoute(routeKind)
+      const url = dateFilter.mode === 'all'
+        ? buildGelbooruAllRoute(routeKind)
+        : dateFilter.scale === 'range' && dateFilter.rangeStart && dateFilter.rangeEnd
+          ? await buildGelbooruRangeRoute(routeKind, dateFilter.rangeStart, dateFilter.rangeEnd)
+          : await buildGelbooruRecentRoute(routeKind, dateFilter.scale)
       location.assign(url)
     } catch (error) {
       console.error('Gelbooru recent route error:', error)
@@ -204,7 +226,7 @@ function onRangeNativeChange(event: Event) {
 function applyRange() {
   if (!rangeComplete.value) return
   const [rangeStart, rangeEnd] = [dateFilter.rangeStart, dateFilter.rangeEnd].sort()
-  updateDateFilter({ rangeStart, rangeEnd })
+  updateDateFilter({ rangeStart, rangeEnd, scale: 'range', mode: site === 'gelbooru' ? 'latest' : dateFilter.mode })
   showRangePicker.value = false
   navigate()
 }
