@@ -5385,198 +5385,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       }
     }
   };
-  function isRule34Page() {
-    return location.hostname == "rule34.xxx";
-  }
-  function isRule34FavPage() {
-    return /rule34\.xxx\/index\.php\?page\=favorites\&s\=view/.test(location.href);
-  }
-  function isRule34Firefox() {
-    return location.hostname == "rule34.xxx" && (navigator.userAgent.includes("Firefox") || !settings.credentialQuery);
-  }
-  async function fetchRule34Posts(page, tags) {
-    const url = new URL("https://rule34.xxx/index.php");
-    url.searchParams.set("page", "post");
-    url.searchParams.set("s", "list");
-    url.searchParams.set("pid", `${(page - 1) * 42}`);
-    tags && url.searchParams.set("tags", tags);
-    const htmlResp = await fetch(url.href, { credentials: "include" });
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const results = [...doc.querySelectorAll("#content .image-list .thumb")].map(async (el) => {
-      const id = el.id;
-      const img = el.querySelector("img");
-      const imgSrc = img?.src || "";
-      const postView = el.querySelector("a")?.href;
-      const { width, height } = await getImageSize(imgSrc);
-      const tags2 = img?.title.split(/\s+/).filter(Boolean);
-      const isVideo = ["mp4", "video"].some((e) => tags2?.includes(e));
-      const videoUrl = imgSrc.replace(/(.*)thumbnails(.*)thumbnail_(.*)\.jpg/i, "$1images$2$3.mp4").replace("https://wimg.", "https://api-cdn-mp4.");
-      const rating = img?.title.match(/rating\:(\w)/)?.[1];
-      const score = img?.title.match(/score\:(\d+)/)?.[1];
-      if (el.querySelector(".blacklist-img")) {
-        return null;
-      }
-      return {
-        id,
-        postView,
-        previewUrl: imgSrc,
-        sampleUrl: isVideo ? videoUrl : imgSrc.replace(/(.*)thumbnails(.*)thumbnail_(.*)/i, "$1samples$2sample_$3"),
-        fileUrl: isVideo ? videoUrl.replace(/\?\d+$/, "") : imgSrc.replace(/(.*)thumbnails(.*)thumbnail_(.*)\.jpg/i, "$1images$2$3.jpeg").replace(/\?\d+$/, ""),
-        tags: tags2,
-        width: width * 10,
-        height: height * 10,
-        aspectRatio: width / height,
-        fileExt: isVideo ? "mp4" : "jpg",
-        fileDownloadName: `rule34_xxx_${id}`,
-        rating,
-        score
-      };
-    });
-    const posts = await Promise.all(results);
-    return posts.filter(Boolean);
-  }
-  async function fetchRule34Favorites(page) {
-    const url = new URL(location.href);
-    url.searchParams.set("pid", `${(page - 1) * 50}`);
-    const htmlResp = await fetch(url.href);
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const results = [...doc.querySelectorAll("#content .image-list .thumb")].map(async (el) => {
-      const img = el.querySelector("img");
-      const imgSrc = img?.src || "";
-      const postView = el.querySelector("a")?.href;
-      const id = postView?.match(/id=(\d+)/)?.[1];
-      const { width, height } = await getImageSize(imgSrc);
-      const tags = img?.title.split(/\s+/).filter(Boolean);
-      const isVideo = ["mp4", "animated", "video"].some((e) => tags?.includes(e));
-      const videoUrl = imgSrc.replace(/(.*)thumbnails(.*)thumbnail_(.*)\.jpg/i, "$1images$2$3.mp4").replace("https://wimg.", "https://api-cdn-mp4.");
-      return {
-        id,
-        postView,
-        previewUrl: imgSrc,
-        sampleUrl: isVideo ? videoUrl : imgSrc.replace(/(.*)thumbnails(.*)thumbnail_(.*)/i, "$1samples$2sample_$3"),
-        fileUrl: isVideo ? videoUrl.replace(/\?\d+$/, "") : imgSrc.replace(/(.*)thumbnails(.*)thumbnail_(.*)\.jpg/i, "$1images$2$3.jpeg").replace(/\?\d+$/, ""),
-        tags,
-        width: width * 10,
-        height: height * 10,
-        aspectRatio: width / height,
-        fileExt: isVideo ? "mp4" : "jpg",
-        fileDownloadName: `rule34_xxx_${id}`,
-        rating: ""
-      };
-    });
-    const list = await Promise.all(results);
-    list.__isR34Fav = true;
-    return list;
-  }
-  const rule34 = {
-    is: isRule34Page,
-    fav: {
-      is: isRule34FavPage,
-      posts: fetchRule34Favorites
-    },
-    firefox: {
-      is: isRule34Firefox,
-      posts: fetchRule34Posts
-    }
-  };
-  function isRealbooruPage() {
-    return location.hostname == "realbooru.com";
-  }
-  async function fetchRealbooruPosts(page, tags) {
-    const url = new URL("https://realbooru.com/index.php");
-    url.searchParams.set("page", "post");
-    url.searchParams.set("s", "list");
-    url.searchParams.set("pid", `${(page - 1) * 42}`);
-    tags && url.searchParams.set("tags", tags);
-    const htmlResp = await fetch(url.href);
-    const doc = new DOMParser().parseFromString(await htmlResp.text(), "text/html");
-    const results = [...doc.querySelectorAll(".content .thumb")].map(async (el) => {
-      const a = el.querySelector("a");
-      const img = el.querySelector("img");
-      const id = a.getAttribute("id")?.slice(1);
-      const previewUrl = img.src;
-      const { width, height } = await getImageSize(previewUrl);
-      const tags2 = img.title.split(/,\s+/).filter(Boolean);
-      const isGif = tags2.includes("gif");
-      const isVideo = img?.style.border.includes("rgb(0, 0, 255)") || img?.style.border.includes("#0000ff");
-      const replaceSampleExt = isGif ? "$1images$2$3.gif" : isVideo ? "$1images$2$3.webm" : "$1samples$2sample_$3.jpg";
-      const replaceFileExt = isGif ? "$1images$2$3.gif" : isVideo ? "$1images$2$3.mp4" : "$1images$2$3.jpeg";
-      return {
-        id,
-        postView: a.href,
-        previewUrl,
-        sampleUrl: previewUrl.replace(/(.*)thumbnails(.*)thumbnail_(.*)\.jpg$/i, replaceSampleExt),
-        fileUrl: previewUrl.replace(/(.*)thumbnails(.*)thumbnail_(.*)\.jpg/i, replaceFileExt),
-        tags: tags2,
-        width: Number(width) * 10,
-        height: Number(height) * 10,
-        aspectRatio: Number(width) / Number(height),
-        fileExt: isGif ? "gif" : isVideo ? "mp4" : "jpg",
-        fileDownloadName: `realbooru_${id}`,
-        rating: "e"
-      };
-    });
-    return Promise.all(results);
-  }
-  const realbooru = {
-    is: isRealbooruPage,
-    posts: fetchRealbooruPosts
-  };
-  function isZerochanPage() {
-    return location.hostname == "www.zerochan.net";
-  }
-  let isChallengePass = false;
-  function openApiWindow() {
-    return new Promise((resolve) => {
-      const win = window.open("https://www.zerochan.net/?p=1&json", "", "width=500,height=500");
-      win?.addEventListener("load", () => {
-        isChallengePass = true;
-        win.close();
-        resolve();
-      });
-      setTimeout(() => {
-        if (!isChallengePass) {
-          win?.close();
-          resolve();
-        }
-      }, 5e3);
-    });
-  }
-  async function fetchZerochanPosts(page, tags) {
-    if (!isChallengePass) {
-      await openApiWindow();
-    }
-    const resp = await fetch(`https://www.zerochan.net/${tags || ""}?p=${page}&json`);
-    const json = await resp.json();
-    return json.items.map((e) => {
-      const primary = escape(e.tag.replace(/\s/g, "."));
-      return {
-        id: e.id,
-        postView: `https://www.zerochan.net/${e.id}`,
-        previewUrl: e.thumbnail,
-        sampleUrl: `https://s1.zerochan.net/${primary}.600.${e.id}.jpg`,
-        fileUrl: `https://static.zerochan.net/${primary}.full.${e.id}.png`,
-        tags: e.tags,
-        width: e.width,
-        height: e.height,
-        aspectRatio: e.width / e.height,
-        fileExt: "jpg",
-        fileDownloadName: `zerochan ${e.id} ${e.tags.join(" ")}`,
-        fileDownloadText: `${e.width}\xD7${e.height}`,
-        rating: "",
-        sourceUrl: e.source
-      };
-    });
-  }
-  async function getZerochanFileUrl(id) {
-    const resp = await fetch(`https://www.zerochan.net/${id}?json`);
-    const json = await resp.json();
-    return json.full;
-  }
-  const zerochan = {
-    is: isZerochanPage,
-    posts: fetchZerochanPosts
-  };
   const fetchPostsActions = [
     moebooru.popular,
     moebooru.pool,
@@ -6568,7 +6376,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   var _sfc_main$5 = /* @__PURE__ */ Vue2.defineComponent({
     __name: "PostDetail",
     setup(__props) {
-      const notR34Fav = Vue2.ref(!(rule34.fav.is() || rule34.firefox.is() || gelbooru.fav.is() || gelbooru.is() || zerochan.is() || realbooru.is()));
+      const notR34Fav = Vue2.ref(!(gelbooru.fav.is() || gelbooru.is()));
       const isMobile2 = window.matchMedia("(max-width: 959px), (pointer: coarse)").matches;
       const showImageToolbar = Vue2.ref(true);
       const detailVisualState = Vue2.ref("closed");
@@ -6845,12 +6653,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         }
         const { fileUrl } = imageSelected.value;
         const el = ev.target;
-        if (fileUrl && location.hostname.includes("zerochan")) {
-          getZerochanFileUrl(imageSelected.value.id).then((url) => {
-            imageSelected.value.fileUrl = url;
-          });
-          return;
-        }
         if (!el?.src.includes("/images/")) {
           el.src = imageSelected.value.fileUrl || "";
           return;
@@ -6861,10 +6663,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         }
         if (fileUrl?.includes(".jpg")) {
           imageSelected.value.fileUrl = fileUrl.replace(/\.jpg(\?\d+)?$/, ".png");
-          return;
-        }
-        if (fileUrl && (realbooru.is() || rule34.firefox.is())) {
-          imageSelected.value.fileUrl = fileUrl.replace(/\.png(\?\d+)?$/, ".gif");
         }
       }
       const scaleImgSrc = Vue2.computed(() => {
@@ -6877,13 +6675,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         }
         const img = ev.target;
         const { fileUrl } = imageSelected.value;
-        if (fileUrl && location.hostname.includes("zerochan")) {
-          getZerochanFileUrl(imageSelected.value.id).then((url) => {
-            imageSelected.value.fileUrl = url;
-            img.src = url;
-          });
-          return;
-        }
         if (fileUrl?.includes(".jpeg")) {
           imageSelected.value.fileUrl = fileUrl.replace(/\.jpeg(\?\d+)?$/, ".jpg");
           img.src = imageSelected.value.fileUrl;
@@ -6891,11 +6682,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         }
         if (fileUrl?.includes(".jpg")) {
           imageSelected.value.fileUrl = fileUrl.replace(/\.jpg(\?\d+)?$/, ".png");
-          img.src = imageSelected.value.fileUrl;
-          return;
-        }
-        if (fileUrl && (realbooru.is() || rule34.firefox.is())) {
-          imageSelected.value.fileUrl = fileUrl.replace(/\.png(\?\d+)?$/, ".gif");
           img.src = imageSelected.value.fileUrl;
         }
       }
