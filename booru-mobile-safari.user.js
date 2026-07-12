@@ -4923,21 +4923,10 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
   })();
   const specTitleMap = {
     "yande.re": "yande.re",
-    "konachan.com": "Koanchan",
-    "konachan.net": "Koanchan(Safe)",
-    "sakugabooru.com": "sakugabooru".toUpperCase(),
-    "behoimi.org": "3dbooru",
-    "rule34.paheal.net": "Rule34.Paheal",
-    "booru.allthefallen.moe": "ATFBooru",
-    "aibooru.online": "AIBooru",
-    "sankaku.app": "Sankaku APP",
-    "www.sankakucomplex.com": "Sankaku Complex",
-    "chan.sankakucomplex.com": "Sankaku Complex",
-    "www.idolcomplex.com": "Idol Complex",
-    "anime-pictures.net": "Anime Pictures",
-    "allgirl.booru.org": "All girl",
-    "booru.eu": "Hentai Booru",
-    "rule34hentai.net": "Rule34Hentai"
+    "konachan.com": "Konachan",
+    "konachan.net": "Konachan (Safe)",
+    "danbooru.donmai.us": "Danbooru",
+    "gelbooru.com": "Gelbooru"
   };
   function getSiteTitle(domain = location.host) {
     const host = domain.toLowerCase().replace("www.", "");
@@ -4948,13 +4937,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     "konachan.com": 21,
     "konachan.net": 21,
     "danbooru.donmai.us": 20,
-    "gelbooru.com": 42,
-    "rule34.xxx": 42,
-    "safebooru.org": 40,
-    "tbib.org": 42,
-    "xbooru.com": 42,
-    "rule34.paheal.net": 70,
-    "realbooru.com": 42
+    "gelbooru.com": 42
   };
   const BOORU_PAGE_LIMIT = defaultLimitMap[location.host] || 40;
   const isPidSite = () => sites[location.host]?.paginate === "pid";
@@ -5485,22 +5468,6 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     list.__isR34Fav = true;
     return list;
   }
-  async function addFavoriteRule34(id) {
-    const _id = id.match(/(\d+)/)?.[1] || id;
-    const response = await fetch(`https://rule34.xxx/public/addfav.php?id=${_id}`);
-    if (!response.ok) {
-      showMsg({ msg: `${i18n.t("MWVfUiW8egLWq7MgV-wzc")}: ${response.status}`, type: "error" });
-      return false;
-    }
-    const result = await response.text();
-    if (result == "3") {
-      showMsg({ msg: i18n.t("ctWGhVvqB2k_1TX2iY0l2").toString() });
-      return true;
-    } else {
-      showMsg({ msg: `${i18n.t("MWVfUiW8egLWq7MgV-wzc")}: ${result}`, type: "error" });
-      return false;
-    }
-  }
   const rule34 = {
     is: isRule34Page,
     fav: {
@@ -5731,31 +5698,12 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     const result = await response.json();
     return result.map((e) => e.value);
   }
-  async function fetchRule34Autocomplete(term) {
-    const response = await fetch(`https://ac.rule34.xxx/autocomplete.php?q=${term}`);
-    if (!response.ok) {
-      return [];
-    }
-    const result = await response.json();
-    return result.map((e) => e.value);
-  }
-  async function fetchEshuushuuAutocomplete(term) {
-    term = term.replace(/#\d+$/, "");
-    const response = await fetch(`https://e-shuushuu.net/api/v1/tags/?search=${term}&limit=10`);
-    if (!response.ok) {
-      return [];
-    }
-    const result = await response.json();
-    return result.tags.map((e) => `${e.title}#${e.tag_id}`);
-  }
   const autocompleteActions = {
     "yande.re": async (term) => searchTagsByName(term),
     "konachan.com": async (term) => searchTagsByName(term),
     "konachan.net": async (term) => searchTagsByName(term),
     "danbooru.donmai.us": fetchDanbooruAutocomplete,
-    "gelbooru.com": fetchGelbooruAutocomplete,
-    "rule34.xxx": fetchRule34Autocomplete,
-    "e-shuushuu.net": fetchEshuushuuAutocomplete
+    "gelbooru.com": fetchGelbooruAutocomplete
   };
   const isAutocompleteAct = Object.keys(autocompleteActions).includes(location.hostname);
   const fetchAutocomplete = autocompleteActions[location.hostname] || (() => {
@@ -6573,8 +6521,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
     "konachan.com": addPostToFavorites$1,
     "konachan.net": addPostToFavorites$1,
     "danbooru.donmai.us": addFavoriteDanbooru,
-    "gelbooru.com": addFavoriteGelbooru,
-    "rule34.xxx": addFavoriteRule34
+    "gelbooru.com": addFavoriteGelbooru
   };
   const isFavBtnShow = Object.keys(favActions).includes(location.hostname);
   const addPostToFavorites = favActions[location.hostname] || (() => {
