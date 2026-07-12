@@ -32,7 +32,7 @@ declare function GM_addElement(tagName: 'script', attributes: Record<string, any
 
 interface Window {
   __tagsCN?: Record<string, string>
-  Fancybox: any
+
   showDirectoryPicker(options?: {
     id?: string;
     startIn?: "desktop" | "documents" | "downloads" | "music" | "pictures" | "videos" | FileSystemHandle;

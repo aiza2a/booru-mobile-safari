@@ -68,7 +68,7 @@
             <v-checkbox class="ma-0 pa-0" :value="isPostChecked(item?.id)" hide-details @change="onPostCheckboxChange($event, item)" />
           </div>
           <div v-if="settings.showListPostReso" class="posts-image-wh">{{ item?.width }} × {{ item?.height }}</div>
-          <div v-if="true" class="posts-image-actions">
+          <div class="posts-image-actions">
             <v-btn icon color="#fff" :title="$t('EsiorRgoeHI8h7IHMLDA4')" :href="item?.postView" target="_blank" rel="noreferrer">
               <v-icon>{{ mdiLinkVariant }}</v-icon>
             </v-btn>
@@ -161,7 +161,7 @@
           <v-checkbox class="ma-0 pa-0" :value="isPostChecked(image?.id)" hide-details @change="onPostCheckboxChange($event, image)" />
         </div>
         <div v-if="settings.showListPostReso" class="posts-image-wh">{{ image?.width }} × {{ image?.height }}</div>
-        <div v-if="true" class="posts-image-actions">
+        <div class="posts-image-actions">
           <v-btn icon color="#fff" :title="$t('EsiorRgoeHI8h7IHMLDA4')" :href="image?.postView" target="_blank" rel="noreferrer">
             <v-icon>{{ mdiLinkVariant }}</v-icon>
           </v-btn>

@@ -64,7 +64,6 @@
     <div v-else-if="!isMobile && store.showPostList" style="display:flex" class="align-center">
       <v-toolbar-title class="hidden-md-and-down" v-text="title" />
       <input
-        v-if="true"
         :value="store.currentPage"
         class="ml-1 mr-2 text-center rounded"
         :style="{ width: '40px', height: '30px', border: '1px solid #bbb', color: 'inherit' }"

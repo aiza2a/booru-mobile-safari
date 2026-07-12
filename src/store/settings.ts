@@ -34,7 +34,7 @@ const defaultSettings = {
   credentialQuery: '',
   isThumbSampleUrl: false,
   showPostCheckbox: false,
-  useFancybox: false,
+
   isHoldsFalse: false,
   isYandereFetchByHtml: false,
   showListPostReso: false,
@@ -46,7 +46,7 @@ const defaultSettings = {
   detailButtonsBottom: isMobile,
   closePopupOnImgClick: isMobile,
   longPressDirectShare: false,
-  downloadBy: 'tm' as 'tm' | 'fsa' | 'newtab',
+
 }
 
 export const initialSettings: typeof defaultSettings = {
