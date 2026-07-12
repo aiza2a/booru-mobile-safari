@@ -13,6 +13,7 @@
     "postbuild": "node scripts/postbuild.mjs",
     "lint": "eslint src --ext .ts,.vue",
     "verify:dates": "node scripts/verify-site-date-routes.mjs && node scripts/verify-date-route-parser.mjs && node scripts/verify-moebooru-html.mjs && node scripts/verify-gelbooru-recent.mjs",
+    "verify:pages": "node scripts/verify-post-page-prefill.mjs",
     "verify:gelbooru-live": "node scripts/verify-live-gelbooru-recent.mjs",
     "preinstall": "npx -y only-allow pnpm"
   },

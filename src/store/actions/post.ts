@@ -8,14 +8,16 @@ const query = {
   page: getFirstPageNo(params),
   tags: params.get('tags'),
 }
+let initialPageTarget = query.page
 export const getSearchState = () => query
 export const setPage = (page: number) => query.page = page
 export const setTags = (tags: string) => query.tags = tags
 
-export const searchPosts = async (latePageQuery = false) => {
+export const searchPosts = async (latePageQuery = false, pageOverride?: number) => {
   store.requestLoading = true
   try {
-    const { page, tags } = getSearchState()
+    const { tags } = getSearchState()
+    const page = pageOverride ?? query.page
     let posts = await fetchPostsActions.find(e => e.is())?.posts(page, tags)
     if (Array.isArray(posts) && posts.length > 0) {
       posts = handleBlacklist(posts as any)
@@ -25,7 +27,7 @@ export const searchPosts = async (latePageQuery = false) => {
         ...(settings.showNSFWContents ? posts : posts.filter(e => ['s', 'g'].includes(e.rating))),
       ], 'id')
       pushPageState(page, latePageQuery)
-      setPage(page + 1)
+      if (pageOverride == null) setPage(page + 1)
     } else {
       store.requestStop = true
     }
@@ -43,7 +45,20 @@ const calcFetchTimes = () => {
   return cnth ? Math.floor(doch / cnth) : 1
 }
 
+async function preloadHistoryPages(targetPage: number) {
+  if (targetPage <= 1) return
+  const { page } = getSearchState()
+  for (let current = 1; current < targetPage; current += 1) {
+    if (store.requestStop) break
+    await searchPosts(true, current)
+  }
+  setPage(Math.max(page, targetPage))
+}
+
 export const initPosts = async () => {
+  await preloadHistoryPages(initialPageTarget)
+  if (store.requestStop) return
+
   await searchPosts(true)
   if (settings.masonryLayout === 'virtual') {
     document.documentElement.scrollTop = 1
@@ -58,6 +73,7 @@ export const initPosts = async () => {
 }
 
 export const refreshPosts = () => {
+  initialPageTarget = 1
   setPage(1)
   store.imageList = []
   store.selectedImageList = []
@@ -66,12 +82,15 @@ export const refreshPosts = () => {
 }
 
 export const loadPostsByPage = (toPage: string) => {
-  setPage(Number(toPage) || 1)
+  const page = Number(toPage) || 1
+  initialPageTarget = page
+  setPage(page)
   store.imageList = []
   searchPosts()
 }
 
 export const loadPostsByTags = (searchTerm: string) => {
+  initialPageTarget = 1
   setPage(1)
   setTags(searchTerm)
   store.imageList = []
