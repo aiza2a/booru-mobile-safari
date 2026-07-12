@@ -69,7 +69,6 @@ var __publicField = (obj, key, value) => {
     credentialQuery: "",
     isThumbSampleUrl: false,
     showPostCheckbox: false,
-    useFancybox: false,
     isHoldsFalse: false,
     isYandereFetchByHtml: false,
     showListPostReso: false,
@@ -80,8 +79,7 @@ var __publicField = (obj, key, value) => {
     justifiedBaseWidth: isMobile ? 240 : 340,
     detailButtonsBottom: isMobile,
     closePopupOnImgClick: isMobile,
-    longPressDirectShare: false,
-    downloadBy: "tm"
+    longPressDirectShare: false
   };
   const initialSettings = {
     ...defaultSettings,
@@ -6384,11 +6382,11 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       _setup.isDarkMode = $$v;
     }, expression: "isDarkMode" } })], 1)], 1) : _vm._e(), _setup.isMobile ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v("\u957F\u6309\u7ACB\u5373\u5206\u4EAB\u5E16\u5B50")]), _c("v-list-item-subtitle", [_vm._v("\u5173\u95ED\u65F6\u957F\u6309\u663E\u793A\u64CD\u4F5C\u83DC\u5355\uFF1B\u5F00\u542F\u65F6\u76F4\u63A5\u6253\u5F00 iOS \u5206\u4EAB\u9762\u677F")])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.longPressDirectShare, callback: function($$v) {
       _vm.$set(_setup.settings, "longPressDirectShare", $$v);
-    }, expression: "settings.longPressDirectShare" } })], 1)], 1) : _vm._e(), !_setup.settings.useFancybox ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("_nQfaNuwbvPAIFKOY6_7u")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("SIUUZ4wqJTOilEdcX3EOi")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.isListenWheelEvent, callback: function($$v) {
+    }, expression: "settings.longPressDirectShare" } })], 1)], 1) : _vm._e(), _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("_nQfaNuwbvPAIFKOY6_7u")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("SIUUZ4wqJTOilEdcX3EOi")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.isListenWheelEvent, callback: function($$v) {
       _vm.$set(_setup.settings, "isListenWheelEvent", $$v);
-    }, expression: "settings.isListenWheelEvent" } })], 1)], 1) : _vm._e(), !_setup.settings.useFancybox ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("fVE5taO6GDTPbILat4GCt")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("w95XGurDhDfOfw7XH4JFW")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.isListenKeyupEvent, callback: function($$v) {
+    }, expression: "settings.isListenWheelEvent" } })], 1)], 1), _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("fVE5taO6GDTPbILat4GCt")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("w95XGurDhDfOfw7XH4JFW")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.isListenKeyupEvent, callback: function($$v) {
       _vm.$set(_setup.settings, "isListenKeyupEvent", $$v);
-    }, expression: "settings.isListenKeyupEvent" } })], 1)], 1) : _vm._e(), _setup.notPartialSupportSite && !_setup.settings.useFancybox ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("kFcteLMfnoezhOwuTlLFC")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("FT1uJs8XG__n5qBvuFsH4")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.isFullImgPreload, callback: function($$v) {
+    }, expression: "settings.isListenKeyupEvent" } })], 1)], 1), _setup.notPartialSupportSite ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("kFcteLMfnoezhOwuTlLFC")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("FT1uJs8XG__n5qBvuFsH4")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.isFullImgPreload, callback: function($$v) {
       _vm.$set(_setup.settings, "isFullImgPreload", $$v);
     }, expression: "settings.isFullImgPreload" } })], 1)], 1) : _vm._e(), _setup.notPartialSupportSite && _setup.settings.isFullImgPreload ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("G3b7rbyQEj3_rgzVsNJZY")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("iRt9V9wNQASic3D7-wTZo")))])], 1), _c("v-list-item-action", { staticClass: "pl-1" }, [_c("input", { staticClass: "text-center rounded preload_num", attrs: { "type": "number", "min": "0", "max": "5" }, domProps: { "value": _setup.settings.imgPreloadNum }, on: { "blur": _setup.onPreloadNumBlur } })])], 1) : _vm._e(), _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("kop_-39vkeg-bz2wztJ9O")))]), _c("v-list-item-subtitle", { attrs: { "title": "Masonry/Grid/Justified/Virtual" } }, [_vm._v("Masonry/Grid/Justified/Virtual")])], 1), _c("v-list-item-action", [_c("v-menu", { attrs: { "transition": "slide-y-transition", "offset-y": "" }, scopedSlots: _vm._u([{ key: "activator", fn: function({ on, attrs }) {
       return [_c("v-btn", _vm._g(_vm._b({ staticClass: "sel_menu_btn", staticStyle: { "max-width": "100px" }, attrs: { "small": "" } }, "v-btn", attrs, false), on), [_vm._v(" " + _vm._s(_setup.actLayout) + " "), _c("v-icon", { attrs: { "size": 16 } }, [_vm._v(_vm._s(_setup.mdiChevronDown))])], 1)];
@@ -6414,13 +6412,11 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
       _vm.$set(_setup.settings, "showPostCheckbox", $$v);
     }, expression: "settings.showPostCheckbox" } })], 1)], 1) : _vm._e(), _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("UqbfVZzRyk0iD2NcOii_E")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("_4E2zv2NpOG4y8TV5PRL0")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.showListPostReso, callback: function($$v) {
       _vm.$set(_setup.settings, "showListPostReso", $$v);
-    }, expression: "settings.showListPostReso" } })], 1)], 1), !_setup.settings.useFancybox ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("ECpLfRMsS0zpJPTw0qqNs")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("vJobIibroyz2wkpmONSnR")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.detailButtonsBottom, callback: function($$v) {
+    }, expression: "settings.showListPostReso" } })], 1)], 1), _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("ECpLfRMsS0zpJPTw0qqNs")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("vJobIibroyz2wkpmONSnR")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.detailButtonsBottom, callback: function($$v) {
       _vm.$set(_setup.settings, "detailButtonsBottom", $$v);
-    }, expression: "settings.detailButtonsBottom" } })], 1)], 1) : _vm._e(), !_setup.settings.useFancybox ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("HPukB-OKzIuRxMmO4Rx2U")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("I_MKXUxaNXp3D35GFULn4")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.closePopupOnImgClick, callback: function($$v) {
+    }, expression: "settings.detailButtonsBottom" } })], 1)], 1), _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("HPukB-OKzIuRxMmO4Rx2U")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("I_MKXUxaNXp3D35GFULn4")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.closePopupOnImgClick, callback: function($$v) {
       _vm.$set(_setup.settings, "closePopupOnImgClick", $$v);
-    }, expression: "settings.closePopupOnImgClick" } })], 1)], 1) : _vm._e(), _setup.isBoorus ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("dvs63FvVKWm3uHVfqeq00")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("w4uJjpTmSEkm6SIDgEo-0")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "" }, model: { value: _setup.settings.useFancybox, callback: function($$v) {
-      _vm.$set(_setup.settings, "useFancybox", $$v);
-    }, expression: "settings.useFancybox" } })], 1)], 1) : _vm._e(), _setup.store.isYKSite ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("IxTawC_qs_xjxj5g8_aGx")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("-x4wjDoHtodaXEgm2SXkg")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "", "disabled": _setup.settings.isYandereFetchByHtml }, model: { value: _setup.settings.isHoldsFalse, callback: function($$v) {
+    }, expression: "settings.closePopupOnImgClick" } })], 1)], 1), _setup.store.isYKSite ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("IxTawC_qs_xjxj5g8_aGx")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("-x4wjDoHtodaXEgm2SXkg")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "", "disabled": _setup.settings.isYandereFetchByHtml }, model: { value: _setup.settings.isHoldsFalse, callback: function($$v) {
       _vm.$set(_setup.settings, "isHoldsFalse", $$v);
     }, expression: "settings.isHoldsFalse" } })], 1)], 1) : _vm._e(), _setup.isYandere ? _c("v-list-item", [_c("v-list-item-content", [_c("v-list-item-title", [_vm._v(_vm._s(_vm.$t("YAUNSVT_pTygaY306DZmU")))]), _c("v-list-item-subtitle", [_vm._v(_vm._s(_vm.$t("HkRzE7fweBSefchs0z0r8")))])], 1), _c("v-list-item-action", [_c("v-switch", { attrs: { "inset": "", "disabled": _setup.settings.isHoldsFalse }, model: { value: _setup.settings.isYandereFetchByHtml, callback: function($$v) {
       _vm.$set(_setup.settings, "isYandereFetchByHtml", $$v);
@@ -7516,7 +7512,7 @@ Make sure you have modified Tampermonkey's "Download Mode" to "Browser API".`;
         $event.stopPropagation();
         return _setup.addFavorite(item?.id);
       } } }, [_c("v-icon", [_vm._v(_vm._s(_setup.mdiHeartPlusOutline))])], 1) : _vm._e()], 1)], 2)];
-    } }], null, false, 1380294475) }) : _c("wf-layout", _vm._l(_setup.store.imageList, function(image, index) {
+    } }], null, false, 2448936258) }) : _c("wf-layout", _vm._l(_setup.store.imageList, function(image, index) {
       return _c("v-card", { key: index, staticClass: "posts-image-card", style: _setup.imgCardStyle(image), on: { "touchstart": function($event) {
         return _setup.onPostTouchStart($event, image);
       }, "touchmove": _setup.onPostTouchMove, "touchend": _setup.onPostTouchEnd, "touchcancel": _setup.cancelPostLongPress, "contextmenu": function($event) {
