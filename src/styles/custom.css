@@ -2552,9 +2552,9 @@ html:has(#app.theme--light).mobile-detail-open body {
     order: 1;
   }
 
-  .mobile-date-filter.date-filter--gelbooru > .v-menu {
+  .mobile-date-filter.date-filter--gelbooru > .gelbooru-scale-button {
     order: 2;
-    flex: 0 0 auto;
+    flex: 0 0 38px;
   }
 
   .mobile-date-filter.date-filter--gelbooru .gelbooru-scale-button {
