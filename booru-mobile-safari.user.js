@@ -14,10 +14,12 @@
 // @match                https://konachan.net/*
 // @match                https://danbooru.donmai.us/*
 // @match                https://gelbooru.com/*
-// @homepage             https://github.com/aiza2a/yandere-masonry
-// @source               https://github.com/aiza2a/yandere-masonry
+// @homepage             https://github.com/aiza2a/booru-mobile-safari
+// @source               https://github.com/aiza2a/booru-mobile-safari
 // @icon                 https://img.nagi.xx.kg/file/github:github_1783748006551_qtg8z0.png
-// @supportURL           https://github.com/aiza2a/yandere-masonry/issues
+// @updateURL            https://raw.githubusercontent.com/aiza2a/booru-mobile-safari/main/booru-mobile-safari.user.js
+// @downloadURL          https://raw.githubusercontent.com/aiza2a/booru-mobile-safari/main/booru-mobile-safari.user.js
+// @supportURL           https://github.com/aiza2a/booru-mobile-safari/issues
 // @run-at               document-end
 // @grant                GM_addStyle
 // @grant                unsafeWindow
@@ -275,7 +277,7 @@ var __publicField = (obj, key, value) => {
     const locale = document.cookie.match(/locale=(\w+)/)?.[1];
     if (locale && locale !== "zh_CN")
       return;
-    const response = await fetch("https://cdn.jsdelivr.net/gh/asadahimeka/yandere-masonry@main/src/data/all_tags_cn.min.json");
+    const response = await fetch("https://raw.githubusercontent.com/aiza2a/booru-mobile-safari/main/src/data/all_tags_cn.min.json");
     window.__tagsCN = await response.json();
     const url = new URL(location.href);
     if (url.pathname == "/tag")
@@ -292,7 +294,7 @@ var __publicField = (obj, key, value) => {
     let tagsCache = sessionStorage.getItem("__YM_TAGS_CN_CACHE") || "";
     if (!tagsCache) {
       try {
-        const response = await fetch("https://cdn.jsdelivr.net/gh/asadahimeka/yandere-masonry@main/src/data/all_tags_cn_space.min.json");
+        const response = await fetch("https://raw.githubusercontent.com/aiza2a/booru-mobile-safari/main/src/data/all_tags_cn_space.min.json");
         tagsCache = await response.text();
         sessionStorage.setItem("__YM_TAGS_CN_CACHE", tagsCache);
       } catch (error) {
